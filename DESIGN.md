@@ -98,6 +98,41 @@ intensities.
   this weapon, and neither is enough on its own.
 - Script-created entities raise no event, so the turret registry self-repairs every 600 ticks.
 
+## Research and recipes
+
+| thing | detail |
+|---|---|
+| technology | `melta-turret`, prereqs `laser-turret` + `advanced-oil-processing`, 150 x (automation, logistic, military, chemical) at 30 s |
+| unlocks | the turret recipe and the fuel recipe |
+| turret recipe | 25 steel-plate + 20 iron-gear-wheel + 15 advanced-circuit + 5 processing-unit, 6 s |
+| fuel recipe | chemistry: 10 light-oil -> 40 melta-fuel, 2 s, productivity allowed |
+| fuel value | engine burns 0.15 per shot; a shot is every 8 ticks, so ~1.1/s cold and ~2.3/s white-hot with the surcharge |
+
+## Living with her other mods
+
+Two tables in `constants.lua` are the whole integration surface, and both stages read them:
+
+- `C.fuels` — any fluid listed here that exists in the install can be piped into the turret
+  and sets a damage multiplier (applied by the script, because the engine's own
+  `fluids[].damage_modifier` only scales its invisible 1-damage stream). The fluid box is
+  **unfiltered** for this reason, exactly like the flamethrower's.
+- `C.recipe_hooks` — an item + amount + technology. If that item exists, it is added to the
+  turret recipe; if the technology exists too, it becomes a prerequisite. Absent item or
+  technology = the hook silently does nothing.
+
+What that gives today:
+
+| installed | effect |
+|---|---|
+| vanilla | melta-fuel only; recipe and tech as above |
+| `? lilys-incendiaries` | `lilys-napalm-mix` pipes straight in and hits 1.35x (verified: 56 -> 75.6 damage per pulse) |
+| `? wanderer` | nothing yet (the mod has no items); the moment it defines `iridium-plate` + `iridium-processing` the recipe gains 10 iridium and the tech requires that research (verified with a stub mod) |
+
+`data-updates.lua` prints one line per applied integration into `factorio-current.log`, so a
+load log answers "why is napalm not burning" without guesswork. Unlocking stays vanilla --
+neither mod is allowed to *gate* the melta; they can only make its fuel better, because a
+missing optional dependency must never make the turret unbuildable.
+
 ## Known simplifications
 
 - The beam is flat: it passes over walls, cliffs and your own base (it damages enemies

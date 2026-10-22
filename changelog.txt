@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.2.1
+Date: 2026-10-22
+  Changes:
+    - Fuel list is data-driven: the turret accepts any fluid listed in constants.lua that exists
+      in the install, and the fluid box is no longer filtered to one fluid
+    - Lily's Incendiaries integration: lilys-napalm-mix can be piped straight in and burns 35%
+      hotter than pyrum
+    - Wanderer integration hooks: if an iridium item/technology appears, the turret recipe and
+      the technology pick it up automatically (nothing happens when they are absent)
+---------------------------------------------------------------------------------------------------
 Version: 0.2.0
 Date: 2026-10-22
   Changes:

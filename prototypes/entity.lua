@@ -20,6 +20,16 @@ end
 
 local source = table.deepcopy(base)
 local head = require("prototypes.graphics")
+
+-- every fuel in constants.lua that actually exists in this install; the turret's
+-- fluid box stays unfiltered (like the flamethrower) so any of them can be piped in,
+-- and the engine only burns the ones listed here
+local fuels = {}
+for _, fuel in ipairs(C.fuels) do
+  if data.raw["fluid"][fuel.name] then
+    fuels[#fuels + 1] = {type = fuel.name, damage_modifier = fuel.damage_modifier}
+  end
+end
 local flamer = data.raw["fluid-turret"]["flamethrower-turret"]
 
 local turret =
@@ -67,7 +77,6 @@ local turret =
   fluid_box =
   {
     production_type = "none",        -- fluid turrets run their own fluid logic
-    filter = C.fluid,
     volume = C.fluid_buffer,
     pipe_connections =
     {
@@ -92,7 +101,7 @@ local turret =
     -- full circle: the melta tracks like a normal turret, not like a fixed flamer
     turn_range = 1.0,
     fluid_consumption = C.fluid_consumption,
-    fluids = {{type = C.fluid}},
+    fluids = fuels,
     ammo_category = C.ammo_category,
     gun_barrel_length = 0.4,
     gun_center_shift = {north = {0, -1.5}, east = {1.5, 0}, south = {0, 1.5}, west = {-1.5, 0}},

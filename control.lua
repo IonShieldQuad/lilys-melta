@@ -16,6 +16,45 @@ local C = require("constants")
 
 local TURRET = C.turret
 
+-- fuel gate: any fluid in constants.lua that this install actually has. Uses the
+-- prototypes table so a fuel belonging to an absent mod is simply skipped.
+-- fuels listed in constants.lua that this install actually has; cache once, the
+-- runtime prototype table is `prototypes.fluid` (there is no game.fluid_prototypes)
+local available_fuels
+local function fuels_here()
+  if not available_fuels then
+    available_fuels = {}
+    for _, fuel in ipairs(C.fuels) do
+      if prototypes.fluid[fuel.name] then
+        available_fuels[#available_fuels + 1] = fuel
+      end
+    end
+  end
+  return available_fuels
+end
+
+local function has_fuel(turret)
+  for _, fuel in ipairs(fuels_here()) do
+    if turret.get_fluid_count(fuel.name) > 0 then
+      return true
+    end
+  end
+  return false
+end
+
+-- A hotter fuel hits harder: the best fuel currently in the box sets the multiplier.
+-- (The engine's own fluids[].damage_modifier only scales its invisible 1-damage
+-- stream, so the real beam damage has to apply it here.)
+local function fuel_modifier(turret)
+  local best = 1
+  for _, fuel in ipairs(fuels_here()) do
+    if turret.get_fluid_count(fuel.name) > 0 then
+      best = math.max(best, fuel.damage_modifier or 1)
+    end
+  end
+  return best
+end
+
 -- one entry per placed melta turret, keyed by unit_number:
 --   entity, charge (0..1), pulse_at, debt, line, glow, beam_end, last_muzzle
 local turrets
@@ -154,7 +193,7 @@ end
 -- Cuts everything standing on the beam axis and returns where the beam stopped.
 local function pulse(turret, state, muzzle, dx, dy, reach)
   local force = turret.force
-  local damage = C.damage_cold + (C.damage_hot - C.damage_cold) * state.charge
+  local damage = (C.damage_cold + (C.damage_hot - C.damage_cold) * state.charge) * fuel_modifier(turret)
   local far_x = muzzle.x + dx * reach
   local far_y = muzzle.y + dy * reach
 
@@ -369,7 +408,7 @@ local function update(turret, state, tick)
   -- read off the turret's own target. The engine happily keeps *aiming* at a target
   -- with an empty magazine, so the fuel check has to be ours: no cell, no beam.
   local target = turret.shooting_target
-  local firing = target ~= nil and target.valid and turret.get_fluid_count(C.fluid) > 0
+  local firing = target ~= nil and target.valid and has_fuel(turret)
   local aim = firing and target.position or nil
 
   if C.debug and firing ~= state.was_firing then

@@ -47,6 +47,27 @@ C.fluid_consumption         = 0.15   -- engine-side, fluid units per shot
 C.extra_fluid_per_pulse_hot = 0.16   -- script-side, fluid units per pulse at full charge
 C.fluid_buffer              = 100
 
+-- Anything in this list can be piped into the turret. Entries whose fluid does not
+-- exist are skipped by BOTH stages, so listing another mod's fuel is safe with or
+-- without that mod installed. `damage_modifier` multiplies the beam damage, like the
+-- flamethrower's fluid bonuses.
+C.fuels =
+{
+  {name = "melta-fuel", damage_modifier = 1.0},
+  -- Lily's Incendiaries: napalm burns hotter than pyrum
+  {name = "lilys-napalm-mix", damage_modifier = 1.35}
+}
+
+-- Late-game ingredient hooks: if the named item (and optionally the named technology)
+-- exists because another mod added it, the melta's recipe and tech pick it up on their
+-- own. Wanderer is where the iridium tier is meant to live (plans.txt: "Iridium turrets
+-- (Melta, IRBM, Excalibur and Durandal)"), so the names are already wired.
+C.recipe_hooks =
+{
+  -- item, amount into the turret recipe, and a technology to hang the turret's tech off
+  {item = "iridium-plate", amount = 10, technology = "iridium-processing"}
+}
+
 -- set true to log every pulse and every fire/stop transition into factorio-current.log
 C.debug = false
 
