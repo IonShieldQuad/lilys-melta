@@ -12,7 +12,7 @@ data:extend(
     effects =
     {
       {type = "unlock-recipe", recipe = C.turret},
-      {type = "unlock-recipe", recipe = C.ammo}
+      {type = "unlock-recipe", recipe = C.fluid}
     },
     -- a beam weapon with a fuel feed: you need a reliable beam (laser turret) and
     -- the oil chain that makes the fuel worth burning

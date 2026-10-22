@@ -1,89 +1,113 @@
 # Melta turret — design
 
-A short-ranged thermal emitter that burns fuel and cuts a line through a crowd.
-Everything below is implemented and verified in-game (headless create + benchmark
-with a scripted harness: charge ramp, pierce falloff, fuel burn, fuel gate, no
+A short-ranged thermal emitter that drinks liquid fuel and cuts a line through a crowd.
+Everything below is implemented and verified in-game (headless create + benchmark with a
+scripted harness: spin-up, pierce falloff, fluid burn, dry-turret gate, friendly fire,
 render-object leaks).
 
 ## The three things it has to feel like
 
-1. **A lance, not a squirt gun.** One continuous beam, thin at the muzzle and
-   wider with heat, that goes *through* the front rank instead of stopping at it.
-2. **It has to warm up.** Tapping fire is a weak orange line; holding it on a
-   target for ~2.5 s turns it white-hot and roughly quadruples the damage.
-3. **It costs something.** Fuel, not electricity — a turret you feed, and a hot
+1. **A lance, not a squirt gun.** One beam that starts at the muzzle and runs its whole
+   12 tiles, cutting every body on the line instead of stopping at the first one.
+2. **It has to warm up.** Tapping fire is a thin orange line; holding it on a target for
+   ~2.5 s turns it into a boiling white-hot column and roughly quadruples the damage.
+3. **It costs something.** Liquid fuel, not electricity — a turret you plumb in, and a hot
    beam burns about twice the fuel of a cold one.
 
 ## Numbers
 
 | thing | value | why |
 |---|---|---|
-| hull | rocket turret (2x2), heat-tinted pod | her call: reuse the rocket turret, different gun reading |
+| hull | rocket turret (2x2), base art untouched | her call: reuse the rocket turret |
+| head | purpose-drawn 64-direction emitter sheet | see **Graphics** below |
 | health | 1200 | an emitter, not an armoured box (rocket turret: 1500) |
-| range | 12 tiles | laser 24, rocket 36. It has to be near the wall |
+| range | 12 tiles | laser 24, rocket 36: the melta has to be near the wall |
 | pulse rate | 8 ticks (7.5/s) | fast enough that discrete pulses read as one beam |
 | damage / pulse | 14 cold → 56 hot | 105 → 420 dps single target, before pierce |
-| spin-up | 150 ticks (2.5 s) | one biter wave arriving is not enough time to peak |
+| spin-up | 150 ticks (2.5 s) | one biter wave is not enough time to peak |
 | spin-down | 60 ticks (1 s) | it cools fast, so holding a line is the skill |
 | pierce | 12 bodies, 0.82 falloff each | front rank eats it, back ranks eat 82 % of the one in front |
 | damage type | `thermal` (new) | nothing in vanilla resists it — that is the fantasy |
-| fuel | 1 cell per 60 pulses + a surcharge while hot | ~8 s of full beam per cell; ~2x that when white-hot |
+| fuel | 40 melta-fuel per 10 light oil; engine burns 0.15/shot plus a script surcharge | ~1 light oil per 2.7 s of full-intensity beam |
 
-Derived: a behemoth biter (3000 hp) dies in ~5 s of full-intensity fire; five
-small biters in a line die to one cold pulse.
+Derived: a behemoth biter (3000 hp) dies in ~5 s of full-intensity fire.
 
 ## How it is built
 
-Two layers, split so the engine keeps the boring bits:
+**Why a *fluid* turret.** The engine offers exactly two turret shapes: an ammo turret
+(beam attacks, but its `fluid_box` is silently dropped — "does not have fluids") and a
+fluid turret (fluid box, but "Fluid turret can have only stream attack parameters").
+Liquid fuel therefore forces the fluid-turret type, and the beam has to be ours.
+
+Two consequences, both handled:
+
+- a fluid turret must be `turret_base_has_direction = true` (forced by the loader) and
+  wants a 4-entry circuit connector — the collision box is symmetric and the rocket hull's
+  base is a single non-directional sprite, so neither shows.
+- its `turn_range` is set to `1.0` (vanilla flamers use 1/3): the turret tracks in a full
+  circle like a normal turret instead of guarding one 120° arc.
 
 **Prototype (`prototypes/`)**
-- `melta-turret`: an ordinary `ammo-turret` with `attack_parameters.type = "beam"`,
-  ammo category `melta`. The engine does targeting, rotation, the 64-direction
-  head, the cyclic roar sound and the ammo magazine.
-- `melta-beam`: the vanilla laser beam tinted orange, widened to 0.9, carrying the
-  **cold** contact damage (14 thermal).
-- `melta-fuel`: an ammo item with `magazine_size = 60` — the engine's own fuel burn.
-- `thermal` damage type, `melta` ammo category, turret + fuel recipes, technology.
+- `melta-turret`: `fluid-turret` on the rocket hull, `fluid_box` filtered to
+  `melta-fuel`, `fluid_buffer_size`, fuel out-of-ammo alert icon.
+- `melta-stream`: a copy of the flamethrower stream with its particles zeroed and its
+  damage set to 1 — **invisible on purpose**. It exists because the engine only lets a
+  fluid turret consume fluid through a stream; the beam is not it.
+- `melta-fuel`: fluid + chemistry recipe from light oil.
+- `thermal` damage type, `melta` ammo category, turret recipe, technology.
 
 **Runtime (`control.lua`)**
-- `charge` per turret: +1/150 per tick while a target is held *and* fuel is in the
-  turret, −1/60 per tick otherwise.
-- one **pulse** every 8 ticks: a corridor hit test along the beam axis, every body
-  within `hit_half_width + body radius` of the line, sorted by distance, damage
-  scaled by charge and by `pierce_falloff ^ (index - 1)`. The engine's own target
-  gets the difference (`total − damage_cold`) because the beam prototype already
-  landed the cold hit on it.
-- fuel surcharge: `extra_cell_per_pulse_hot * charge` accumulated per pulse, cells
-  removed from the turret when a whole cell is owed.
-- visuals: one `rendering.draw_line` whose width/colour follow charge, plus a
-  two-circle muzzle orb (hot core inside a soft halo) that shrinks as it cools.
+- `charge` per turret: +1/150 per tick while a target is held *and* the turret has fluid,
+  −1/60 per tick otherwise.
+- one **pulse** every 8 ticks: corridor hit test along the beam axis (12 bodies, 0.82
+  falloff), `entity.damage()` with the `thermal` type. Enemies only.
+- fuel surcharge: `extra_fluid_per_pulse_hot * charge` per pulse, removed with
+  `remove_fluid(amount, 1)` — positional API, like `damage()`.
+- visuals: 4 stacked `rendering.draw_line` layers (haze / glow / hot / white core), a
+  9-segment **boiling sheath** re-rolled every 3 ticks, a muzzle orb, a 3-tick muzzle
+  flash and a burn pop on every body the beam cuts.
 
-## Engine facts this leans on (and the two that bit)
+## Graphics
 
-- `LuaEntity::shooting_state` **throws** on a turret ("Entity is not character") —
-  engagement is read off `shooting_target` instead.
-- A turret keeps *aiming* at a target with an empty magazine, so "has a target" is
-  not "can fire"; the fuel check in the script is what gates the damage.
-- `rendering.draw_light` needs a sprite path and `__core__/...` is not resolvable at
-  runtime ("Unknown type __core__") — hence circles instead of a light.
-- Beams cannot pierce (`BeamPrototype` has no piercing field; only projectile
-  prototypes do), which is why the pierce lives in the script.
-- Script-created entities raise no event at all, so the turret registry is repaired
-  by a sweep every 600 ticks instead of trusting build/mine events alone.
+Not a recolour of the rocket pod. `graphics/_generator/melta_head.py` draws a new head
+procedurally at 4x supersampling and writes a sheet that drops straight into the vanilla
+rig (frame 160x164, 64 directions, 3 files of 22/22/20 rows, shift `by_pixel(0, -8.5)`,
+scale 0.5), so the base/hull stays the rocket turret's own art:
+
+- everything on the head is drawn in a **barrel-aligned frame**, so the barrel, collar,
+  cooling rings, heat-sink vanes and sight glass all rotate together;
+- the housing is rotation-symmetric and drawn in **screen space**, so a rigid turn does not
+  squash it;
+- painter's order flips at the camera: pointing away → dome over barrel, pointing toward →
+  barrel over dome, which fixes the south-facing junction;
+- mounting plate + contact shadow so it sits on the hull instead of floating;
+- no fold/unfold strip: the emitter is always deployed, which keeps the head one sheet.
+
+`preview.png` (review only, never loaded) shows the turret at rest and at three beam
+intensities.
+
+## Engine facts this leans on (and the ones that bit)
+
+- `LuaEntity::shooting_state` **throws** on turrets ("Entity is not character") — use
+  `shooting_target`. A turret keeps *aiming* with no fuel at all, so the fuel gate has to
+  be script-side.
+- `remove_fluid` / `damage` are **positional** APIs; calling them with a table errors.
+- `rendering.draw_light` needs a sprite and `__core__/...` is not resolvable at runtime
+  ("Unknown type __core__") — circles instead.
+- Beams cannot pierce; the stream cannot beam. Both halves of the engine are needed for
+  this weapon, and neither is enough on its own.
+- Script-created entities raise no event, so the turret registry self-repairs every 600 ticks.
 
 ## Known simplifications
 
-- The beam ignores walls/rocks: it only tests military targets, so a melta will
-  happily cut biters standing behind a wall. Cheap to add if it matters.
-- The gun is the rocket pod sheet, heat-tinted. A real melta nozzle sprite (or a
-  swap to the tesla emitter head, which is the same 64-direction rig) is an art
-  pass, not a code one.
-- Quality affects the turret like any other (health/crafting speed); no per-quality
-  beam scaling.
+- The beam is flat: it passes over walls, cliffs and your own base (it damages enemies
+  only, so there is **no friendly fire** — verified with a friendly wall in the corridor:
+  wall hp unchanged, biter behind it cooked).
+- Quality affects the turret like any other; no per-quality beam scaling.
 - `thumbnail.png` is still the radar-artillery leftover from the stub.
 
 ## Where to retune
 
-`constants.lua` only — it is read by both stages, so prototype and script can
-never disagree. The four knobs that decide how it feels: `damage_cold`,
-`damage_hot`, `spin_up_ticks`, `pierce_falloff`.
+`constants.lua` only — read by both stages. The knobs that decide the feel:
+`damage_cold`, `damage_hot`, `spin_up_ticks`, `pierce_falloff`, `sheath_segments`
+(lower = tidier beam, higher = wilder plasma), `fluid_consumption`.

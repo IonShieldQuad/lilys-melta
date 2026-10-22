@@ -14,99 +14,68 @@ data:extend(
   }
 })
 
----------------------------------------------------------------- beam ---------
--- Built from the vanilla laser beam so the head/tail/body/ground light rig comes
--- free; only the tint, width and the (tiny) contact hit are ours.
-local beam = table.deepcopy(data.raw["beam"]["laser-beam"])
-beam.name = C.beam
-beam.width = 0.9
-beam.damage_interval = C.cooldown
-beam.random_target_offset = false
-beam.action =
+---------------------------------------------------------------- fuel ---------
+-- Liquid pyrum, brewed from light oil. One light oil stretches into several units,
+-- so a turret holding a beam costs a steady trickle of oil rather than a belt of
+-- shells -- which is the point: liquid input, no ammo logistics.
+data:extend(
 {
-  type = "direct",
-  action_delivery =
   {
-    type = "instant",
-    target_effects =
+    type = "fluid",
+    name = C.fluid,
+    icons = {{icon = "__base__/graphics/icons/fluid/light-oil.png", icon_size = 64, tint = {r = 1.0, g = 0.55, b = 0.20}}},
+    default_temperature = 25,
+    max_temperature = 100,
+    base_color = {r = 0.85, g = 0.32, b = 0.06},
+    flow_color = {r = 1.00, g = 0.66, b = 0.32},
+    auto_barrel = false
+  },
+  {
+    type = "recipe",
+    name = C.fluid,
+    enabled = false,
+    energy_required = 2,
+    categories = {"chemistry"},
+    ingredients =
     {
-      -- The engine lands this cold hit on the turret's own target; control.lua
-      -- adds the spin-up part and the pierced bodies behind it.
+      {type = "fluid", name = "light-oil", amount = 10}
+    },
+    results = {{type = "fluid", name = C.fluid, amount = 40}},
+    allow_productivity = true,
+    crafting_machine_tint =
+    {
+      primary = {r = 0.98, g = 0.45, b = 0.10, a = 1.0},
+      secondary = {r = 1.00, g = 0.70, b = 0.35, a = 1.0}
+    }
+  }
+})
+
+---------------------------------------------------------------- stream -------
+-- A fluid turret is only allowed stream attacks, and that is what lets it drink
+-- from a pipe at all. This stream is deliberately invisible and near-harmless:
+-- control.lua owns the beam, the pierce and the damage. The engine keeps the
+-- aiming, the attack state and the fluid burn natively.
+local stream = table.deepcopy(data.raw["stream"]["flamethrower-fire-stream"])
+stream.name = C.stream
+stream.particle_buffer_size = 1
+stream.particle_spawn_interval = 600
+stream.particle_spawn_timeout = 0
+stream.particle_start_alpha = 0
+stream.particle_end_alpha = 0
+stream.particle_start_scale = 0.01
+stream.smoke_sources = nil
+stream.action =
+{
+  {
+    type = "direct",
+    action_delivery =
+    {
+      type = "instant",
+      target_effects =
       {
-        type = "damage",
-        damage = {amount = C.damage_cold, type = C.damage_type}
-      },
-      {
-        type = "play-sound",
-        sound = {filename = "__base__/sound/fire-impact-1.ogg", volume = 0.25}
+        {type = "damage", damage = {amount = 1, type = C.damage_type}}
       }
     }
   }
 }
-
-local hot = {r = 1.00, g = 0.62, b = 0.28}
-local function tint_directional(directional, tint)
-  if not directional then return end
-  for _, layer in pairs(directional.layers or {}) do
-    layer.tint = tint
-  end
-end
-tint_directional(beam.graphics_set.beam.head, hot)
-tint_directional(beam.graphics_set.beam.tail, hot)
-for _, segment in pairs(beam.graphics_set.beam.body or {}) do
-  tint_directional(segment, hot)
-end
--- the floor glow is a light sprite, so tinting it orange is all it takes
-for _, part in pairs(beam.graphics_set.ground or {}) do
-  part.tint = {r = 0.85, g = 0.30, b = 0.05}
-end
-
-data:extend({beam})
-
----------------------------------------------------------------- fuel ---------
-data:extend(
-{
-  {
-    type = "ammo",
-    name = C.ammo,
-    icons = {{icon = "__base__/graphics/icons/solid-fuel.png", icon_size = 64, tint = {r = 1.0, g = 0.62, b = 0.30}}},
-    subgroup = "ammo",
-    order = "a[melta-fuel]",
-    stack_size = 200,
-    magazine_size = C.magazine_size,
-    ammo_category = C.ammo_category,
-    ammo_type =
-    {
-      category = C.ammo_category,
-      action =
-      {
-        type = "direct",
-        action_delivery =
-        {
-          type = "beam",
-          beam = C.beam,
-          max_length = C.range,
-          duration = C.cooldown,
-          source_offset = {0, 0}
-        }
-      }
-    }
-  }
-})
-
-data:extend(
-{
-  {
-    type = "recipe",
-    name = C.ammo,
-    enabled = false,
-    energy_required = 4,
-    ingredients =
-    {
-      {type = "item", name = "solid-fuel", amount = 1},
-      {type = "item", name = "steel-plate", amount = 1}
-    },
-    results = {{type = "item", name = C.ammo, amount = 10}},
-    allow_productivity = true
-  }
-})
+data:extend({stream})

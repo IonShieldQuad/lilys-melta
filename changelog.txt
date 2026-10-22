@@ -1,4 +1,19 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.2.0
+Date: 2026-10-22
+  Changes:
+    - Fuel is now a liquid: melta-fuel, brewed from light oil, piped straight into the turret
+      (the turret is a fluid turret for that reason; its stream is invisible and only carries
+      the fluid burn, the beam is drawn by the script)
+    - New drawn 64-direction emitter head replaces the recoloured rocket pod; the hull art is
+      still the vanilla rocket turret, untouched
+    - The beam now runs its full length instead of stopping at the first body it cuts
+    - Beam is layered (haze / glow / hot / white core) with a boiling plasma sheath on the
+      outer edge, a muzzle flash and a burn pop on every body it cuts
+    - Friendly forces are never damaged; the beam passes over your own walls like any turret
+  Bugfixes:
+    - A turret with no fuel no longer damages anything
+---------------------------------------------------------------------------------------------------
 Version: 0.1.0
 Date: 2026-10-22
   Features:
