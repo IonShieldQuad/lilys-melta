@@ -42,17 +42,26 @@ local function has_fuel(turret)
   return false
 end
 
--- A hotter fuel hits harder: the best fuel currently in the box sets the multiplier.
--- (The engine's own fluids[].damage_modifier only scales its invisible 1-damage
--- stream, so the real beam damage has to apply it here.)
-local function fuel_modifier(turret)
-  local best = 1
+-- Which fuel is burning decides both how hard the beam hits and what colour it is.
+-- The engine's own fluids[].damage_modifier only scales its invisible 1-damage stream,
+-- so the real beam damage and colour are applied here. Highest modifier present wins.
+local DEFAULT_PROFILE =
+{
+  damage_modifier = 1,
+  core = {r = 1.00, g = 0.88, b = 0.60},
+  sheath = {r = 1.00, g = 0.42, b = 0.10}
+}
+
+local function fuel_profile(turret)
+  local best = nil
   for _, fuel in ipairs(fuels_here()) do
     if turret.get_fluid_count(fuel.name) > 0 then
-      best = math.max(best, fuel.damage_modifier or 1)
+      if not best or (fuel.damage_modifier or 1) > (best.damage_modifier or 1) then
+        best = fuel
+      end
     end
   end
-  return best
+  return best or DEFAULT_PROFILE
 end
 
 -- one entry per placed melta turret, keyed by unit_number:
@@ -73,15 +82,14 @@ local function lerp(from, to, ratio)
   return from + (to - from) * ratio
 end
 
-local function beam_color(style, charge)
-  local cold = style.color_cold
-  local hot = style.color_hot
+local function beam_color(style, charge, profile)
+  local base = (style.tier == "core") and profile.core or profile.sheath
   return
   {
-    r = lerp(cold.r, hot.r, charge),
-    g = lerp(cold.g, hot.g, charge),
-    b = lerp(cold.b, hot.b, charge),
-    a = lerp(cold.a, hot.a, charge)
+    r = base.r,
+    g = base.g,
+    b = base.b,
+    a = lerp(style.alpha_cold, style.alpha_hot, charge)
   }
 end
 
@@ -150,8 +158,9 @@ local function burn_surcharge(turret, state)
   if state.debt < 1 then
     return
   end
-  -- positional API (like damage()): remove_fluid(amount, fluidbox_index)
-  local removed = turret.remove_fluid(state.debt, 1)
+  -- positional API, and the order is (index, amount) -- the docs list them by `order`,
+  -- not by position: remove_fluid(1, amount)
+  local removed = turret.remove_fluid(1, state.debt)
   if removed and removed.amount then
     state.debt = state.debt - removed.amount
   end
@@ -193,7 +202,8 @@ end
 -- Cuts everything standing on the beam axis and returns where the beam stopped.
 local function pulse(turret, state, muzzle, dx, dy, reach)
   local force = turret.force
-  local damage = (C.damage_cold + (C.damage_hot - C.damage_cold) * state.charge) * fuel_modifier(turret)
+  local profile = fuel_profile(turret)
+  local damage = (C.damage_cold + (C.damage_hot - C.damage_cold) * state.charge) * profile.damage_modifier
   local far_x = muzzle.x + dx * reach
   local far_y = muzzle.y + dy * reach
 
@@ -248,7 +258,7 @@ local function pulse(turret, state, muzzle, dx, dy, reach)
 
   if C.debug then
     log(string.format("melta pulse unit=%s charge=%.2f damage=%.1f reach=%.1f candidates=%d hits=%d fuel=%d",
-      tostring(turret.unit_number), state.charge, damage, reach, #candidates, #hits, turret.get_fluid_count(C.fluid)))
+      tostring(turret.unit_number), state.charge, damage, reach, #candidates, #hits, turret.get_fluid_count()))
   end
 
   burn_surcharge(turret, state)
@@ -285,6 +295,7 @@ end
 -- stops it reading as a tidy light line.
 local function draw_beam(turret, state, muzzle, stop, tick)
   local charge = state.charge
+  local profile = fuel_profile(turret)
   local flicker = 1 + C.beam_flicker * math.sin(tick * 0.7) * charge
 
   local dx = stop.x - muzzle.x
@@ -306,7 +317,7 @@ local function draw_beam(turret, state, muzzle, stop, tick)
   -- inner layers: stable
   for index, style in ipairs(C.beam_layers) do
     local width = (style.width_cold + (style.width_hot - style.width_cold) * charge) * flicker
-    update_line(turret, lines, index, muzzle, stop, beam_color(style, charge), width)
+    update_line(turret, lines, index, muzzle, stop, beam_color(style, charge, profile), width)
   end
 
   ---------------------------------------------------------------- sheath -----
@@ -329,8 +340,7 @@ local function draw_beam(turret, state, muzzle, stop, tick)
     end
   end
 
-  local hot = C.beam_layers[#C.beam_layers]
-  local sheath_color = beam_color(hot, charge)
+  local sheath_color = profile.sheath
   for index, roll in ipairs(state.sheath_rolls or {}) do
     local start_f, run_f, offset, alpha, width = roll[1], roll[2], roll[3], roll[4], roll[5]
     local from =
@@ -345,7 +355,7 @@ local function draw_beam(turret, state, muzzle, stop, tick)
     }
     update_line(turret, sheath, index,
       from, to,
-      {r = sheath_color.r, g = sheath_color.g * 0.85, b = sheath_color.b * 0.5, a = alpha},
+      {r = sheath_color.r, g = sheath_color.g, b = sheath_color.b, a = alpha},
       width)
   end
 end
@@ -356,7 +366,7 @@ end
 -- runtime ("Unknown type __core__"), so this keeps the mod asset-free.
 local function draw_glow(turret, state, muzzle)
   local charge = state.charge
-  local color = beam_color(C.beam_layers[#C.beam_layers], charge)
+  local color = beam_color(C.beam_layers[#C.beam_layers], charge, fuel_profile(turret))
   local halo_color = {r = color.r, g = color.g * 0.7, b = color.b * 0.4, a = 0.18 + 0.35 * charge}
   local core_color = {r = 1.0, g = lerp(0.55, 1.0, charge), b = lerp(0.25, 0.85, charge), a = 0.55 + 0.4 * charge}
   local core_radius = 0.16 + 0.30 * charge

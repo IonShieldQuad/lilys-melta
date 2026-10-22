@@ -85,7 +85,7 @@ local turret =
     }
   },
   fluid_buffer_size = C.fluid_buffer,
-  fluid_buffer_input_flow = C.fluid_buffer / 5 / 60,   -- fills in ~5 s
+  fluid_buffer_input_flow = 1.6,   -- units/tick: enough to feed ~50/s at full beam
   activation_buffer_ratio = 0.25,
   not_enough_fuel_indicator_light = {intensity = 0.2, size = 1.5, color = {1, 0, 0}},
   enough_fuel_indicator_light = {intensity = 0.2, size = 1.5, color = {0, 1, 0}},
@@ -119,20 +119,18 @@ local turret =
         }
       }
     },
+    -- synthesised jet exhaust + sizzle (sound/_generator/melta_sounds.py): a
+    -- high-pressure stream, not a flame loop borrowed from the flamethrower
     cyclic_sound =
     {
-      begin_sound = {filename = "__base__/sound/fight/flamethrower-turret-start-1.ogg", volume = 0.4},
+      begin_sound = {filename = "__lilys-melta__/sound/melta-start.ogg", volume = 0.55},
       middle_sound =
       {
-        variations =
-        {
-          {filename = "__base__/sound/fight/flamethrower-turret-mid-1.ogg", volume = 0.3},
-          {filename = "__base__/sound/fight/flamethrower-turret-mid-2.ogg", volume = 0.3},
-          {filename = "__base__/sound/fight/flamethrower-turret-mid-3.ogg", volume = 0.3}
-        },
+        filename = "__lilys-melta__/sound/melta-burn.ogg",
+        volume = 0.45,
         aggregation = {max_count = 2, remove = true, count_already_playing = true}
       },
-      end_sound = {filename = "__base__/sound/fight/flamethrower-turret-end-1.ogg", volume = 0.4}
+      end_sound = {filename = "__lilys-melta__/sound/melta-stop.ogg", volume = 0.5}
     }
   }
 }

@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.3.0
+Date: 2026-10-22
+  Features:
+    - Own sound set, synthesised (sound/_generator/melta_sounds.py): a jet-exhaust loop with a
+      sizzling top layer, plus pressure build-up and shut-down cues
+    - Fuel defines the beam: light-oil (orange, 1.0x), petroleum-gas (blue, 0.85x),
+      enriched melta-fuel (green-white, 1.6x), incendiaries napalm (deep red, 1.35x)
+    - Enriched melta-fuel is now laced with uranium: 20 light oil + 2 uranium-238 + 1 sulfur -> 100
+    - Burn rate raised to ~19/s cold and ~47/s held at full intensity (was ~1/s)
+  Bugfixes:
+    - The fuel surcharge could throw "Fluid index out of bounds": remove_fluid is (index, amount)
+---------------------------------------------------------------------------------------------------
 Version: 0.2.1
 Date: 2026-10-22
   Changes:

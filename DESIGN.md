@@ -28,7 +28,8 @@ render-object leaks).
 | spin-down | 60 ticks (1 s) | it cools fast, so holding a line is the skill |
 | pierce | 12 bodies, 0.82 falloff each | front rank eats it, back ranks eat 82 % of the one in front |
 | damage type | `thermal` (new) | nothing in vanilla resists it — that is the fantasy |
-| fuel | 40 melta-fuel per 10 light oil; engine burns 0.15/shot plus a script surcharge | ~1 light oil per 2.7 s of full-intensity beam |
+| fuel | light-oil 1.0x, petroleum-gas 0.85x, enriched melta-fuel 1.6x, incendiaries napalm 1.35x | each fuel sets damage *and* beam colour; see the fuel table below |
+| burn rate | 2.5 units/shot engine-side + 3.8 per pulse at full charge | ~19/s cold, ~47/s white-hot |
 
 Derived: a behemoth biter (3000 hp) dies in ~5 s of full-intensity fire.
 
@@ -98,6 +99,37 @@ intensities.
   this weapon, and neither is enough on its own.
 - Script-created entities raise no event, so the turret registry self-repairs every 600 ticks.
 
+## Fuels
+
+| fluid | damage | beam | how you get it |
+|---|---|---|---|
+| light-oil | 1.00x | orange, warm white core | straight from the refinery |
+| petroleum-gas | 0.85x | pale blue | gas cracking, leaner burn |
+| melta-fuel | 1.60x | green-white | chemistry: 20 light oil + 2 uranium-238 + 1 sulfur -> 100 |
+| lilys-napalm-mix | 1.35x | deep red | Lily's Incendiaries |
+
+Burn rate: 7.5 shots/s x 2.5 units = ~19/s cold, plus the script surcharge (3.8/pulse at full
+charge) = **~47/s held at full intensity**. The 200-unit buffer is 4-10 s of beam, so a short
+feed hiccup does not kill the turret. Cost note: 47/s of light oil is most of a refinery's
+light-oil output -- that is deliberate (it is a burst weapon, and the enriched fuel is 5x more
+units per oil at 1.6x damage), but `C.fluid_consumption` / `C.extra_fluid_per_pulse_hot` are the
+two numbers to turn down if it feels like a pipe into the void.
+
+## Sound
+
+`sound/_generator/melta_sounds.py` synthesises the whole set from noise spectra (random phase ->
+circular filters -> inverse FFT, so the loop is seamless):
+
+- `melta-burn.ogg` -- 2 s loop: low rumble, a band-passed roaring body with a 7 Hz flutter, and a
+  thin sizzle with crackle ticks on top. Measured 63 % of its energy sits in 0.5-3 kHz, ~2.4 kHz
+  centroid: air being pushed, not white hiss.
+- `melta-start.ogg` -- 0.45 s pressure build-up (rising jet + falling thump).
+- `melta-stop.ogg` -- 0.6 s decay, sizzle lingering.
+
+They are wired as the turret's `cyclic_sound` (begin / middle loop / end), so the jet runs for as
+long as the trigger is held and stops with the beam. The engine cannot pitch a sound per entity,
+so the spin-up is carried by the visuals, not the audio.
+
 ## Research and recipes
 
 | thing | detail |
@@ -105,7 +137,7 @@ intensities.
 | technology | `melta-turret`, prereqs `laser-turret` + `advanced-oil-processing`, 150 x (automation, logistic, military, chemical) at 30 s |
 | unlocks | the turret recipe and the fuel recipe |
 | turret recipe | 25 steel-plate + 20 iron-gear-wheel + 15 advanced-circuit + 5 processing-unit, 6 s |
-| fuel recipe | chemistry: 10 light-oil -> 40 melta-fuel, 2 s, productivity allowed |
+| fuel recipe | chemistry: 20 light-oil + 2 uranium-238 + 1 sulfur -> 100 enriched melta-fuel, 4 s, productivity allowed |
 | fuel value | engine burns 0.15 per shot; a shot is every 8 ticks, so ~1.1/s cold and ~2.3/s white-hot with the surcharge |
 
 ## Living with her other mods
@@ -125,13 +157,17 @@ What that gives today:
 | installed | effect |
 |---|---|
 | vanilla | melta-fuel only; recipe and tech as above |
-| `? lilys-incendiaries` | `lilys-napalm-mix` pipes straight in and hits 1.35x (verified: 56 -> 75.6 damage per pulse) |
+| `? lilys-incendiaries` | `lilys-napalm-mix` pipes straight in and hits 1.35x with a deep red beam (verified: 56 -> 75.6 damage per pulse) |
 | `? wanderer` | nothing yet (the mod has no items); the moment it defines `iridium-plate` + `iridium-processing` the recipe gains 10 iridium and the tech requires that research (verified with a stub mod) |
 
 `data-updates.lua` prints one line per applied integration into `factorio-current.log`, so a
-load log answers "why is napalm not burning" without guesswork. Unlocking stays vanilla --
-neither mod is allowed to *gate* the melta; they can only make its fuel better, because a
-missing optional dependency must never make the turret unbuildable.
+load log answers "why is napalm not burning" without guesswork.
+
+This mod does not gate itself against your other mods: the turret item, recipe and technology are
+ordinary prototypes under stable names, so Incendiaries or Wanderer can rewrite the recipe, add
+prerequisites or move the unlock from **their** data-updates and it simply wins (they load after
+this mod alphabetically, so their edit is the last word). The hooks here are only the version that
+works without anyone touching us.
 
 ## Known simplifications
 

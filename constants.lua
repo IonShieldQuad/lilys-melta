@@ -26,14 +26,15 @@ C.hit_half_width  = 0.45  -- tiles: half-width of the line hit test around the b
 C.muzzle_offset   = 1.9   -- tiles in front of the turret centre the beam starts
 
 -- beam look ------------------------------------------------------------------
--- three stacked lines: a soft heat column, an orange glow, a white-hot core
+-- Four stacked lines. Colours come from whichever fuel is burning (see C.fuels) and
+-- the alphas ramp with charge: the sheath is the wide heat column, the core is the
+-- thin cutting line that goes white-hot.
 C.beam_layers =
 {
-  {width_cold = 0.55, width_hot = 1.90, color_cold = {r = 1.00, g = 0.30, b = 0.06, a = 0.16}, color_hot = {r = 1.00, g = 0.55, b = 0.18, a = 0.30}},
-  {width_cold = 0.30, width_hot = 1.05, color_cold = {r = 1.00, g = 0.45, b = 0.12, a = 0.45}, color_hot = {r = 1.00, g = 0.78, b = 0.40, a = 0.70}},
-  {width_cold = 0.12, width_hot = 0.42, color_cold = {r = 1.00, g = 0.85, b = 0.55, a = 0.80}, color_hot = {r = 1.00, g = 1.00, b = 0.95, a = 1.00}},
-  -- the cutting core: stays thin and goes white-hot, that is what reads as a melta
-  {width_cold = 0.05, width_hot = 0.16, color_cold = {r = 1.00, g = 0.95, b = 0.80, a = 0.95}, color_hot = {r = 1.00, g = 1.00, b = 1.00, a = 1.00}}
+  {tier = "sheath", width_cold = 0.55, width_hot = 1.90, alpha_cold = 0.16, alpha_hot = 0.30},
+  {tier = "sheath", width_cold = 0.30, width_hot = 1.05, alpha_cold = 0.45, alpha_hot = 0.70},
+  {tier = "core",   width_cold = 0.12, width_hot = 0.42, alpha_cold = 0.80, alpha_hot = 1.00},
+  {tier = "core",   width_cold = 0.05, width_hot = 0.16, alpha_cold = 0.95, alpha_hot = 1.00}
 }
 C.beam_flicker = 0.12       -- +/- fraction of the width that wobbles as the beam burns
 -- the boiling plasma sheath around the core: short segments that re-roll often
@@ -43,19 +44,31 @@ C.sheath_retune_ticks = 3
 -- fuel -----------------------------------------------------------------------
 -- A fluid turret burns fluid per shot all by itself; the script adds a surcharge
 -- while the beam is hot, so holding full intensity costs about twice the fuel.
-C.fluid_consumption         = 0.15   -- engine-side, fluid units per shot
-C.extra_fluid_per_pulse_hot = 0.16   -- script-side, fluid units per pulse at full charge
-C.fluid_buffer              = 100
+-- 7.5 shots/s: 2.5 per shot = ~19/s cold, +3.8 per pulse at full charge = ~47/s hot
+C.fluid_consumption         = 2.5    -- engine-side, fluid units per shot
+C.extra_fluid_per_pulse_hot = 3.8    -- script-side, fluid units per pulse at full charge
+C.fluid_buffer              = 200    -- ~4-10 s of beam in the buffer, so a short gap in the pipe is survivable
 
 -- Anything in this list can be piped into the turret. Entries whose fluid does not
 -- exist are skipped by BOTH stages, so listing another mod's fuel is safe with or
 -- without that mod installed. `damage_modifier` multiplies the beam damage, like the
 -- flamethrower's fluid bonuses.
+-- `core` is the cutting line's colour, `sheath` the heat column around it, so the
+-- fuel you burn is readable at a glance. Highest modifier present wins.
 C.fuels =
 {
-  {name = "melta-fuel", damage_modifier = 1.0},
-  -- Lily's Incendiaries: napalm burns hotter than pyrum
-  {name = "lilys-napalm-mix", damage_modifier = 1.35}
+  -- vanilla oil straight out of the refinery: cheap, orange
+  {name = "light-oil", damage_modifier = 1.00,
+   core = {r = 1.00, g = 0.88, b = 0.60}, sheath = {r = 1.00, g = 0.42, b = 0.10}},
+  -- gas burns leaner: pale blue, less bite
+  {name = "petroleum-gas", damage_modifier = 0.85,
+   core = {r = 0.85, g = 0.95, b = 1.00}, sheath = {r = 0.35, g = 0.55, b = 1.00}},
+  -- the good stuff: pyrum laced with uranium, green-white and vicious
+  {name = "melta-fuel", damage_modifier = 1.60,
+   core = {r = 0.80, g = 1.00, b = 0.75}, sheath = {r = 0.25, g = 0.95, b = 0.40}},
+  -- Lily's Incendiaries: napalm, deep red and hot
+  {name = "lilys-napalm-mix", damage_modifier = 1.35,
+   core = {r = 1.00, g = 0.82, b = 0.55}, sheath = {r = 1.00, g = 0.28, b = 0.06}}
 }
 
 -- Late-game ingredient hooks: if the named item (and optionally the named technology)

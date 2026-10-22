@@ -23,29 +23,31 @@ data:extend(
   {
     type = "fluid",
     name = C.fluid,
-    icons = {{icon = "__base__/graphics/icons/fluid/light-oil.png", icon_size = 64, tint = {r = 1.0, g = 0.55, b = 0.20}}},
+    icons = {{icon = "__base__/graphics/icons/fluid/light-oil.png", icon_size = 64, tint = {r = 0.55, g = 1.0, b = 0.55}}},
     default_temperature = 25,
     max_temperature = 100,
-    base_color = {r = 0.85, g = 0.32, b = 0.06},
-    flow_color = {r = 1.00, g = 0.66, b = 0.32},
+    base_color = {r = 0.20, g = 0.55, b = 0.22},
+    flow_color = {r = 0.55, g = 1.00, b = 0.60},
     auto_barrel = false
   },
   {
     type = "recipe",
     name = C.fluid,
     enabled = false,
-    energy_required = 2,
+    energy_required = 4,
     categories = {"chemistry"},
     ingredients =
     {
-      {type = "fluid", name = "light-oil", amount = 10}
+      {type = "fluid", name = "light-oil", amount = 20},
+      {type = "item", name = "uranium-238", amount = 2},
+      {type = "item", name = "sulfur", amount = 1}
     },
-    results = {{type = "fluid", name = C.fluid, amount = 40}},
+    results = {{type = "fluid", name = C.fluid, amount = 100}},
     allow_productivity = true,
     crafting_machine_tint =
     {
-      primary = {r = 0.98, g = 0.45, b = 0.10, a = 1.0},
-      secondary = {r = 1.00, g = 0.70, b = 0.35, a = 1.0}
+      primary = {r = 0.40, g = 0.95, b = 0.45, a = 1.0},
+      secondary = {r = 0.70, g = 1.00, b = 0.75, a = 1.0}
     }
   }
 })
