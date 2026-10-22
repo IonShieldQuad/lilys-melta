@@ -1,0 +1,11 @@
+{
+	"name": "lilys-melta",
+	"version": "1.0.0",
+	"title": "Lily's Thermal Beam turret",
+	"author": "MsBinaryLily",
+	"description": "Flamers not enought for you? This turret will COOK everything in it's path!",
+	"factorio_version": "2.0",
+	"dependencies": [
+		"base >= 2.0"
+		]
+}
