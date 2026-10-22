@@ -1,5 +1,8 @@
 ---------------------------------------------------------------------------------------------------
-Version: 1.0.0
-Date: 2025-02-22
-  Changes:
-    - Initial release
+Version: 0.1.0
+Date: 2026-10-22
+  Features:
+    - Melta turret: fuel-fed thermal beam turret on the rocket turret hull
+    - The beam pierces every body in line; thermal damage is its own damage type
+    - Beam spins up over 2.5 s of sustained fire and decays in 1 s
+    - Melta fuel item, recipe and the technology that unlocks both
