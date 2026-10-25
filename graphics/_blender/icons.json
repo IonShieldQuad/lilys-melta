@@ -1,0 +1,52 @@
+{
+  "direction": 40,
+  "icon_px": 64,
+  "icon_file_px": [
+    120,
+    64
+  ],
+  "tech_px": 256,
+  "tech_file_px": [
+    480,
+    256
+  ],
+  "thumbnail_px": 512,
+  "fit_px": 61,
+  "icon_tone": {
+    "reference": "vanilla flamethrower-turret.png icon",
+    "target_p10_90": [
+      20.0,
+      44.0,
+      76.0,
+      140.0,
+      205.0
+    ],
+    "chroma": 1.6
+  },
+  "mips": {
+    "icon": [
+      64,
+      32,
+      16,
+      8
+    ],
+    "technology": [
+      256,
+      128,
+      64,
+      32
+    ]
+  },
+  "shadow": {
+    "icon_offset_px": [
+      1.5,
+      1.0
+    ],
+    "icon_blur_px": 0.75,
+    "tech_offset_px": [
+      3.0,
+      2.0
+    ],
+    "tech_blur_px": 1.5
+  }
+}

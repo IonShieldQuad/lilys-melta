@@ -13,13 +13,19 @@ local C = require("constants")
 --   * they want a 4-entry circuit connector; dropping it is legal and simpler.
 
 local base = data.raw["ammo-turret"] and data.raw["ammo-turret"]["rocket-turret"]
-local space_age = base ~= nil
 if not base then
   base = data.raw["electric-turret"]["laser-turret"]
 end
 
 local source = table.deepcopy(base)
 local head = require("prototypes.graphics")
+
+-- Our own icon, rendered from the same model as the sprite sheets
+-- (graphics/_blender/render_icons.py + assemble_icons.py). The file is shaped like
+-- the base game's turret icons: 120x64 = the 64 px icon plus its 32/16/8 px mip
+-- levels packed to the right, which is why icon_size is 64 and not the file width.
+local ICON = "__lilys-melta__/graphics/icons/melta-turret.png"
+local ICON_SIZE = 64
 
 -- every fuel in constants.lua that actually exists in this install; the turret's
 -- fluid box stays unfiltered (like the flamethrower) so any of them can be piped in,
@@ -36,8 +42,8 @@ local turret =
 {
   type = "fluid-turret",
   name = C.turret,
-  icon = space_age and "__space-age__/graphics/icons/rocket-turret.png" or "__base__/graphics/icons/laser-turret.png",
-  icon_size = 64,
+  icon = ICON,
+  icon_size = ICON_SIZE,
   flags = {"placeable-player", "player-creation"},
   minable = {mining_time = 0.6, result = C.turret},
   max_health = 1200,
@@ -195,8 +201,8 @@ data:extend(
   {
     type = "item",
     name = C.turret,
-    icon = turret.icon,
-    icon_size = 64,
+    icon = ICON,
+    icon_size = ICON_SIZE,
     subgroup = "defensive-structure",
     order = "e[melta-turret]",
     place_result = C.turret,

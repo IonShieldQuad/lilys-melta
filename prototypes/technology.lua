@@ -1,14 +1,18 @@
 local C = require("constants")
 
-local turret_icon = data.raw["item"][C.turret].icon
+-- Technology icons are authored at 256 px in 2.1 (vanilla: 480x256 = the 256 px
+-- icon plus its 128/64/32 px mip levels packed to the right). Our own render at
+-- that size keeps the tech page crisp instead of upscaling the 64 px item icon.
+local TECH_ICON = "__lilys-melta__/graphics/icons/melta-turret-technology.png"
+local TECH_ICON_SIZE = 256
 
 data:extend(
 {
   {
     type = "technology",
     name = C.tech,
-    icon = turret_icon,
-    icon_size = 64,
+    icon = TECH_ICON,
+    icon_size = TECH_ICON_SIZE,
     effects =
     {
       {type = "unlock-recipe", recipe = C.turret},
