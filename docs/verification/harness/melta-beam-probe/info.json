@@ -1,0 +1,8 @@
+{
+  "name": "beam-probe",
+  "version": "0.0.1",
+  "title": "melta beam probe",
+  "author": "verification run",
+  "factorio_version": "2.1",
+  "dependencies": ["base", "lilys-melta"]
+}

@@ -1,4 +1,38 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.5.0
+Date: 2026-10-25
+  Graphics:
+    - The firing beam is no longer a hairline. rendering.draw_line's `width` is in PIXELS
+      (32 per tile) and the old layer table was written as if it were tiles, so the whole
+      four-line stack was at most 1.90 px = 0.06 tiles wide -- thinner than the barrel it
+      came out of. Measured from a 64 px/tile screenshot, the lance is now 1.03 tiles wide
+      at half maximum (16.5x wider), puts 2.8x the light into the scene, and the peak is
+      no brighter (so it gained body, not glare)
+    - The beam is built in layers now: two sharp core lines, three additive glow sprites
+      (wide soft haze -> tight bright gas), six boiling sheath tongues that re-roll a few
+      times a second, a muzzle flare plus a directional blast cone, an impact flare that
+      follows the body it is cutting, and a tip flare where the lance runs out of reach
+    - The glow reads on dark ground: the sprite layers blend additively, and their
+      textures are generated white with the shape in the alpha channel
+      (graphics/beam/generate.py), so one set of five textures is tinted with whatever
+      fuel is burning (oil orange, gas blue, melta green, napalm red)
+    - The beam fades out over 10 ticks instead of snapping off, and it keeps fading when
+      the turret or its target dies mid-beam: a dead turret's lance is handed to a fade
+      list, drawn from its last geometry and then freed, so no beam can be left stuck in
+      the air
+    - Cheaper than the old beam despite owning 17 render objects per turret instead of 15:
+      the draw path allocates nothing per tick (measured -15% script time with six turrets
+      firing continuously)
+  Fixed:
+    - The impact flare no longer lingers on a dead body: it is re-positioned to its target
+      every tick and hidden the instant that body dies
+    - The core lines are mixed toward white; a fuel-coloured line over an additive glow
+      measured darker than its surroundings and drew a dark seam down the middle of the
+      beam
+    - Beams no longer outlive their turret's death: mining or destroying a firing melta
+      used to leave the render objects destroyed mid-fade, now the lance is retired and
+      freed through a fenced path
+---------------------------------------------------------------------------------------------------
 Version: 0.4.0
 Date: 2026-10-25
   Graphics:

@@ -8,7 +8,8 @@
 --   * pierce     -- one pulse cuts every body on the beam axis, each body behind the
 --                   first taking pierce_falloff of the last one's damage
 --   * fuel       -- the engine drinks melta-fuel from the pipe; a hot beam drinks more
---   * visuals    -- three stacked beam lines and a muzzle orb, all driven by charge
+--   * visuals    -- a sharp line core inside a wide additive glow, a muzzle blast, an
+--                   impact flare and a clean fade-out (see the visuals section)
 --
 -- Numbers live in constants.lua.
 
@@ -65,8 +66,11 @@ local function fuel_profile(turret)
 end
 
 -- one entry per placed melta turret, keyed by unit_number:
---   entity, charge (0..1), pulse_at, debt, line, glow, beam_end, last_muzzle
+--   entity, charge (0..1), pulse_at, debt, objs, beam, beam_end, last_muzzle
 local turrets
+-- beams whose turret is already gone: frozen geometry + their own objects, drawn
+-- until they have faded out (see retire_beam / fade_beam)
+local fades
 
 ---------------------------------------------------------------- helpers ------
 
@@ -219,33 +223,64 @@ local function destroy_object(id)
   end
 end
 
-local function clear_beam(state)
-  for _, container in ipairs({state.lines, state.sheath}) do
-    if container then
-      for index = 1, #container do
-        destroy_object(container[index])
-      end
-    end
-  end
-  state.lines = nil
-  state.sheath = nil
-  state.sheath_rolls = nil
-  state.sheath_tick = nil
+-- Which fuel colour a layer uses. `pulse` (which colours its flares from the same
+-- profile) is defined above the visuals section, so this lives here with the other
+-- helpers rather than next to the drawing code it serves.
+local TIER = {r = 0, g = 0, b = 0}
+
+local function tier_color(tier, charge, profile)
+  local base = (tier == "core") and profile.core or profile.sheath
+  TIER.r, TIER.g, TIER.b = base.r, base.g, base.b
+  return TIER
 end
 
-local function clear_glow(state)
-  local glow = state.glow
-  if not glow then
+-- Every beam owns exactly this set of render objects. Built once, here, so destroying
+-- a beam never has to build a list.
+local BEAM_KEYS = {"cone", "muzzle", "impact", "tip"}
+for index = 1, #C.beam_glow do
+  BEAM_KEYS[#BEAM_KEYS + 1] = "glow" .. index
+end
+for index = 1, #C.beam_core do
+  BEAM_KEYS[#BEAM_KEYS + 1] = "core" .. index
+end
+for index = 1, C.beam_tongues do
+  BEAM_KEYS[#BEAM_KEYS + 1] = "tongue" .. index
+end
+
+-- Frees every object a beam owns. Keyed off the object table the beam carries, so a
+-- beam that has outlived its turret (retire_beam) still frees its own objects and
+-- cannot leave a stuck lance behind.
+local function destroy_beam(beam)
+  local objs = beam and beam.objs
+  if not objs then
     return
   end
-  destroy_object(glow.core)
-  destroy_object(glow.halo)
-  state.glow = nil
+  for index = 1, #BEAM_KEYS do
+    local key = BEAM_KEYS[index]
+    destroy_object(objs[key])
+    objs[key] = nil
+  end
+end
+
+-- The heat at the mouth: the charge-up glow and the emitter bleeding off after a shot.
+local function destroy_orb(state)
+  local objs = state.objs
+  if not objs then
+    return
+  end
+  destroy_object(objs.orb_core)
+  destroy_object(objs.orb_halo)
+  objs.orb_core, objs.orb_halo = nil, nil
+end
+
+local function clear_beam(state)
+  destroy_beam(state.beam)
+  state.beam = nil
 end
 
 local function clear_state(state)
   clear_beam(state)
-  clear_glow(state)
+  destroy_orb(state)
   state.beam_end = nil
 end
 
@@ -297,22 +332,17 @@ end
 
 -- Short-lived pops (auto-freed by the engine) so the beam has something to *do* at
 -- both ends: a flash at the muzzle and a burn mark wherever a body is cut.
-local function pop(surface, position, charge, radius, alpha, layer)
-  rendering.draw_circle
+local function pop(surface, position, base, radius, alpha, layer)
+  rendering.draw_sprite
   {
+    sprite = C.beam_texture.flare.sprite,
     surface = surface,
     target = position,
-    color =
-    {
-      r = 1.0,
-      g = lerp(0.50, 0.95, charge),
-      b = lerp(0.18, 0.80, charge),
-      a = alpha
-    },
-    radius = radius,
-    filled = true,
+    x_scale = radius * 2 / C.beam_texture.flare.tiles[1],
+    y_scale = radius * 2 / C.beam_texture.flare.tiles[2],
+    tint = {r = base.r, g = base.g, b = base.b, a = alpha},
     render_layer = layer or "projectile",
-    time_to_live = 3
+    time_to_live = C.beam_pop_ticks
   }
 end
 
@@ -361,6 +391,9 @@ local function pulse(turret, state, muzzle, dx, dy, reach)
   table.sort(hits, function(left, right) return left.along < right.along end)
 
   local stop = {x = far_x, y = far_y}
+  -- nearest body the pulse cuts: the impact flare follows it (see render_beam)
+  local impact = nil
+  local impact_entity = nil
   local cut = math.min(#hits, C.pierce_max)
   for index = 1, cut do
     local hit = hits[index]
@@ -388,15 +421,28 @@ local function pulse(turret, state, muzzle, dx, dy, reach)
       if victim.valid and victim.health and victim.health > 0 and victim.type == "asteroid" then
         victim.damage(dealt * C.asteroid_damage_multiplier, force, C.asteroid_damage_type, turret)
       end
-      pop(turret.surface, hit.position, state.charge, 0.42 + 0.35 * state.charge, 0.85, "higher-object-above")
+      pop(turret.surface, hit.position, tier_color("sheath", state.charge, profile),
+        0.38 + 0.42 * state.charge, 0.85, "higher-object-above")
+    end
+    if not impact then
+      impact = hit.position
+      impact_entity = victim
     end
     stop = hit.position
   end
 
   -- muzzle flash: forward of the barrel so it does not sit inside the sprite
   local flash = {x = muzzle.x + dx * 0.45, y = muzzle.y + dy * 0.45}
-  pop(turret.surface, flash, state.charge, 0.55 + 0.65 * state.charge, 0.55)
-  pop(turret.surface, flash, state.charge, 0.25 + 0.30 * state.charge, 0.95)
+  pop(turret.surface, flash, tier_color("sheath", state.charge, profile),
+    0.70 + 0.80 * state.charge, 0.55)
+  pop(turret.surface, flash, tier_color("core", state.charge, profile),
+    0.30 + 0.35 * state.charge, 0.95)
+  -- the impact flare is drawn with the beam itself, every tick, and tracks the body
+  -- it is burning (so it cannot be left glowing on a corpse)
+  if state.beam then
+    state.beam.hit = impact
+    state.beam.hit_entity = impact_entity
+  end
 
   if C.debug then
     log(string.format("melta pulse unit=%s charge=%.2f damage=%.1f reach=%.1f candidates=%d hits=%d fuel=%d",
@@ -409,172 +455,358 @@ end
 
 ---------------------------------------------------------------- visuals ------
 
-local function update_line(turret, container, index, from, to, color, width)
-  local line = container[index] and rendering.get_object_by_id(container[index])
-  if line and line.valid then
-    line.from = {from.x, from.y}
-    line.to = {to.x, to.y}
-    line.color = color
-    line.width = width
-    return
-  end
-  local object = rendering.draw_line
-  {
-    surface = turret.surface,
-    from = {from.x, from.y},
-    to = {to.x, to.y},
-    color = color,
-    width = width,
-    render_layer = "projectile"
-  }
-  container[index] = object.id
+-- The lance, outside in:
+--
+--   * a sharp CORE of two `draw_line` layers. Lines are the only primitive that is
+--     exactly 1:1 with the world at every zoom and follows a moving target without
+--     resampling, and the core is what reads as *cutting*;
+--   * a wide, soft GLOW of three ADDITIVE sprites (prototypes/beam.lua, textures from
+--     graphics/beam/generate.py). `draw_line` cannot do this at all: it paints a flat
+--     quad with a hard edge, and -- the actual bug behind the old placeholder look --
+--     its `width` is in PIXELS (32 per tile), so the old widest entry of 1.90 was a
+--     1.9 px hairline, thinner than the barrel it came out of. Widths in constants.lua
+--     are tiles now and are multiplied by C.px_per_tile only where a line needs them;
+--   * BOILING TONGUES: soft blobs that jump to a new offset, length and alpha every
+--     few ticks, so the sheath never settles into a tidy light bar;
+--   * a MUZZLE BURST (flare + blast cone) and an IMPACT FLARE on the nearest body the
+--     pulse cut. Both swell for C.beam_pulse_ticks after a pulse, so each shot thumps
+--     instead of the whole thing being a constant hum.
+--
+-- Cost discipline: every object is created once per turret and only mutated afterwards,
+-- and all position/colour arguments come from two module-level scratch tables (V, COL)
+-- -- so the per-tick draw path allocates nothing. A beam keeps its own geometry and
+-- object ids, which is what lets it outlive its turret (see retire_beam / the fade
+-- list): nothing can be left drawing after the turret or its target is gone.
+
+local V = {x = 0, y = 0}                    -- scratch position, reused every setter
+local COL = {r = 0, g = 0, b = 0, a = 1}    -- scratch colour, reused every setter
+local ORB_CORE = {r = 1, g = 1, b = 1, a = 1}
+local ORB_HALO = {r = 1, g = 1, b = 1, a = 1}
+
+local SPRITE = C.beam_texture
+
+local function objects_of(state)
+  state.objs = state.objs or {}
+  return state.objs
 end
 
+-- The render object in `key`, created on first use. Creation is the only place in the
+-- draw path that allocates, and it happens once per turret per key.
+local function get_sprite(objs, key, texture, surface)
+  local id = objs[key]
+  local object = id and rendering.get_object_by_id(id)
+  if object and object.valid then
+    return object
+  end
+  object = rendering.draw_sprite
+  {
+    sprite = SPRITE[texture].sprite,
+    surface = surface,
+    target = {0, 0},
+    x_scale = 1,
+    y_scale = 1,
+    tint = {r = 1, g = 1, b = 1, a = 1},
+    render_layer = "projectile",
+    visible = false
+  }
+  objs[key] = object.id
+  return object
+end
 
--- A melta beam is a lance of superheated *stuff*, not a laser: the two inner layers
--- are stable, and the sheath around them is a set of short segments that jump to a
--- new random offset, length and alpha every few ticks. That boiling edge is what
--- stops it reading as a tidy light line.
-local function draw_beam(turret, state, muzzle, stop, tick)
-  local charge = state.charge
-  local profile = fuel_profile(turret)
+-- Position, rotation, size and tint in one go. `x_scale`/`y_scale` are the *sprite
+-- axes*: for a sprite, orientation 0 is north and the image is drawn unrotated, so a
+-- beam layer is a tall image whose height runs along the beam and whose width is the
+-- beam's thickness.
+local function place(object, x, y, orientation, width, height, texture, base, alpha)
+  V.x, V.y = x, y
+  object.target = V
+  object.orientation = orientation
+  object.x_scale = width / SPRITE[texture].tiles[1]
+  object.y_scale = height / SPRITE[texture].tiles[2]
+  COL.r, COL.g, COL.b, COL.a = base.r, base.g, base.b, alpha
+  object.color = COL
+  object.visible = alpha > 0.004
+end
+
+local function place_beam(objs, key, surface, x, y, orientation, width, height, texture, base, alpha)
+  local object = get_sprite(objs, key, texture, surface)
+  place(object, x, y, orientation, width, height, texture, base, alpha)
+  return object
+end
+
+-- The beam's own state: the last geometry it drew, the colour inputs, and its object
+-- ids. Kept out of the turret state on purpose, so a dead turret's lance can go on
+-- being drawn (and then freed) by the fade list.
+local function beam_for(state)
+  local beam = state.beam
+  if beam then
+    return beam
+  end
+  beam =
+  {
+    objs = objects_of(state),
+    from = {x = 0, y = 0},
+    to = {x = 0, y = 0},
+    ux = 0,
+    uy = 1,
+    orient = 0,
+    length = 0,
+    charge = 0,
+    profile = DEFAULT_PROFILE,
+    surface = nil,
+    alpha = 1,
+    tick = 0,
+    pulse_tick = nil,
+    hit = nil,
+    rolls = {}
+  }
+  for index = 1, C.beam_tongues do
+    beam.rolls[index] = {start = 0, finish = 0, offset = 0, alpha = 0, width = 0, length = 0}
+  end
+  state.beam = beam
+  return beam
+end
+
+-- Draw one whole lance from its frozen geometry. Nothing here reads the turret, the
+-- target or the world -- that is what makes it safe to keep drawing after either dies.
+local function render_beam(beam, tick)
+  local objs, surface = beam.objs, beam.surface
+  local length = beam.length
+  if not objs or not surface or not length or length < 0.01 then
+    return
+  end
+  local charge, profile, fade = beam.charge, beam.profile, beam.alpha
+  local from, to, ux, uy = beam.from, beam.to, beam.ux, beam.uy
+  local orient = beam.orient
+  local cx, cy = (from.x + to.x) * 0.5, (from.y + to.y) * 0.5
+  local px, py = -uy, ux
   local flicker = 1 + C.beam_flicker * math.sin(tick * 0.7) * charge
+  -- a dying lance thins as it dims (1 at full strength, 0.55 at the last frame)
+  local narrow = 0.55 + 0.45 * fade
 
-  local dx = stop.x - muzzle.x
-  local dy = stop.y - muzzle.y
+  -- 1. the glow: wide and faint outside, tight and bright inside
+  for index = 1, #C.beam_glow do
+    local style = C.beam_glow[index]
+    local base = tier_color(style.tint, charge, profile)
+    local width = lerp(style.width_cold, style.width_hot, charge) * flicker * narrow
+    local alpha = lerp(style.alpha_cold, style.alpha_hot, charge) * fade
+    place_beam(objs, "glow" .. index, surface, cx, cy, orient, width, length,
+      style.texture, base, alpha)
+  end
+
+  -- 2. the cutting core: lines, so the width has to go to the engine in pixels
+  for index = 1, #C.beam_core do
+    local style = C.beam_core[index]
+    local key = "core" .. index
+    local id = objs[key]
+    local line = id and rendering.get_object_by_id(id)
+    local width = lerp(style.width_cold, style.width_hot, charge) * flicker * narrow * C.px_per_tile
+    local alpha = lerp(style.alpha_cold, style.alpha_hot, charge) * fade
+    if not (line and line.valid) then
+      line = rendering.draw_line
+      {
+        surface = surface,
+        from = {from.x, from.y},
+        to = {to.x, to.y},
+        color = {r = 1, g = 1, b = 1, a = 1},
+        width = width,
+        render_layer = "projectile"
+      }
+      objs[key] = line.id
+    end
+    V.x, V.y = from.x, from.y
+    line.from = V
+    V.x, V.y = to.x, to.y
+    line.to = V
+    line.width = width
+    local base = tier_color("core", charge, profile)
+    -- the inner line runs toward white as it heats, so the core has a hot edge -- and
+    -- it MUST be near-white: the line blends normally, the glow under it is additive,
+    -- so a coloured line over a saturated glow reads as a dark band down the middle of
+    -- the beam (measured: luminance 232 in the centre against 255 around it)
+    local whiten = 0.30 + (index - 1) * 0.55
+    COL.r = lerp(base.r, 1.0, whiten)
+    COL.g = lerp(base.g, 1.0, whiten)
+    COL.b = lerp(base.b, 1.0, whiten)
+    COL.a = alpha
+    line.color = COL
+  end
+
+  -- 3. the boiling sheath: re-rolled a few times a second, not every tick
+  if not beam.roll_tick or tick - beam.roll_tick >= C.beam_tongue_ticks then
+    beam.roll_tick = tick
+    for index = 1, C.beam_tongues do
+      local roll = beam.rolls[index]
+      roll.start = math.random() * 0.85
+      roll.finish = roll.start + 0.05 + math.random() * 0.20
+      roll.offset = (math.random() * 2 - 1) * (0.30 + 0.60 * charge)
+      roll.alpha = lerp(C.beam_tongue_alpha[1], C.beam_tongue_alpha[2], charge)
+                     * (0.55 + 0.45 * math.random())
+      roll.width = lerp(C.beam_tongue_width[1], C.beam_tongue_width[2], charge)
+                     * (0.60 + 0.40 * math.random())
+    end
+  end
+  for index = 1, C.beam_tongues do
+    local roll = beam.rolls[index]
+    local ax = from.x + ux * length * roll.start + px * roll.offset
+    local ay = from.y + uy * length * roll.start + py * roll.offset
+    local bx = from.x + ux * length * roll.finish + px * roll.offset * 0.4
+    local by = from.y + uy * length * roll.finish + py * roll.offset * 0.4
+    local sx, sy = bx - ax, by - ay
+    local seg = math.sqrt(sx * sx + sy * sy)
+    place_beam(objs, "tongue" .. index, surface, (ax + bx) * 0.5, (ay + by) * 0.5, orient,
+      roll.width, seg + roll.width, "tongue", tier_color("sheath", charge, profile),
+      roll.alpha * fade)
+  end
+
+  -- 4. muzzle: the flare sits just off the mouth, the cone points down the beam. Both
+  --    swell for a few ticks after each pulse, which is the shot's thump.
+  local pop = 1
+  if beam.pulse_tick and tick - beam.pulse_tick < C.beam_pulse_ticks then
+    pop = C.beam_pulse_pop
+  end
+  local mouth = C.beam_muzzle
+  local flash = lerp(mouth.flare_cold, mouth.flare_hot, charge) * pop * narrow
+  place_beam(objs, "muzzle", surface,
+    from.x + ux * mouth.offset, from.y + uy * mouth.offset, orient,
+    flash, flash, "flare", tier_color("sheath", charge, profile), mouth.flare_alpha * fade)
+  local cone_len = lerp(mouth.cone_len_cold, mouth.cone_len_hot, charge) * pop * narrow
+  local cone_width = lerp(mouth.cone_width_cold, mouth.cone_width_hot, charge) * pop * narrow
+  place_beam(objs, "cone", surface,
+    from.x + ux * cone_len * 0.5, from.y + uy * cone_len * 0.5, orient,
+    cone_width, cone_len, "cone", tier_color("core", charge, profile), mouth.cone_alpha * fade)
+
+  -- 5. impact: a flare on the nearest body the last pulse cut, so the beam visibly
+  --    bites. It is re-positioned to the body's *current* position every tick (the cut
+  --    only re-runs every pulse) and hidden the moment that body dies. Hidden, not
+  --    destroyed, when the line is clear.
+  local hit, hit_entity = beam.hit, beam.hit_entity
+  if hit and hit_entity and (not hit_entity.valid
+     or (hit_entity.health and hit_entity.health <= 0)) then
+    hit = nil
+  end
+  if hit then
+    local hx, hy = hit.x, hit.y
+    if hit_entity and hit_entity.valid then
+      local position = hit_entity.position
+      hx, hy = position.x, position.y
+    end
+    local size = lerp(C.beam_impact.flare_cold, C.beam_impact.flare_hot, charge) * pop * narrow
+    place_beam(objs, "impact", surface, hx, hy, orient, size, size, "flare",
+      tier_color("core", charge, profile), C.beam_impact.alpha * fade)
+  else
+    local id = objs.impact
+    local object = id and rendering.get_object_by_id(id)
+    if object and object.valid then
+      object.visible = false
+    end
+  end
+
+  -- 6. the far end: the lance sprays out where it runs out of reach, so it terminates
+  --    in something instead of stopping in mid-air
+  local tip = lerp(C.beam_tip.flare_cold, C.beam_tip.flare_hot, charge) * narrow
+  place_beam(objs, "tip", surface, to.x, to.y, orient, tip, tip, "flare",
+    tier_color("sheath", charge, profile), C.beam_tip.alpha * fade)
+end
+
+-- Draw the lance from the mouth to `stop` this tick and remember that geometry: the
+-- fade-out re-draws exactly the same data, so a beam looks the same for its whole life
+-- however it ends.
+local function draw_beam(turret, state, muzzle, stop, tick)
+  local beam = beam_for(state)
+  local dx, dy = stop.x - muzzle.x, stop.y - muzzle.y
   local length = math.sqrt(dx * dx + dy * dy)
   if length < 0.01 then
     return
   end
-  dx, dy = dx / length, dy / length
-  -- perpendicular, for sideways jitter
-  local px, py = -dy, dx
+  beam.surface = turret.surface
+  beam.charge = state.charge
+  beam.profile = fuel_profile(turret)
+  beam.from.x, beam.from.y = muzzle.x, muzzle.y
+  beam.to.x, beam.to.y = stop.x, stop.y
+  beam.length = length
+  beam.ux, beam.uy = dx / length, dy / length
+  beam.orient = (atan2(dx, -dy) / (2 * math.pi)) % 1
+  beam.alpha = 1
+  beam.tick = tick
+  render_beam(beam, tick)
+end
 
-  local lines = state.lines
-  if not lines then
-    lines = {}
-    state.lines = lines
+-- One tick of fade-out; false when the beam is gone. Time is frozen on purpose: a dying
+-- beam dims, it does not re-roll its sheath or re-pop its flare.
+local function fade_beam(beam)
+  beam.alpha = beam.alpha - 1 / C.beam_fade_ticks
+  if beam.alpha <= 0 then
+    destroy_beam(beam)
+    return false
   end
+  render_beam(beam, beam.tick)
+  return true
+end
 
-  -- inner layers: stable
-  for index, style in ipairs(C.beam_layers) do
-    local width = (style.width_cold + (style.width_hot - style.width_cold) * charge) * flicker
-    update_line(turret, lines, index, muzzle, stop, beam_color(style, charge, profile), width)
+local function fade_current_beam(state)
+  local beam = state.beam
+  if not beam then
+    return
   end
-
-  ---------------------------------------------------------------- sheath -----
-  local sheath = state.sheath
-  if not sheath then
-    sheath = {}
-    state.sheath = sheath
-  end
-  -- re-roll the boiling edge a few times a second, not every tick
-  if not state.sheath_tick or tick - state.sheath_tick >= C.sheath_retune_ticks then
-    state.sheath_tick = tick
-    state.sheath_rolls = {}
-    for index = 1, C.sheath_segments do
-      local start_f = math.random() * 0.85
-      local run_f = start_f + 0.06 + math.random() * 0.22
-      local offset = (math.random() * 2 - 1) * (0.35 + 0.55 * charge)
-      local alpha = (0.12 + 0.24 * charge) * (0.55 + 0.45 * math.random())
-      local width = (0.10 + 0.34 * charge) * (0.5 + 0.5 * math.random())
-      state.sheath_rolls[index] = {start_f, run_f, offset, alpha, width}
-    end
-  end
-
-  local sheath_color = profile.sheath
-  for index, roll in ipairs(state.sheath_rolls or {}) do
-    local start_f, run_f, offset, alpha, width = roll[1], roll[2], roll[3], roll[4], roll[5]
-    local from =
-    {
-      x = muzzle.x + dx * (length * start_f) + px * offset,
-      y = muzzle.y + dy * (length * start_f) + py * offset
-    }
-    local to =
-    {
-      x = muzzle.x + dx * (length * run_f) + px * offset * 0.4,
-      y = muzzle.y + dy * (length * run_f) + py * offset * 0.4
-    }
-    update_line(turret, sheath, index,
-      from, to,
-      {r = sheath_color.r, g = sheath_color.g, b = sheath_color.b, a = alpha},
-      width)
+  if not fade_beam(beam) then
+    state.beam = nil
   end
 end
 
--- Two filled circles at the muzzle: a hot core inside a soft halo. Circles rather than
--- draw_light on purpose -- a light needs a sprite file, and `__core__/...` paths are
--- not resolvable at runtime ("Unknown type __core__"), so this keeps the mod
--- asset-free. Both effects below (heat bleeding off, and the charge-up while the
--- barrel swings) are the same two circles with different colours and sizes.
-local function draw_orb(turret, state, muzzle, core_color, core_radius, halo_color, halo_radius)
-  state.glow = state.glow or {}
-  local glow = state.glow
-
-  local core = glow.core and rendering.get_object_by_id(glow.core)
-  if core and core.valid then
-    core.target = {muzzle.x, muzzle.y}
-    core.radius = core_radius
-    core.color = core_color
+-- The turret is gone: killed, mined, or removed by a script. Its lance is handed to the
+-- fade list with the last geometry it drew, so it dims out on screen instead of
+-- vanishing -- and its render objects stay reachable, so nothing can leak or stick.
+local function retire_beam(state)
+  local beam = state.beam
+  state.beam = nil
+  if beam and beam.surface and beam.length and beam.length > 0.01 then
+    fades[#fades + 1] = beam
   else
-    local object = rendering.draw_circle
-    {
-      surface = turret.surface,
-      target = {muzzle.x, muzzle.y},
-      color = core_color,
-      radius = core_radius,
-      filled = true,
-      render_layer = "projectile"
-    }
-    glow.core = object.id
-  end
-
-  local halo = glow.halo and rendering.get_object_by_id(glow.halo)
-  if halo and halo.valid then
-    halo.target = {muzzle.x, muzzle.y}
-    halo.radius = halo_radius
-    halo.color = halo_color
-  else
-    local object = rendering.draw_circle
-    {
-      surface = turret.surface,
-      target = {muzzle.x, muzzle.y},
-      color = halo_color,
-      radius = halo_radius,
-      filled = true,
-      render_layer = "projectile"
-    }
-    glow.halo = object.id
+    destroy_beam(beam)
   end
 end
 
--- the charge orb while the beam is burning / heat bleeding off the mouth
+-- Two additive flares at the mouth: a hot core inside a soft halo. The same two objects
+-- are the charge-up while the head swings (draw_windup) and the emitter bleeding off
+-- its heat after a shot (draw_glow) -- only the colour and the size change.
+local function draw_orb(surface, state, x, y, core, core_radius, halo, halo_radius)
+  local objs = objects_of(state)
+  local core_object = get_sprite(objs, "orb_core", "flare", surface)
+  place(core_object, x, y, 0, core_radius * 2, core_radius * 2, "flare", core, core.a)
+  local halo_object = get_sprite(objs, "orb_halo", "flare", surface)
+  place(halo_object, x, y, 0, halo_radius * 2, halo_radius * 2, "flare", halo, halo.a)
+end
+
+-- the heat bleeding off the mouth while the turret is not firing
 local function draw_glow(turret, state, muzzle)
   local charge = state.charge
-  local color = beam_color(C.beam_layers[#C.beam_layers], charge, fuel_profile(turret))
-  draw_orb(turret, state, muzzle,
-    {r = 1.0, g = lerp(0.55, 1.0, charge), b = lerp(0.25, 0.85, charge), a = 0.55 + 0.4 * charge},
-    0.16 + 0.30 * charge,
-    {r = color.r, g = color.g * 0.7, b = color.b * 0.4, a = 0.18 + 0.35 * charge},
-    0.30 + 0.95 * charge)
+  local profile = fuel_profile(turret)
+  ORB_CORE.r, ORB_CORE.g, ORB_CORE.b = 1.0, lerp(0.55, 1.0, charge), lerp(0.25, 0.85, charge)
+  ORB_CORE.a = 0.55 + 0.40 * charge
+  ORB_HALO.r, ORB_HALO.g, ORB_HALO.b = profile.sheath.r, profile.sheath.g * 0.7, profile.sheath.b * 0.4
+  ORB_HALO.a = 0.20 + 0.35 * charge
+  draw_orb(turret.surface, state, muzzle.x, muzzle.y,
+    ORB_CORE, 0.16 + 0.30 * charge,
+    ORB_HALO, 0.30 + 0.95 * charge)
 end
 
 -- The charge-up that plays while the head is still swinging onto a target: a spot at
--- the mouth that grows over C.windup_ticks and pulses, then hands the mouth over to
--- the beam. Nothing is drawn along the barrel and nothing takes damage until the head
--- is within C.aim_tolerance of the target, so the shot cannot outrun the rotation.
+-- the mouth that grows over C.windup_ticks and pulses, then hands the mouth over to the
+-- beam. Nothing is drawn along the barrel and nothing takes damage until the head is
+-- within C.aim_tolerance of the target, so the shot cannot outrun the rotation.
 local function draw_windup(turret, state, muzzle, elapsed, tick)
   local progress = math.min(1, elapsed / C.windup_ticks)
   local throb = 0.78 + 0.22 * math.sin(tick * 0.9)
   local sheath = fuel_profile(turret).sheath
-  draw_orb(turret, state, muzzle,
-    {r = 1.0, g = lerp(0.40, 0.92, progress), b = lerp(0.12, 0.60, progress),
-     a = (0.28 + 0.55 * progress) * throb},
-    0.09 + 0.25 * progress,
-    {r = sheath.r, g = sheath.g, b = sheath.b, a = (0.08 + 0.26 * progress) * throb},
-    0.20 + 0.52 * progress)
+  ORB_CORE.r, ORB_CORE.g, ORB_CORE.b = 1.0, lerp(0.40, 0.92, progress), lerp(0.12, 0.60, progress)
+  ORB_CORE.a = (0.28 + 0.55 * progress) * throb
+  ORB_HALO.r, ORB_HALO.g, ORB_HALO.b = sheath.r, sheath.g, sheath.b
+  ORB_HALO.a = (0.10 + 0.28 * progress) * throb
+  draw_orb(turret.surface, state, muzzle.x, muzzle.y,
+    ORB_CORE, 0.09 + 0.25 * progress,
+    ORB_HALO, 0.20 + 0.52 * progress)
 end
-
 
 ------------------------------------------------------------------ tick -------
 
@@ -656,6 +888,7 @@ local function update(turret, state, tick)
 
       if tick >= state.pulse_at then
         state.pulse_at = tick + C.cooldown
+        beam_for(state).pulse_tick = tick
         state.beam_end = pulse(turret, state, muzzle, ax, ay, reach)
       end
 
@@ -679,7 +912,7 @@ local function update(turret, state, tick)
     -- still swinging onto the target: charge the mouth, draw no beam, deal no damage.
     -- `state.pulse_at` is deliberately NOT advanced, so the first shot is due the
     -- moment the barrel arrives instead of a cooldown later.
-    clear_beam(state)
+    fade_current_beam(state)
     draw_windup(turret, state, muzzle, elapsed, tick)
     if C.debug then
       log(string.format("melta unit=%s windup err=%.2fdeg aligned=%s elapsed=%d",
@@ -692,11 +925,12 @@ local function update(turret, state, tick)
   state.aim_target = nil
   state.pulse_at = tick + C.cooldown
   state.beam_end = nil
-  clear_beam(state)
+  -- the lance fades out over C.beam_fade_ticks instead of snapping off
+  fade_current_beam(state)
   if state.charge > 0.02 and state.last_muzzle then
     draw_glow(turret, state, state.last_muzzle)
   else
-    clear_glow(state)
+    destroy_orb(state)
     if state.charge <= 0 then
       if C.debug and state.debt ~= 0 then
         log(string.format("melta unit=%s cooled down", tostring(turret.unit_number)))
@@ -709,12 +943,15 @@ end
 ---------------------------------------------------------------- registry -----
 
 local function unregister(entity)
-  if not entity or not entity.valid or not entity.unit_number then
+  if not entity or not entity.unit_number then
     return
   end
   local state = turrets[entity.unit_number]
   if state then
-    clear_state(state)
+    -- mid-beam destruction must not leave a lance hanging in the air: the beam is
+    -- handed to the fade list and dims out, its objects still reachable
+    retire_beam(state)
+    destroy_orb(state)
     turrets[entity.unit_number] = nil
   end
 end
@@ -734,7 +971,8 @@ local function reconcile()
   end
   for unit_number, state in pairs(turrets) do
     if not seen[unit_number] or not state.entity or not state.entity.valid then
-      clear_state(state)
+      retire_beam(state)
+      destroy_orb(state)
       turrets[unit_number] = nil
     end
   end
@@ -742,12 +980,16 @@ end
 
 script.on_init(function()
   storage.turrets = {}
+  storage.fades = {}
   turrets = storage.turrets
+  fades = storage.fades
 end)
 
 script.on_configuration_changed(function()
   storage.turrets = storage.turrets or {}
+  storage.fades = storage.fades or {}
   turrets = storage.turrets
+  fades = storage.fades
   reconcile()
 end)
 
@@ -758,6 +1000,7 @@ end)
 -- on_load only re-binds the local, the table itself is saved with the storage table
 script.on_load(function()
   turrets = storage.turrets
+  fades = storage.fades or {}
 end)
 
 local built_events =
@@ -788,6 +1031,12 @@ script.on_event(removed_events, function(event)
 end)
 
 script.on_nth_tick(1, function(event)
+  -- lances whose turret died mid-beam finish dying here
+  for index = #fades, 1, -1 do
+    if not fade_beam(fades[index]) then
+      table.remove(fades, index)
+    end
+  end
   if not next(turrets) then
     return
   end
@@ -797,7 +1046,8 @@ script.on_nth_tick(1, function(event)
     if turret and turret.valid then
       update(turret, state, tick)
     else
-      clear_state(state)
+      retire_beam(state)
+      destroy_orb(state)
       turrets[unit_number] = nil
     end
   end

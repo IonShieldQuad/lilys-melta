@@ -100,8 +100,6 @@ C.windup_ticks    = 3     -- 0.05 s of charge glow before the first shot at a ne
                           -- acquired target. Short on purpose: with the fast head the
                           -- 45 deg swing takes 5 ticks, so a long wind-up would just
                           -- delay the first pulse on every target switch.
-                          -- acquired target (the 45 deg swing itself takes 21 ticks
-                          -- = 0.35 s, so the glow normally rides the whole turn)
 
 -- muzzle geometry ------------------------------------------------------------
 -- Where the beam starts is not "1.51 tiles in front of the pivot": the head sprite
@@ -135,20 +133,88 @@ C.pipe_reach = 1.12   -- tiles, all four sides
 
 
 -- beam look ------------------------------------------------------------------
--- Four stacked lines. Colours come from whichever fuel is burning (see C.fuels) and
--- the alphas ramp with charge: the sheath is the wide heat column, the core is the
--- thin cutting line that goes white-hot.
-C.beam_layers =
+-- WIDTHS ARE IN TILES, except where a line is handed to the engine (it takes PIXELS,
+-- 32 per tile -- control.lua converts once with C.px_per_tile).
+--
+-- This is the bug that made the old beam read as a placeholder: the previous table
+-- was written as if `rendering.draw_line`'s width were tiles, but it is pixels, so the
+-- whole four-line stack was at most 1.90 px = 0.06 tile wide -- a hairline, thinner
+-- than the barrel it came out of. Widths below are what the beam should actually
+-- cover on the ground.
+C.px_per_tile = 32
+
+-- The sprite layers the glow is made of (prototypes/beam.lua), with the footprint each
+-- one is authored at: `tiles = {width, height}` at scale 1. control.lua divides the
+-- wanted size by these to get x_scale/y_scale.
+C.beam_texture =
 {
-  {tier = "sheath", width_cold = 0.55, width_hot = 1.90, alpha_cold = 0.16, alpha_hot = 0.30},
-  {tier = "sheath", width_cold = 0.30, width_hot = 1.05, alpha_cold = 0.45, alpha_hot = 0.70},
-  {tier = "core",   width_cold = 0.12, width_hot = 0.42, alpha_cold = 0.80, alpha_hot = 1.00},
-  {tier = "core",   width_cold = 0.05, width_hot = 0.16, alpha_cold = 0.95, alpha_hot = 1.00}
+  haze   = {sprite = "melta-beam-haze",   tiles = {2, 8}},
+  glow   = {sprite = "melta-beam-glow",   tiles = {2, 8}},
+  tongue = {sprite = "melta-beam-tongue", tiles = {1, 2}},
+  flare  = {sprite = "melta-beam-flare",  tiles = {4, 4}},
+  cone   = {sprite = "melta-beam-cone",   tiles = {2, 4}}   -- apex at the mouth
 }
-C.beam_flicker = 0.12       -- +/- fraction of the width that wobbles as the beam burns
--- the boiling plasma sheath around the core: short segments that re-roll often
-C.sheath_segments    = 9
-C.sheath_retune_ticks = 3
+
+-- The cutting core: two stacked lines, tiles wide. The inner one is the white-hot
+-- edge; both are drawn as lines rather than sprites because the core has to stay
+-- sharp at every zoom and follow the target exactly.
+C.beam_core =
+{
+  {width_cold = 0.14, width_hot = 0.34, alpha_cold = 0.85, alpha_hot = 1.00},
+  {width_cold = 0.05, width_hot = 0.12, alpha_cold = 0.95, alpha_hot = 1.00}
+}
+
+-- The glow around the core: three additive sprites, tiles wide (cold .. hot), tinted
+-- with the fuel's sheath colour (the innermost mixes toward the core colour). Wide and
+-- faint outside, tight and bright inside -- that gradient is the "glow", and because
+-- the blend is additive it reads as light on dark terrain instead of as a grey wash.
+C.beam_glow =
+{
+  {texture = "haze", tint = "sheath", width_cold = 1.70, width_hot = 3.70,
+   alpha_cold = 0.20, alpha_hot = 0.36},
+  {texture = "glow", tint = "sheath", width_cold = 0.75, width_hot = 1.80,
+   alpha_cold = 0.30, alpha_hot = 0.52},
+  {texture = "glow", tint = "core",   width_cold = 0.32, width_hot = 0.85,
+   alpha_cold = 0.30, alpha_hot = 0.50}
+}
+C.beam_flicker     = 0.12   -- +/- fraction of the width that wobbles as the beam burns
+-- the boiling plasma sheath around the core: soft blobs that re-roll a few times a
+-- second (they replaced short hard-edged line segments, which read as shards)
+C.beam_tongues      = 6      -- segments in the sheath
+C.beam_tongue_ticks = 3      -- re-roll interval, ticks
+C.beam_tongue_len   = {0.60, 1.80}   -- tiles, cold .. hot
+C.beam_tongue_width = {0.30, 0.95}   -- tiles, cold .. hot
+-- alpha has to hold up *against the core*: below ~0.15 the tongues are invisible next to
+-- it and the lance collapses back into a clean bar, which is what the first pass did
+C.beam_tongue_alpha = {0.18, 0.45}
+
+-- Muzzle: a burst flare at the mouth plus a cone of blast pointing down the beam. Both
+-- pop for C.beam_pulse_ticks after each pulse, so the shot has a thump instead of
+-- being a constant hum. Sizes in tiles.
+C.beam_muzzle =
+{
+  offset    = 0.22,                      -- forward of the mouth, so the flare is not
+                                         -- buried inside the barrel sprite
+  flare_cold = 1.30, flare_hot = 2.90,
+  flare_alpha = 0.55,
+  -- long enough to read past the flare: a cone that only covers the first tile is
+  -- completely hidden behind the burst
+  cone_len_cold = 1.60, cone_len_hot = 3.80,
+  cone_width_cold = 0.90, cone_width_hot = 2.30,
+  cone_alpha = 0.65
+}
+-- Impact: a flare wherever the nearest cut body is (so the beam visibly bites), and a
+-- smaller one where the lance reaches its full length, so it terminates in something
+-- instead of stopping in mid-air.
+C.beam_impact = {flare_cold = 0.85, flare_hot = 2.00, alpha = 0.55}
+C.beam_tip    = {flare_cold = 0.55, flare_hot = 1.10, alpha = 0.28}
+C.beam_pulse_pop    = 1.45   -- size multiplier while a pulse is fresh
+C.beam_pulse_ticks  = 3      -- how long "fresh" lasts, ticks
+C.beam_pop_ticks    = 6      -- how long the one-shot flares live before the engine
+                             -- frees them (cut marks at every body on the line)
+-- Fade: the lance thins and dims over this many ticks when firing stops (or when the
+-- turret/target dies mid-beam) instead of snapping off the screen.
+C.beam_fade_ticks   = 10
 
 -- fuel -----------------------------------------------------------------------
 -- A fluid turret burns fluid per shot all by itself; the script adds a surcharge

@@ -1,0 +1,39 @@
+[beam] turret 1 at 0.5,200.5 dummy=true
+[beam] turret 2 at 6.5,200.5 dummy=true
+[beam] turret 3 at 12.5,200.5 dummy=true
+[beam] turret 4 at 18.5,200.5 dummy=true
+[beam] turret 5 at 24.5,200.5 dummy=true
+[beam] turret 6 at 30.5,200.5 dummy=true
+[beam] turret 1 fluid 200.0 (insert=200)
+[beam] turret 2 fluid 200.0 (insert=200)
+[beam] turret 3 fluid 200.0 (insert=200)
+[beam] turret 4 fluid 200.0 (insert=200)
+[beam] turret 5 fluid 200.0 (insert=200)
+[beam] turret 6 fluid 200.0 (insert=200)
+[beam] t6: render objects ours=0 turrets=6
+[beam] shot 01-single-close          -> true
+[beam] shot 02-six-firing            -> true
+[beam] shot 03-beam-mid              -> true
+[beam] t178 all firing: firing=6 idle=0 gone=0 objects=120
+[beam] t178: render objects ours=120 turrets=6
+[beam] script profiler started
+[beam] script time per tick, six meltas firing: Duration: 4.332967ms
+[beam] killed 6 dummies (every turret loses its target at once)
+[beam] shot 04-beams-fading          -> true
+[beam] t363 (3 ticks after every target died): render objects ours=120 turrets=6
+[beam] shot 05-beams-gone            -> true
+[beam] t376 (15 ticks after every target died): render objects ours=12 turrets=6
+[beam] t380 after every target died: firing=0 idle=6 gone=0 objects=12
+[beam] dummies respawned
+[beam] destroying turret 3 mid-beam (shooting_target=true)
+[beam] shot 06-turret-dead-fading    -> true
+[beam] t463 (3 ticks after a turret died mid-beam): render objects ours=118 turrets=6
+[beam] shot 07-turret-dead-gone      -> true
+[beam] t476 (15 ticks after a turret died mid-beam): render objects ours=100 turrets=6
+[beam] t480 after turret death: firing=5 idle=0 gone=1 objects=85
+[beam] night switch -> true
+[beam] shot 08-night                 -> true
+[beam] shot 09-night-six             -> true
+[beam] shot 10-night-wide            -> true
+[beam] t540 final: render objects ours=100 turrets=6
+[beam] BEAM PROBE DONE
