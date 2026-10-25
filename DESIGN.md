@@ -267,10 +267,10 @@ fails if the port does not reach the pipe or if any bare ground shows in between
 
 | side | port reaches | pipe's near edge | overlap | bare ground between |
 |---|---|---|---|---|
-| north | 1.95 | 1.52 | +0.43 | 0 |
-| east | 1.85 | 1.50 | +0.35 | 0 |
-| south | 1.74 | 1.19 | +0.55 | 0 |
-| west | 1.97 | 1.52 | +0.45 | 0 |
+| north | 1.98 | 1.52 | +0.46 | 0 |
+| east | 1.89 | 1.50 | +0.39 | 0 |
+| south | 1.77 | 1.19 | +0.58 | 0 |
+| west | 2.01 | 1.52 | +0.50 | 0 |
 
 The capped sprite is checked the same way (`cap px`: pixels the blanking plate adds over
 the open port, 72-160 per side) so "no pipe connected" cannot silently revert to looking
