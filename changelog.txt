@@ -23,7 +23,44 @@ Date: 2026-10-25
     - Cheaper than the old beam despite owning 17 render objects per turret instead of 15:
       the draw path allocates nothing per tick (measured -15% script time with six turrets
       firing continuously)
+  Changes:
+    - Reach is 16 tiles (was 12), and quality extends it through the engine's own
+      `range_multiplier` rather than a script multiplier: 16 / 17.6 / 19.2 / 20.8 / 24 at
+      normal / uncommon / rare / epic / legendary, and that is both the acquisition and the
+      firing range. The drawn lance mirrors the multiplier and stops at `C.range_max` = 24,
+      so a modded quality with a silly number cannot hand the turret a 48-tile beam.
+      Measured headless on 2.1.23: a normal melta engages at 15 tiles and not 19, a
+      legendary at 23 and not 27, and with the quality mod disabled the whole ladder
+      collapses back to 16
+    - The head turns 5x faster, 0.03 turns/tick (10.8 deg/tick) instead of 0.006 (2.16,
+      inherited from the rocket turret): half a turn takes 16-17 ticks (0.27 s) instead of
+      83 (1.4 s). The old speed could not track a behemoth biter crossing at 0.3 tiles/tick
+      inside its own range; worst-case aim error while tracking that crossing is now 10.7
+      deg. Still twice the vanilla gun turret's 0.015, so it reads as a heavy mount and not
+      a snap turret
+    - The beam can break asteroids now. Every space-age asteroid resists 100 % of the
+      damage types it does not list, and fire is listed for none, so 85 % of every pulse was
+      zero; big and huge rocks then subtracted 2000/3000 flat armour from what was left.
+      Measured before: 11 pulses per small rock, 31 per medium, and a big rock took 0.14 hp
+      from 236 pulses -- effectively immune. Each pulse now adds one extra `explosion` hit
+      (the type the vanilla asteroid ladder is balanced on: 50/30/10/99 %) sized
+      `C.asteroid_damage_multiplier` = 1.6 and gated on `entity.type == "asteroid"`:
+      small 100 hp = 2-3 pulses (0.75 s), medium 400 = 5-7 (1.4 s), big 2000 = 17-21
+      (3.4 s), while a huge rock still outlives a full minute of fire and stays railgun
+      work. Pawns are untouched (821 -> 823 dps on a plain dummy, behemoth TTK ~4.2 s
+      either way); set the dial to 0 to switch the rock channel off
   Fixed:
+    - Pipes read as connected on all four sides. The turret was setting only
+      `fluid_box.pipe_covers`, which 2.1 draws where NOTHING is connected
+      (`always_draw_covers` defaults to true when `pipe_picture` is absent), so every side
+      got vanilla's cap collar about 0.3 tiles short of the pipe, and no port art at all
+      where the pipe arrived. It now carries its own port model -- mount pad, ribbed neck,
+      bolted clamp collar, socket mouth -- as `pipe_picture` where a pipe is connected and a
+      blanked-off plate as `pipe_covers` where none is, with a per-side offset for the 51
+      deg camera (south +0.18, west -0.22 tiles). Port reach overlaps the pipe's near edge
+      by 0.35-0.58 tiles on every side with no bare floor between them; straight, L, T,
+      cross and dead-end runs all meet cleanly, and an unconnected port shows the bolted
+      plate instead of a floating collar
     - The impact flare no longer lingers on a dead body: it is re-positioned to its target
       every tick and hidden the instant that body dies
     - The core lines are mixed toward white; a fuel-coloured line over an additive glow
