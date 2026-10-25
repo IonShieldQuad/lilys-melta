@@ -15,6 +15,11 @@ Date: 2026-10-25
     - selection_box widened to +-1.6 tiles and drawing_box_vertical_extension added so the
       big cannon is fully clickable and does not clip behind neighbours; collision_box is
       unchanged at +-1.2 tiles, so existing blueprints place exactly as before
+    - The turret, the item that places it, the technology and thumbnail.png use icons
+      rendered from that same model now, so no vanilla turret icon art is borrowed
+    - The fluid box became a symmetric four-port set at 1.12 tiles carrying vanilla
+      pipe covers, and the hull is de-squashed in Y so the north and south sockets
+      meet it: a pipe ends in a visible socket on all four sides
   Fixed:
     - The beam no longer appears while the turret is still turning: it waits until the
       head is within one rotation step (2.16 deg) of the target, and the muzzle plays a
@@ -24,6 +29,13 @@ Date: 2026-10-25
       fixed point in front of the pivot: the rendered head is a pitched-camera image, so
       the mouth sits 1.51 tiles from the pivot pointing north but only 0.39 pointing south
       (a raised muzzle is drawn further up the screen)
+    - Damage is fire with a physical slice instead of a damage type of the mod's own:
+      each pulse is 85 % fire + 15 % physical out of the same total, and the `thermal`
+      damage type is gone from the mod entirely
+    - The firing sound is ~15 dB louder in the mix: the loop was re-mastered
+      (-26.4 -> -15.2 dBFS RMS) and now sits at -18.3 dBFS against the vanilla
+      flamethrower turret's -19.2, with aggregation capped at 2 voices so several
+      turrets cannot clip
   Notes:
     - Art pipeline lives in graphics/_blender/ (melta_render.py, assemble.py,
       check_sheets.py, muzzle_marker.py, check_beam_anchor.py, README.md); re-render with
@@ -31,6 +43,12 @@ Date: 2026-10-25
     - muzzle_marker.py projects the model's own muzzle points through Blender's camera and
       check_beam_anchor.py tests the result against every shipped frame, so the beam anchor
       can be re-derived after any re-render instead of guessed
+    - The 15 % physical slice is absorbed by the biters' flat physical armour: dps is
+      unchanged against unarmoured targets but ~8-15 % lower against medium, big and
+      behemoth biters. C.physical_share is the dial if that trade is not wanted
+    - Pipe joins: east, south and west meet the hull; north leaves ~0.12 tiles, and
+      vanilla assembling-machine-2 (same +-1.2 collision box) leaves 0.22 on its own
+      north side. Measured by graphics/_blender/pipe_sockets.py --check
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 Version: 0.3.0

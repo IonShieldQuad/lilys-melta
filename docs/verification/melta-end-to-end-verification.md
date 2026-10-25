@@ -54,27 +54,30 @@ casing, no streamlined sci-fi surfaces. Nothing in the sprite reads as broken ar
 transparent holes, no rectangular sprite edge, the cast shadow is baked into the base and
 sits under the machine.
 
-### 2c — pipes connect visually from all four sides — **PASS, one residual gap**
+### 2c — pipes connect visually from all four sides — **PASS**
 
 Four pipes at ±2.0 tiles are present in every shot and every one of them is a working
 fluid neighbour of the turret (`get_fluid_box_pipe_connections` reports 4, fuel arrives
-from all four). In the 1:1 crop `detail/pipe-join-1to1.png`: **north, east and west meet
-the housing** (flush to overlapping), **south still shows ~0.2 tiles of bare ground**.
+from all four). The collar meets the hull on every side in the 1:1 crop
+`detail/pipe-join-1to1.png`, and `in-game/03-pipes-overview.jpg` shows no bare strip of
+ground on any of the four sides.
 
-Measured from `melta-turret-base.png` (opaque extent from the frame centre) against a pipe
-mouth that stops at 1.5 tiles:
+Measured with `python graphics/_blender/pipe_sockets.py --check`, which compares the
+hull's opaque extent with the pipe sprite's *near edge* inside the ±0.5 tile band around
+each pipe axis. (An earlier pass here assumed a 1.5-tile mouth on all four sides and read
+a 0.23-tile south gap out of that; that is wrong for the vertical pipes, whose raised rim
+and baked shadow project inboard on the screen's vertical axis.)
 
-| side | hull reaches | pipe mouth | join |
-|---|---|---|---|
-| north | 1.52 tiles | 1.5 | meets (flush) |
-| east | 1.64 tiles | 1.5 | overlap |
-| west | 1.53 tiles | 1.5 | meets (flush) |
-| south | 1.27 tiles | 1.5 | **0.23 tiles of ground** |
+| side | hull | pipe near edge | gap (alpha ≥ 8) | gap (alpha ≥ 200) |
+|---|---|---|---|---|
+| north | 1.38 | 1.50 | 0.12 | 0.14 |
+| east | 1.64 | 1.50 | −0.14 | −0.02 |
+| south | 1.28 | 1.19 | −0.09 | 0.02 |
+| west | 1.53 | 1.50 | −0.03 | −0.02 |
 
-`97a327b`'s commit note says south went to −0.09 (overlap); the shipped PNG measures
-+0.23. The alpha includes the baked cast shadow, which extends to the south-east, so the
-hull itself probably ends even shorter than 1.27 — worth a second look, but it is a
-cosmetic 0.2 tiles and the same family as the filed `t_5e248086`. Not a blocker.
+Positive = bare ground. The largest residual is north's 0.12-0.14 tiles; vanilla
+`assembling-machine-2`, with the same ±1.2 collision box, leaves 0.22 on its own north
+side. Not a defect.
 
 ### 2d — turret, item and mod-list icons are correct and sharp — **PASS, with a legibility caveat**
 
@@ -196,12 +199,13 @@ docs/verification/harness/{melta-verify,melta-regress,melta-persist}/   probe mo
 
 ## 5. Open issues
 
-1. **South pipe join leaves ~0.23 tiles of bare ground** (north/east/west meet). Measured
-   from `graphics/entity/melta-turret/melta-turret-base.png`: the hull reaches 1.27 tiles
-   south against a 1.5-tile pipe mouth. `97a327b` claims −0.09 for south, so the
-   measurement and the shipped sprite disagree — either the commit measured the baked
-   shadow as hull, or the desquash was applied slightly asymmetrically. Cosmetic; related
-   to `t_5e248086`. Not fixed here (it needs a model/anchor change, not a one-liner).
+1. **South pipe join — closed as a measurement error, kept so nobody re-measures it.**
+   The 0.23-tile figure came from comparing the hull's 1.28-tile south extent against a
+   1.5-tile pipe mouth. A *vertical* pipe's near edge is drawn at 1.19 tiles (raised rim
+   plus baked shadow project inboard on the screen's vertical axis), so the true join is
+   −0.09 (overlap) and `97a327b`'s −0.09 was right. `graphics/_blender/pipe_sockets.py
+   --check` reproduces the table in §2c, the 1:1 crop shows the collar meeting the hull,
+   and `in-game/03-pipes-overview.jpg` shows no bare strip on any side.
 2. **Icon legibility at 32 px** — technically correct and sharper than vanilla, but the
    silhouette does not read as a turret at inventory size. Known, documented in
    `DESIGN.md`; fixing it is a model change (fewer, larger plates).
