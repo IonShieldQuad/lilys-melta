@@ -150,6 +150,48 @@ Brightness is tuned against vanilla art rather than by eye: the tone curve in
 turret sprites (p10 ~4, p50 ~26, p90 ~120), so the turret does not read as a
 brighter or flatter object pasted into the world.
 
+## Plumbing (pipes and sockets)
+
+The turret drinks from a pipe, so the pipe has to *look* like it goes somewhere. It
+did not: the art was replaced by a much wider hull, the ports stayed at the old
+positions, and a pipe simply ran on top of the emplacement.
+
+What the geometry actually allows — all measured, not assumed:
+
+- A pipe is a 1-tile entity and the turret's collision box is 1.2, so the nearest tile
+  a pipe can occupy is **2.0 tiles** from the turret's centre (`can_place_entity` is
+  false at 1.0 and true at 2.0). The pipe's art then stops at 1.5 tiles.
+- A `pipe_connection.position` **must lie inside the entity's collision box** — the
+  loader rejects anything else ("PipeConnectionDefinition: position must be inside of
+  entity bounding box"), so the socket can never be drawn out at the pipe's mouth;
+  1.199 is the hard ceiling.
+- `pipe_covers` are drawn **at the connection point, inboard of it**: vanilla's cover
+  art sits 0.28-0.5 tiles inside the anchor. That makes them sockets on the machine's
+  wall, not sleeves out in the gap.
+- Turret fluid boxes **rotate with the entity**: rotating the turret moved an
+  asymmetric port set by 0.15 tiles and would slide the sockets off their pipes. Hence
+  one symmetric number, `C.pipe_reach = 1.12`, for all four sides.
+- Vanilla pipe covers (`pipecoverspictures()`) come from base with both diffuse and
+  shadow layers, `priority = "extra-high"` — above the hull's `"high"`, so no
+  z-fighting and no re-ordering needed.
+
+So the ports are `+-1.12` tiles on the four axes, `flow_direction` left at the engine
+default (`"input-output"`, verified at runtime by reading
+`get_fluid_box_pipe_connections`) like the vanilla flamethrower turret, and
+`fluid_box.pipe_covers` carries the four vanilla cover sprites.
+
+Measured join (screen distance from the turret centre to the pipe's near edge vs the
+hull's own silhouette): east the pipe overlaps the hull by 0.12 tiles, west is exactly
+flush, south leaves 0.17 and north 0.42 tiles of ground. Vanilla's own
+assembling-machine-2 — same 2.4 collision box, same rule — leaves 0.22 on its north
+side, so north is the one side where the hull silhouette is genuinely thin: the pitched
+render camera compresses the hull to 1.02-1.09 tiles in Y (the vanilla rocket hull it
+replaces reaches 1.00, so this is inherited, not a regression). Closing that last gap
+means a ~0.2-tile deeper north skirt in the model, not a different connection point.
+
+`docs/pipe-sockets/` holds the comparison that picked 1.12 (sink / flush / float /
+no-covers) and the four side views, with a README that says exactly how they were made.
+
 ## Engine facts this leans on (and the ones that bit)
 
 - `LuaEntity::shooting_state` **throws** on turrets ("Entity is not character") — use

@@ -106,11 +106,29 @@ local turret =
   {
     production_type = "none",        -- fluid turrets run their own fluid logic
     volume = C.fluid_buffer,
+    -- One port per side, so the turret can be plumbed from any direction (it used
+    -- to be west+east only). `position` is where the pipe stops; it has to sit on
+    -- the emplacement's silhouette, or a 1-tile pipe -- which can only be built 2.0
+    -- tiles from the centre -- either buries itself in the hull or floats short of
+    -- it. One symmetric number for all four sides so rotating the turret (the ports
+    -- rotate with it) cannot slide a socket off its pipe: see C.pipe_reach.
+    --
+    -- `flow_direction` is left at the engine default ("input-output", confirmed by
+    -- reading it back at runtime), exactly like the vanilla flamethrower turret: the
+    -- buffer has to be *able* to drain as well as fill (fluid_buffer_input_flow caps
+    -- the fill rate), and pinning it to "input" would turn a full turret into a dead
+    -- end for the rest of the line.
     pipe_connections =
     {
-      {direction = defines.direction.west, position = {-1.2, 0}},
-      {direction = defines.direction.east, position = {1.2, 0}}
-    }
+      {direction = defines.direction.north, position = {0, -C.pipe_reach}},
+      {direction = defines.direction.east, position = {C.pipe_reach, 0}},
+      {direction = defines.direction.south, position = {0, C.pipe_reach}},
+      {direction = defines.direction.west, position = {-C.pipe_reach, 0}}
+    },
+    -- the socket a pipe visibly ends in, one vanilla pipe-cover sprite per side
+    -- (prototypes/graphics.lua): drawn above the hull (extra-high vs high), so the
+    -- join reads as "pipe into port" instead of "pipe lying on the emplacement"
+    pipe_covers = head.pipe_covers
   },
   fluid_buffer_size = C.fluid_buffer,
   fluid_buffer_input_flow = 1.6,   -- units/tick: enough to feed ~50/s at full beam

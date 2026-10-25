@@ -53,10 +53,26 @@ local base =
   priority = "high"
 }
 
+-- Pipe sockets ---------------------------------------------------------------
+-- A pipe is a 1-tile entity and the turret's collision box is 1.2, so the nearest tile
+-- a pipe can occupy is 2.0 tiles out and its art stops at 1.5 -- past the hull's
+-- silhouette on X (1.62) but short of it in Y (1.02-1.09, the camera is pitched). With
+-- no socket the pipe just runs over the emplacement and reads as floating.
+--
+-- Vanilla's own answer is `pipe_covers`: a capped pipe end, drawn once per connected
+-- side at the connection point. We reuse the vanilla art (the same 128x128 @ 0.5
+-- sprites and shadow layers the flamethrower turret uses) so the socket matches every
+-- pipe in the game; `pipecoverspictures()` is base's helper and __space-age__ calls it
+-- too, so it follows base art changes. They draw at priority "extra-high", above the
+-- hull's "high" -- no z-fighting, no render-layer juggling.
+--
+-- Nothing to configure per side: the engine draws the right variant from the
+-- connection's direction. See C.pipe_reach for where they sit.
 return
 {
   head = head,
   base = base,
+  pipe_covers = pipecoverspictures(),
 
   attacking_animation = head_layers(),
   prepared_animation = head_layers(),

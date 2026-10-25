@@ -60,6 +60,24 @@ C.camera_tilt_deg = 51    -- the render camera's pitch from vertical. control.lu
                           -- cos(tilt) to foreshorten the forward reach on screen and
                           -- sin(tilt)*height to lift a raised muzzle up the screen.
 
+-- plumbing -------------------------------------------------------------------
+-- Where a pipe stops against the emplacement. Two hard constraints set this number:
+--   1. a 1-tile pipe can only be built 2.0 tiles from the turret's centre (its 1.0
+--      tile is inside the turret's 1.2 collision box), so the pipe's mouth lands at
+--      1.5 tiles -- and the engine refuses a pipe_connection outside the entity's
+--      collision box ("position must be inside of entity bounding box"), so the
+--      socket can never be drawn at the mouth itself, only as close in as 1.199;
+--   2. the turret rotates, and pipe connections rotate with the entity, so an
+--      asymmetric reach would move every port by up to 0.15 tiles on an R press and
+--      slide the sockets off their pipes. One symmetric number keeps the four ports
+--      on top of themselves for all four rotations (proved with a headless probe).
+-- 1.12 is the measured compromise: the rendered hull's silhouette is 1.56 tiles wide
+-- on X but only 1.02-1.09 on Y (the camera is pitched 51 deg), so 1.12 sits within a
+-- tenth of a tile of the rim on all four sides and the vanilla pipe-cover sprite
+-- reads as a socket on the housing instead of a plate floating in the gap.
+C.pipe_reach = 1.12   -- tiles, all four sides
+
+
 -- beam look ------------------------------------------------------------------
 -- Four stacked lines. Colours come from whichever fuel is burning (see C.fuels) and
 -- the alphas ramp with charge: the sheath is the wide heat column, the core is the
