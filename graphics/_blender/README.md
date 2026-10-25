@@ -14,6 +14,8 @@ damage level by changing numbers instead of pixels.
                       the packed mip chain, plus the mod thumbnail
     check_icons.py    offline stand-in for the atlas: sizes, packed mips, framing,
                       and that the prototypes point at these files
+    pipe_sockets.py   measures the hull/pipe join on all four sides from the sprites,
+                      and draws the docs/pipe-sockets views
     preview.py        (scratch tool) lays renders on a ground tile for review
 
 ## Requirements
@@ -41,6 +43,24 @@ python assemble.py C:/tmp/melta/raw C:/tmp/melta/sheets
 
 Copies nothing: point the second argument at a scratch dir, then copy
 `sheets/graphics/entity/melta-turret/*.png` into the mod.
+
+Two options matter for the hull:
+
+```bash
+# only the static base sprite (a hull-only change needs one 13 s render, not 64)
+blender -b --factory-startup -P melta_render.py -- --out C:/tmp/melta/raw --dirs none
+python assemble.py C:/tmp/melta/raw C:/tmp/melta/sheets --only base
+```
+
+`BASE_DESQUASH_Y` in `assemble.py` stretches the **base layer only** in Y about the
+frame centre (1.26 at the time of writing): the camera's 51 deg pitch draws the round
+hull squashed, and the pipe ports on its north/south walls need the silhouette deeper
+than that. `shift` stays `{0, 0}` and the head sheets are never resampled, so the pivot
+does not move. Measure the result, do not eyeball it:
+
+```bash
+python pipe_sockets.py --check        # gap table per side, exit 1 over 0.22 tiles
+```
 
 ## Icons and thumbnail
 

@@ -180,17 +180,40 @@ default (`"input-output"`, verified at runtime by reading
 `get_fluid_box_pipe_connections`) like the vanilla flamethrower turret, and
 `fluid_box.pipe_covers` carries the four vanilla cover sprites.
 
-Measured join (screen distance from the turret centre to the pipe's near edge vs the
-hull's own silhouette): east the pipe overlaps the hull by 0.12 tiles, west is exactly
-flush, south leaves 0.17 and north 0.42 tiles of ground. Vanilla's own
-assembling-machine-2 — same 2.4 collision box, same rule — leaves 0.22 on its north
-side, so north is the one side where the hull silhouette is genuinely thin: the pitched
-render camera compresses the hull to 1.02-1.09 tiles in Y (the vanilla rocket hull it
-replaces reaches 1.00, so this is inherited, not a regression). Closing that last gap
-means a ~0.2-tile deeper north skirt in the model, not a different connection point.
+Measured join — distance from the turret centre to the hull's own silhouette vs to the
+pipe's near edge, at 64 px/tile, measured in a +-0.5 tile band around each pipe axis
+(that band is the only part of the hull a pipe can meet):
+
+| side | hull silhouette | pipe's near edge | ground gap |
+|---|---|---|---|
+| north | 1.38 | 1.50 | **+0.12** |
+| east | 1.64 | 1.50 | −0.14 (pipe overlaps the hull) |
+| south | 1.28 | 1.19 | −0.09 (overlap: the pipe's raised rim projects over the skirt) |
+| west | 1.53 | 1.50 | −0.03 |
+
+The south and east pipe ends are drawn *closer* than 1.5 tiles because the vertical
+pipe sprite's raised rim, and the baked cast shadow, project inboard on screen — that is
+the art, not a port placement.
+
+North used to be +0.42 and was the one side that read as unattached. It was not a
+plumbing problem: a `pipe_connection` cannot sit outside the 1.199 collision box and the
+cover art draws inboard of the anchor, so no socket sprite can reach into that gap. The
+cause was the **art**: `melta-turret-base.png` is rendered through a 51° pitched
+orthographic camera, so the round hull's footprint is drawn squashed in Y — 3.05 tiles
+wide but only ~2.1 tall where vanilla turret hulls run about 1.2 wide-to-tall. So
+`assemble.py` now de-squashes the base layer vertically (`BASE_DESQUASH_Y = 1.26`,
+applied about the frame centre, so `shift = {0, 0}` and the head stays concentric). Only
+the base layer: the 64 head frames are not resampled, so the pivot is untouched.
+
+For reference, vanilla `assembling-machine-2` (same ±1.2 collision box, so pipes also sit
+2.0 tiles out) leaves **+0.24** on its north side — measured the same way, in
+`docs/pipe-sockets/reference-vanilla.png`. Ours is now tighter than vanilla's.
 
 `docs/pipe-sockets/` holds the comparison that picked 1.12 (sink / flush / float /
-no-covers) and the four side views, with a README that says exactly how they were made.
+no-covers), the four side views, the north before/after panel, the vanilla reference and
+`gaps.json` (the measured table), with a README that says exactly how they were made and
+the one command that re-measures them:
+`python graphics/_blender/pipe_sockets.py --check`.
 
 ## Engine facts this leans on (and the ones that bit)
 

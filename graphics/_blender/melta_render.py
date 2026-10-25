@@ -11,6 +11,9 @@ Run -- native Windows paths required for the Blender binary:
   blender -b --factory-startup -P melta_render.py -- \
       --out C:/tmp/melta/raw --dirs all --res 512 --samples 40
 
+  --dirs none renders the hull pass only (~11 s instead of ~12 min), for a change
+  that only touches the static base sprite.
+
 Outputs, into --out:
   base/hull.png            static hull (transparent, FRAME-sized after assembly)
   gun/gun-000..063.png     head frames, pivot at image centre, 0 = north
@@ -895,6 +898,10 @@ def main():
 
     if DIR_ARG == "all":
         dirs = list(range(DIRECTIONS))
+    elif DIR_ARG in ("", "none", "base"):
+        # base pass only -- the hull sprite is a single still, so a hull-only change
+        # does not need the 64 head frames re-rendered
+        dirs = []
     else:
         dirs = [int(x) for x in DIR_ARG.split(",")]
 

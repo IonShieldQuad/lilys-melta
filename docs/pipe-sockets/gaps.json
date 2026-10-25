@@ -1,0 +1,65 @@
+{
+  "pipe_reach": 1.12,
+  "max_gap": 0.22,
+  "measured_at": "64 px/tile, +-0.5 tile band around each pipe axis",
+  "sides": {
+    "north": {
+      "hull": 1.375,
+      "pipe_near": 1.5,
+      "gap": 0.125,
+      "hull_strict": 1.359,
+      "gap_strict": 0.141
+    },
+    "east": {
+      "hull": 1.641,
+      "pipe_near": 1.5,
+      "gap": -0.141,
+      "hull_strict": 1.516,
+      "gap_strict": -0.016
+    },
+    "south": {
+      "hull": 1.281,
+      "pipe_near": 1.188,
+      "gap": -0.094,
+      "hull_strict": 1.188,
+      "gap_strict": 0.016
+    },
+    "west": {
+      "hull": 1.531,
+      "pipe_near": 1.5,
+      "gap": -0.031,
+      "hull_strict": 1.516,
+      "gap_strict": -0.016
+    }
+  },
+  "before": {
+    "north": {
+      "hull": 1.094,
+      "pipe_near": 1.5,
+      "gap": 0.406,
+      "hull_strict": 1.078,
+      "gap_strict": 0.422
+    },
+    "east": {
+      "hull": 1.641,
+      "pipe_near": 1.5,
+      "gap": -0.141,
+      "hull_strict": 1.516,
+      "gap_strict": -0.016
+    },
+    "south": {
+      "hull": 1.031,
+      "pipe_near": 1.188,
+      "gap": 0.156,
+      "hull_strict": 0.938,
+      "gap_strict": 0.266
+    },
+    "west": {
+      "hull": 1.531,
+      "pipe_near": 1.5,
+      "gap": -0.031,
+      "hull_strict": 1.516,
+      "gap_strict": -0.016
+    }
+  }
+}
