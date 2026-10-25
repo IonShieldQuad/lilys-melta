@@ -1,0 +1,8 @@
+{
+  "name": "melta-ast-probe",
+  "version": "0.0.1",
+  "title": "melta asteroid damage probe",
+  "author": "verification run",
+  "factorio_version": "2.1",
+  "dependencies": ["base", "space-age", "lilys-melta"]
+}

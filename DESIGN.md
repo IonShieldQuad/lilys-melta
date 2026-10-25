@@ -54,6 +54,22 @@ i.e. exactly 56 x 1.6, 15 % of it, and 86.4 % of it.
 Derived: a behemoth biter (3000 hp) dies in ~8 s of full-intensity fire (was ~7 s): its
 flat 12 physical resistance swallows the physical slice whole (0.15 x 56 = 8.4).
 
+## Asteroids (space age)
+
+Rocks are the one target class the fire beam cannot touch: every asteroid prototype gets
+`percent = 100` on every damage type it does not list, and `fire` is listed for none of
+them — so 85 % of a pulse was zero, and the 15 % physical slice was eaten whole by the
+-2000 / -3000 flat armour of big and huge asteroids. Measured before the fix: small rock
+11 pulses, medium 31, big and huge never (236 pulses for 0.14 hp).
+
+The melta now delivers one extra hit per pulse to `entity.type == "asteroid"` — an
+`explosion` hit sized `C.asteroid_damage_multiplier` (1.6) x the pulse. Explosion is the
+type the vanilla asteroid ladder is built on (small 50 %, medium 30 %, big 10 %, huge
+99 %), so the turret becomes a small/medium/big rock killer and huge asteroids stay
+railgun work. After the fix: 2–3 / 5–6 / 17 pulses and huge >8 minutes. Pawn dps is
+byte-identical before and after, because the extra call is gated on the asteroid type.
+Full numbers, method and the reproducible harness: `docs/verification/asteroid-damage.md`.
+
 ## How it is built
 
 **Why a *fluid* turret.** The engine offers exactly two turret shapes: an ammo turret

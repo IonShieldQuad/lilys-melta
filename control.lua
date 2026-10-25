@@ -297,6 +297,15 @@ local function pulse(turret, state, muzzle, dx, dy, reach)
       if victim.valid and victim.health and victim.health > 0 then
         victim.damage(dealt * C.physical_share, force, C.damage_type_hit, turret)
       end
+      -- Asteroids are 100 % fire resistant and their big/huge tiers subtract 2000/3000
+      -- from every physical hit, so a rock would otherwise take almost nothing from the
+      -- beam. Rocks get an extra hit in `explosion` -- the damage type the vanilla
+      -- asteroid ladder is balanced around -- sized off the same pulse, so it ramps with
+      -- charge, with fuel and with pierce falloff like everything else. Gated on the
+      -- entity type, so pawns, spawners and buildings never take it (constants.lua).
+      if victim.valid and victim.health and victim.health > 0 and victim.type == "asteroid" then
+        victim.damage(dealt * C.asteroid_damage_multiplier, force, C.asteroid_damage_type, turret)
+      end
       pop(turret.surface, hit.position, state.charge, 0.42 + 0.35 * state.charge, 0.85, "higher-object-above")
     end
     stop = hit.position

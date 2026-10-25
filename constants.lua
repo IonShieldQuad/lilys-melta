@@ -33,6 +33,36 @@ C.pierce_falloff  = 0.82  -- each further body in the line takes this fraction o
 C.pierce_max      = 12    -- hard cap on bodies a single pulse can cut through
 C.hit_half_width  = 0.45  -- tiles: half-width of the line hit test around the beam axis
 
+-- asteroids / rocks ------------------------------------------------------------
+-- A melta pulse is 85 % fire, and EVERY space-age asteroid is 100 % fire resistant:
+-- data/space-age/prototypes/entity/asteroid.lua gives every asteroid an explicit
+-- `percent = 100` entry for each damage type its type does not list, and fire is
+-- listed for none of them. So 85 % of the beam is literally nothing on a rock, and
+-- the 15 % physical slice is all that lands -- until the rock's flat armour eats it:
+--
+--   asteroid   hp    physical resistance        physical that lands per pulse (hot)
+--   small      100   none                       8.4
+--   medium     400   10 %, no flat armour       7.6
+--   big       2000   10 % and -2000 flat        0.0   <- the whole slice is absorbed
+--   huge      5000   10 % and -3000 flat        0.0   <- same
+--
+-- Rocks therefore get their own channel: an extra hit sized as a multiple of the
+-- pulse, in a damage type the vanilla asteroid ladder already balances. `explosion`
+-- is that ladder (small 50 %, medium 30 %, big 10 %, huge 99 % resistance), so the
+-- melta becomes a small/medium/big rock killer and leaves huge asteroids to the
+-- railgun -- the progression space-age already ships.
+--
+-- `asteroid_damage_multiplier` is the single dial (0 removes the channel). Measured
+-- on metallic asteroids with one turret on light oil (docs/verification/
+-- asteroid-damage.md): 1.6 gives 2-3 pulses for a small rock, 5-6 for a medium and 17
+-- for a big one, while a huge one takes >10 minutes and stays untouched in practice.
+-- 1.9 was measured too: big drops 17 -> 15 pulses, medium and small are unchanged.
+-- Pawns never see this number -- it is gated on `entity.type == "asteroid"` in
+-- control.lua, and biter dps was measured identical before and after.
+C.asteroid_damage_type       = "explosion"
+C.asteroid_damage_multiplier = 1.6   -- x pulse damage per pulse, asteroids only
+
+
 -- aiming ----------------------------------------------------------------------
 -- The engine turns the head at `rotation_speed` (prototypes/entity.lua: 0.006 turns
 -- per tick = 2.16 deg/tick, measured with a headless probe) and only lets the
