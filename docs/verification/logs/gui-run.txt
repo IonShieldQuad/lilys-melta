@@ -1,0 +1,163 @@
+   1.412 [Audio] Driver:wasapi, Device:Default device, Depth:32, Channels:2, Frequency:44100
+   2.852 Loading mod core 0.0.0 (data.lua)
+   2.950 Loading mod base 2.1.23 (data.lua)
+   3.846 Loading mod lilys-melta 0.4.0 (data.lua)
+   4.060 Loading mod melta-verify 0.0.1 (data.lua)
+   4.133 Loading mod base 2.1.23 (data-updates.lua)
+   4.216 Loading mod lilys-melta 0.4.0 (data-updates.lua)
+   6.289 Loading sounds...
+  17.041 Initial atlas bitmap size is 4096
+  17.051 Created an atlas bitmap (size 4096x4092) [none]
+  17.060 Created an atlas bitmap (size 4096x4076) [none]
+  17.068 Created an atlas bitmap (size 4096x4092) [none]
+  17.076 Created an atlas bitmap (size 4096x4072) [none]
+  17.082 Created an atlas bitmap (size 4096x4084) [none]
+  17.091 Created an atlas bitmap (size 4096x4076) [none]
+  17.097 Created an atlas bitmap (size 4096x4076) [none]
+  17.104 Created an atlas bitmap (size 4096x4068) [none]
+  17.111 Created an atlas bitmap (size 4096x4096) [none]
+  17.123 Created an atlas bitmap (size 4096x4092) [none]
+  17.128 Created an atlas bitmap (size 4096x4096) [none]
+  17.132 Created an atlas bitmap (size 4096x4084) [none]
+  17.137 Created an atlas bitmap (size 4096x4084) [none]
+  17.141 Created an atlas bitmap (size 4096x4088) [none]
+  17.145 Created an atlas bitmap (size 4096x4092) [none]
+  17.149 Created an atlas bitmap (size 4096x4092) [none]
+  17.152 Created an atlas bitmap (size 4096x4076) [none]
+  17.154 Created an atlas bitmap (size 4096x4076) [none]
+  17.156 Created an atlas bitmap (size 4096x4084) [none]
+  17.158 Created an atlas bitmap (size 4096x4092) [linear-magnification]
+  17.161 Created an atlas bitmap (size 4096x4084) [linear-magnification]
+  17.164 Created an atlas bitmap (size 4096x4080) [none]
+  17.165 Created an atlas bitmap (size 4096x4072) [none]
+  17.166 Created an atlas bitmap (size 4096x3920) [none]
+  17.167 Created an atlas bitmap (size 4096x4096) [none]
+  17.167 Created an atlas bitmap (size 4096x4048) [none]
+  17.169 Created an atlas bitmap (size 4096x4092) [none]
+  17.169 Created an atlas bitmap (size 4096x4048) [none]
+  17.170 Created an atlas bitmap (size 4096x4092) [none]
+  17.170 Created an atlas bitmap (size 4096x2192) [none]
+  17.172 Created an atlas bitmap (size 4096x4096) [low-object]
+  17.173 Created an atlas bitmap (size 4096x4096) [low-object]
+  17.174 Created an atlas bitmap (size 4096x4096) [low-object]
+  17.175 Created an atlas bitmap (size 4096x4096) [low-object]
+  17.176 Created an atlas bitmap (size 4096x4064) [low-object]
+  17.176 Created an atlas bitmap (size 4096x4096) [low-object]
+  17.176 Created an atlas bitmap (size 4096x4064) [low-object]
+  17.177 Created an atlas bitmap (size 4096x4044) [corpse-decay]
+  17.178 Created an atlas bitmap (size 4096x3976) [corpse-decay]
+  17.179 Created an atlas bitmap (size 4096x4080) [corpse-decay]
+  17.179 Created an atlas bitmap (size 4096x4036) [corpse-decay]
+  17.180 Created an atlas bitmap (size 4096x4096) [corpse-decay]
+  17.181 Created an atlas bitmap (size 4096x3956) [corpse-decay]
+  17.181 Created an atlas bitmap (size 4096x4056) [corpse-decay]
+  17.182 Created an atlas bitmap (size 4096x4092) [corpse-decay]
+  17.182 Created an atlas bitmap (size 4096x4088) [corpse-decay]
+  17.183 Created an atlas bitmap (size 4096x4060) [corpse-decay]
+  17.183 Created an atlas bitmap (size 4096x4032) [corpse-decay]
+  17.183 Created an atlas bitmap (size 4096x4092) [corpse-decay]
+  17.184 Created an atlas bitmap (size 4096x1584) [corpse-decay]
+  17.184 Created an atlas bitmap (size 4096x3992) [decal]
+  17.184 Created an atlas bitmap (size 4096x4044) [decal]
+  17.185 Created an atlas bitmap (size 4096x1116) [decal]
+  17.185 Created an atlas bitmap (size 4096x1284) [none]
+  17.186 Created an atlas bitmap (size 4096x4096) [mipmap, linear-minification, linear-magnification, linear-mip-level]
+  17.187 Created an atlas bitmap (size 4096x4096) [mipmap]
+  17.187 Created an atlas bitmap (size 4096x3312) [mipmap, linear-minification, linear-magnification, linear-mip-level]
+  17.188 Created an atlas bitmap (size 4096x1632) [smoke, mipmap, linear-minification, linear-magnification]
+  17.190 Created an atlas bitmap (size 4096x4080) [terrain, mipmap, linear-minification, linear-mip-level]
+  17.191 Created an atlas bitmap (size 4096x4096) [terrain, mipmap, linear-minification, linear-mip-level]
+  17.192 Created an atlas bitmap (size 4096x3984) [terrain, mipmap, linear-minification, linear-mip-level]
+  17.193 Created an atlas bitmap (size 4096x4016) [terrain, mipmap, linear-minification, linear-mip-level]
+  17.194 Created an atlas bitmap (size 4096x4048) [terrain, mipmap, linear-minification, linear-mip-level]
+  17.195 Created an atlas bitmap (size 4096x4080) [terrain, mipmap, linear-minification, linear-mip-level]
+  17.196 Created an atlas bitmap (size 4096x4080) [terrain, mipmap, linear-minification, linear-mip-level]
+  17.197 Created an atlas bitmap (size 4096x4048) [terrain, mipmap, linear-minification, linear-mip-level]
+  17.197 Created an atlas bitmap (size 3248x528) [terrain, mipmap, linear-minification, linear-mip-level]
+  17.197 Created an atlas bitmap (size 4096x2800) [terrain-effect-map, mipmap, linear-minification, linear-mip-level]
+  17.197 Created an atlas bitmap (size 4096x3088) [mipmap]
+  17.199 Created an atlas bitmap (size 4096x4080) [icon, not-compressed, mipmap, linear-minification, linear-magnification, linear-mip-level, ]
+  17.199 Created an atlas bitmap (size 4096x1056) [icon, not-compressed, mipmap, linear-minification, linear-magnification, linear-mip-level, ]
+  17.202 Created an atlas bitmap (size 4096x4088) [alpha-mask]
+  17.204 Created an atlas bitmap (size 4096x4084) [alpha-mask]
+  17.205 Created an atlas bitmap (size 4096x4080) [alpha-mask]
+  17.206 Created an atlas bitmap (size 4096x4012) [alpha-mask]
+  17.211 Created an atlas bitmap (size 4096x4092) [shadow, linear-magnification, alpha-mask]
+  17.215 Created an atlas bitmap (size 4096x4080) [shadow, linear-magnification, alpha-mask]
+  17.220 Created an atlas bitmap (size 4096x4080) [shadow, linear-magnification, alpha-mask]
+  17.226 Created an atlas bitmap (size 4096x4088) [shadow, linear-magnification, alpha-mask]
+  17.232 Created an atlas bitmap (size 4096x4096) [shadow, linear-magnification, alpha-mask]
+  17.235 Created an atlas bitmap (size 4096x4064) [shadow, linear-magnification, alpha-mask]
+  17.238 Created an atlas bitmap (size 4096x4096) [shadow, linear-magnification, alpha-mask]
+  17.242 Created an atlas bitmap (size 4096x4084) [shadow, linear-magnification, alpha-mask]
+  17.247 Created an atlas bitmap (size 4096x4096) [shadow, linear-magnification, alpha-mask]
+  17.248 Created an atlas bitmap (size 4096x4084) [shadow, linear-magnification, alpha-mask]
+  17.250 Created an atlas bitmap (size 4096x4080) [shadow, linear-magnification, alpha-mask]
+  17.250 Created an atlas bitmap (size 4096x4080) [shadow, linear-magnification, alpha-mask]
+  17.251 Created an atlas bitmap (size 4096x4044) [shadow, linear-magnification, alpha-mask]
+  17.252 Created an atlas bitmap (size 4096x4028) [shadow, linear-magnification, alpha-mask]
+  17.253 Created an atlas bitmap (size 4096x4048) [shadow, linear-magnification, alpha-mask]
+  17.253 Created an atlas bitmap (size 4096x4084) [shadow, linear-magnification, alpha-mask]
+  17.254 Created an atlas bitmap (size 4096x4004) [shadow, linear-magnification, alpha-mask]
+  17.254 Created an atlas bitmap (size 3340x336) [shadow, linear-magnification, alpha-mask]
+  17.254 Created an atlas bitmap (size 4096x4096) [shadow, mipmap, linear-magnification, alpha-mask]
+  17.255 Created an atlas bitmap (size 4096x656) [shadow, mipmap, linear-magnification, alpha-mask]
+  17.255 Created an atlas bitmap (size 4096x176) [icon-background, not-compressed, mipmap, linear-minification, linear-magnification, linear-mip-level, ]
+  17.594 Parallel sprite loader initialized (threads: 7, bitmaps: 4752)
+  74.552 Sprites loaded
+  76.495 Script @__melta-verify__/control.lua:37: [verify] heartbeat: turret invalid
+  77.669 Script @__melta-verify__/control.lua:37: [verify] chunk generation -> true
+  77.707 Script @__melta-verify__/control.lua:37: [verify] cleared 19 entities, laid concrete
+  77.708 Script @__melta-verify__/control.lua:37: [verify] melta at 0.5,200.5 with 4/4 pipes
+  77.708 Script @__melta-verify__/control.lua:37: [verify] pipe connections: 4
+  77.708 Script @__melta-verify__/control.lua:37: [verify] row gun-turret             at x+6: ok
+  77.708 Script @__melta-verify__/control.lua:37: [verify] row flamethrower-turret    at x+10: ok
+  77.708 Script @__melta-verify__/control.lua:37: [verify] row laser-turret           at x+14: ok
+  77.708 Script @__melta-verify__/control.lua:37: [verify] turret_ammo inventory: none
+  77.708 Script @__melta-verify__/control.lua:37: [verify] status with no fuel: 29
+  77.709 Script @__melta-verify__/control.lua:37: [verify] quickbar (slot, item)         -> false err=__melta-verify__/control.lua:227: Arguments count error for 'set_quick_bar_slot': Expected 3 arguments but 2 were given
+  77.709 Script @__melta-verify__/control.lua:37: [verify] quickbar (page, slot, item)   -> true
+  77.755 Script @__melta-verify__/control.lua:37: [verify] icon item melta-turret           -> ok
+  77.755 Script @__melta-verify__/control.lua:37: [verify] icon item gun-turret             -> ok
+  77.756 Script @__melta-verify__/control.lua:37: [verify] icon item laser-turret           -> ok
+  77.756 Script @__melta-verify__/control.lua:37: [verify] icon item flamethrower-turret    -> ok
+  78.040 Script @__melta-verify__/control.lua:37: [verify] t20: orient=0.0000 dir=0 fluid=0.0 hp=1200.0 dummies=0 dummy_hp=-1 tick=20
+  78.049 Script @__melta-verify__/control.lua:37: [verify] shot 01-scale-row         -> true
+  78.058 Script @__melta-verify__/control.lua:37: [verify] shot 02-melta-closeup     -> true
+  78.067 Script @__melta-verify__/control.lua:37: [verify] shot 03-pipes-overview    -> true
+  78.182 Script @__melta-verify__/control.lua:37: [verify] shot 04-icon-row          -> true
+  78.256 Script @__melta-verify__/control.lua:37: [verify] t30 after filling the four pipes: orient=0.0000 dir=0 fluid=103.5 hp=1200.0 dummies=0 dummy_hp=-1 tick=30
+  78.508 Script @__melta-verify__/control.lua:37: [verify] dummy spawned 0,-1 at 0.5,191.5
+  78.508 Script @__melta-verify__/control.lua:37: [verify] spawned 3 small biters in the beam line
+  78.757 Script @__melta-verify__/control.lua:37: [verify] t60 (biters should be dying): orient=0.0000 dir=0 fluid=135.5 hp=1200.0 dummies=1 dummy_hp=5000034 tick=60
+  78.757 Script @__melta-verify__/control.lua:37: [verify] live biters: 0
+  79.073 Script @__melta-verify__/control.lua:37: [verify] live biters at t79: 0
+  79.089 Script @__melta-verify__/control.lua:37: [verify] t80 north (aligned from the start): orient=0.0000 dir=0 fluid=149.0 hp=1200.0 dummies=1 dummy_hp=4999996 tick=80
+  79.099 Script @__melta-verify__/control.lua:37: [verify] shot 05-beam-north        -> true
+  79.165 Script @__melta-verify__/control.lua:37: [verify] shot 06-beam-north-b      -> true
+  79.257 Script @__melta-verify__/control.lua:37: [verify] dummy spawned 1,0 at 9.5,200.5
+  79.390 Script @__melta-verify__/control.lua:37: [verify] t98 mid-swing east: orient=0.0240 dir=0 fluid=165.1 hp=1200.0 dummies=1 dummy_hp=5000038 tick=98
+  79.399 Script @__melta-verify__/control.lua:37: [verify] shot 07-windup-east       -> true
+  79.424 Script @__melta-verify__/control.lua:37: [verify] heartbeat: orient=0.0360 dir=0 fluid=167.2 hp=1200.0 dummies=1 dummy_hp=5000038 tick=100
+  80.173 Script @__melta-verify__/control.lua:37: [verify] t145 east (should be on target): orient=0.2500 dir=0 fluid=208.9 hp=1200.0 dummies=1 dummy_hp=5000029 tick=145
+  80.182 Script @__melta-verify__/control.lua:37: [verify] shot 08-beam-east         -> true
+  80.258 Script @__melta-verify__/control.lua:37: [verify] dummy spawned 0,1 at 0.5,209.5
+  80.390 Script @__melta-verify__/control.lua:37: [verify] t158 mid-swing south: orient=0.2920 dir=0 fluid=222.8 hp=1200.0 dummies=1 dummy_hp=5000077 tick=158
+  80.399 Script @__melta-verify__/control.lua:37: [verify] shot 09-windup-south      -> true
+  81.090 Script @__melta-verify__/control.lua:37: [verify] heartbeat: orient=0.5000 dir=0 fluid=227.7 hp=1200.0 dummies=1 dummy_hp=5000082 tick=200
+  81.174 Script @__melta-verify__/control.lua:37: [verify] t205 south: orient=0.5000 dir=0 fluid=225.8 hp=1200.0 dummies=1 dummy_hp=5000047 tick=205
+  81.182 Script @__melta-verify__/control.lua:37: [verify] shot 10-beam-south        -> true
+  81.259 Script @__melta-verify__/control.lua:37: [verify] dummy spawned -1,0 at -8.5,200.5
+  81.392 Script @__melta-verify__/control.lua:37: [verify] t218 mid-swing west: orient=0.5120 dir=0 fluid=223.8 hp=1200.0 dummies=1 dummy_hp=5000115 tick=218
+  81.404 Script @__melta-verify__/control.lua:37: [verify] shot 11-windup-west       -> true
+  82.173 Script @__melta-verify__/control.lua:37: [verify] t265 west: orient=0.7500 dir=0 fluid=220.4 hp=1186.0 dummies=1 dummy_hp=5000152 tick=265
+  82.182 Script @__melta-verify__/control.lua:37: [verify] shot 12-beam-west         -> true
+  82.290 Script @__melta-verify__/control.lua:37: [verify] t272 final: orient=0.7500 dir=0 fluid=218.3 hp=1186.0 dummies=1 dummy_hp=5000113 tick=272
+  82.299 Script @__melta-verify__/control.lua:37: [verify] shot 13-gui               -> true
+  82.505 Script @__melta-verify__/control.lua:37: [verify] server_save -> true
+  82.505 Script @__melta-verify__/control.lua:37: [verify] VERIFY DONE
+  82.757 Script @__melta-verify__/control.lua:37: [verify] heartbeat: orient=0.7500 dir=0 fluid=211.2 hp=1186.0 dummies=1 dummy_hp=5000034 tick=300
+  84.423 Script @__melta-verify__/control.lua:37: [verify] heartbeat: orient=0.7500 dir=0 fluid=184.5 hp=1186.0 dummies=1 dummy_hp=4999527 tick=400
+  86.090 Script @__melta-verify__/control.lua:37: [verify] heartbeat: orient=0.7500 dir=0 fluid=152.0 hp=1186.0 dummies=1 dummy_hp=4999174 tick=500
+  87.757 Script @__melta-verify__/control.lua:37: [verify] heartbeat: orient=0.7500 dir=0 fluid=122.0 hp=1179.0 dummies=1 dummy_hp=4998743 tick=600
+  89.424 Script @__melta-verify__/control.lua:37: [verify] heartbeat: orient=0.7500 dir=0 fluid=89.5 hp=1158.0 dummies=1 dummy_hp=4998313 tick=700

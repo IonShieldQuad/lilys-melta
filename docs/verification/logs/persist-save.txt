@@ -1,0 +1,4 @@
+   3.926 Script @__melta-persist__/control.lua:13: [persist] on_init: chunk generation true
+   3.927 Script @__melta-persist__/control.lua:13: [persist] on_init: direct fluid fill true
+   3.927 Script @__melta-persist__/control.lua:13: [persist] on_init after build: valid dir=4 orient=0.2500 fluid=246.7 hp=1200 unit=11
+   3.927 Script @__melta-persist__/control.lua:13: [persist] on_init after build: connections -0.62,200.50 0.50,199.38 0.50,201.62 1.62,200.50

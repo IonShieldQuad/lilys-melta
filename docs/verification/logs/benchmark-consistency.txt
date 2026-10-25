@@ -1,0 +1,12 @@
+   0.005 Program arguments: "E:\SteamLibrary\steamapps\common\Factorio\bin\x64\factorio.exe" "--config" "C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-verify/config.ini" "--mod-directory" "C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-verify/mods" "--benchmark" "C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-verify/bench.zip" "--benchmark-ticks" "600" "--benchmark-consistency"
+   0.794 Checksum for core: 3668028660
+   0.794 Checksum of base: 3864816957
+   0.794 Checksum of lilys-melta: 1667545151
+   0.794 Checksum of melta-regress: 0
+   1.261 Prototype list checksum: 107850270
+   1.659 Checksum for script __level__/control.lua: 3368906707
+   1.665 Checksum for script __lilys-melta__/control.lua: 455650128
+   1.669 Checksum for script __melta-regress__/control.lua: 2297845163
+  Performed 600 updates in 464.377 ms
+  avg: 0.774 ms, min: 0.130 ms, max: 192.376 ms
+  checksum: 3830358549

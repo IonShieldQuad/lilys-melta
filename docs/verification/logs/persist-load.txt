@@ -1,0 +1,6 @@
+   1.532 Script @__melta-persist__/control.lua:13: [persist] reload: storage.built_at=0.5,200.5
+   1.533 Script @__melta-persist__/control.lua:13: [persist] reload: valid dir=4 orient=0.2500 fluid=247.7 hp=1200 unit=11
+   1.533 Script @__melta-persist__/control.lua:13: [persist] reload: connections -0.62,200.50 0.50,199.38 0.50,201.62 1.62,200.50
+   1.533 Script @__melta-persist__/control.lua:13: [persist] reload: pipes on the map around the turret: 4
+   1.533 Script @__melta-persist__/control.lua:13: [persist] reload: melta turrets on the map: 1
+   1.533 Script @__melta-persist__/control.lua:13: [persist] PERSIST DONE

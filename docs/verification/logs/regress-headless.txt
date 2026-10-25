@@ -1,0 +1,27 @@
+   1.715 Script @__melta-regress__/control.lua:22: [regress] start tick 0, players: 0
+   1.902 Script @__melta-regress__/control.lua:22: [regress] generate chunks                      OK   ok
+   1.903 Script @__melta-regress__/control.lua:22: [regress] create turret (raise_built)          OK   [LuaEntity: melta-turret at [gps=0.5,200.5]]
+   1.903 Script @__melta-regress__/control.lua:22: [regress] pipes placed: 4/4, connection positions: -0.62,200.50 0.50,199.38 0.50,201.62 1.62,200.50
+   1.903 Script @__melta-regress__/control.lua:22: [regress] prototype flags                      OK   true,true
+   1.907 Script @__melta-regress__/control.lua:22: [regress] t10 empty (no fuel): valid dir=0 orient=0.0000 fluid=0.0 hp=1200.0 status=29
+   1.907 Script @__melta-regress__/control.lua:22: [regress] t10 after filling pipes: valid dir=0 orient=0.0000 fluid=103.5 hp=1200.0 status=29
+   1.907 Script @__melta-regress__/control.lua:22: [regress] units spawned in the beam line: 3
+   1.919 Script @__melta-regress__/control.lua:22: [regress] units alive at t35: 0
+   1.919 Script @__melta-regress__/control.lua:22: [regress] t35 after firing: valid dir=0 orient=0.0000 fluid=130.2 hp=1200.0 status=1
+   1.922 Script @__melta-regress__/control.lua:22: [regress] rotate() (what R does)               OK   dir 0 -> 4
+   1.922 Script @__melta-regress__/control.lua:22: [regress] connection set after rotate identical: true
+   1.930 Script @__melta-regress__/control.lua:22: [regress] clone turret 20 tiles east (paste)   OK   [LuaEntity: melta-turret at [gps=20.5,200.5]]
+   1.931 Script @__melta-regress__/control.lua:22: [regress] pasted turret: dir=4 fluid=156.9 hp=1200 status=1 conns=19.38,200.50 20.50,199.38 20.50,201.62 21.62,200.50
+   1.931 Script @__melta-regress__/control.lua:22: [regress] pipes fed to the pasted turret: 4/4
+   1.931 Script @__melta-regress__/control.lua:22: [regress] units spawned in front of the pasted turret: 3
+   1.936 Script @__melta-regress__/control.lua:22: [regress] pasted turret after being fed: fluid=204.5 status=1
+   1.936 Script @__melta-regress__/control.lua:22: [regress] units alive in front of the pasted turret: 3
+   1.946 Script @__melta-regress__/control.lua:22: [regress] shot 20-blueprint-paste     -> true
+   1.951 Script @__melta-regress__/control.lua:22: [regress] order_deconstruction                 OK   requested
+   1.951 Script @__melta-regress__/control.lua:22: [regress] to_be_deconstructed: true
+   1.961 Script @__melta-regress__/control.lua:22: [regress] shot 21-deconstruction-marked -> true
+   1.961 Script @__melta-regress__/control.lua:22: [regress] cancel_deconstruction                OK   cancelled
+   1.961 Script @__melta-regress__/control.lua:22: [regress] to_be_deconstructed after cancel: false
+   1.965 Script @__melta-regress__/control.lua:22: [regress] t100 before save: valid dir=4 orient=0.2500 fluid=199.5 hp=1200.0 status=1
+   1.970 Script @__melta-regress__/control.lua:22: [regress] auto_save                            OK   requested
+   1.970 Script @__melta-regress__/control.lua:22: [regress] REGRESS DONE
