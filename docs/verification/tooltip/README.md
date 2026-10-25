@@ -40,7 +40,10 @@ prototype could ever have described it.
    `cooldown`, `pierce_falloff`, `pierce_max`, each fuel's `damage_modifier`,
    `asteroid_damage_multiplier`), and only the fuels this install actually has are
    listed -- so a retune changes the tooltip by itself and an absent dependency
-   cannot leave a ghost entry. Text lives in `locale/en` and `locale/ru`.
+   cannot leave a ghost entry. Text lives in `locale/en` and `locale/ru`. The rock
+   sentence is its own translation key: setting `asteroid_damage_multiplier = 0` (the
+   documented way to remove that channel) drops the sentence instead of claiming an
+   explosion hit at 0 %.
 2. `prototypes/melta.lua` drops the carrier stream's 1 damage. It measured as dead
    code -- a full-charge pulse took exactly 56.00 hp off an unarmoured dummy, i.e. the
    script's number and not a point more -- but the engine still printed it as the

@@ -43,21 +43,44 @@ end
 -- __1__ cold per pulse, __2__ white-hot, __3__ fire share, __4__ physical share,
 -- __5__ pulses per second, __6__ cold dps, __7__ hot dps, __8__ pierce falloff,
 -- __9__ pierce cap, __10__ the fuel list, __11__ the rock multiplier
-local block =
-{
-  "melta-tooltip.block",
-  num(C.damage_cold),
-  num(C.damage_hot),
-  percent(1 - C.physical_share),
-  percent(C.physical_share),
-  num(per_second),
-  num(C.damage_cold * per_second),
-  num(C.damage_hot * per_second),
-  percent(C.pierce_falloff),
-  tostring(C.pierce_max),
-  table.concat(fuels, ", "),
-  percent(C.asteroid_damage_multiplier or 0)
-}
+--
+-- The rock sentence is its own key, not a number: `asteroid_damage_multiplier = 0`
+-- is the documented way to remove that channel, and a tooltip that still promised an
+-- explosion hit at 0 % would be exactly the sort of lie this file exists to stop.
+local asteroid_percent = C.asteroid_damage_multiplier or 0
+local block
+if asteroid_percent > 0 then
+  block =
+  {
+    "melta-tooltip.block",
+    num(C.damage_cold),
+    num(C.damage_hot),
+    percent(1 - C.physical_share),
+    percent(C.physical_share),
+    num(per_second),
+    num(C.damage_cold * per_second),
+    num(C.damage_hot * per_second),
+    percent(C.pierce_falloff),
+    tostring(C.pierce_max),
+    table.concat(fuels, ", "),
+    percent(asteroid_percent)
+  }
+else
+  block =
+  {
+    "melta-tooltip.block-no-rocks",
+    num(C.damage_cold),
+    num(C.damage_hot),
+    percent(1 - C.physical_share),
+    percent(C.physical_share),
+    num(per_second),
+    num(C.damage_cold * per_second),
+    num(C.damage_hot * per_second),
+    percent(C.pierce_falloff),
+    tostring(C.pierce_max),
+    table.concat(fuels, ", ")
+  }
+end
 
 -- The description the player reads: the flavour text that already exists in locale/,
 -- then the generated damage block. Same block on the item and on the entity, so the
