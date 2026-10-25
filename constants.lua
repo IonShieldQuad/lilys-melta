@@ -23,7 +23,25 @@ C.damage_type_hit  = "physical"   -- secondary: the impact of the stream itself
 C.physical_share   = 0.15         -- 0.15 = 15 % of every pulse is physical, 85 % fire
 
 -- the beam -------------------------------------------------------------------
-C.range           = 12    -- tiles. laser turret reaches 24, rocket turret 36: the melta has to be close
+C.range           = 16    -- tiles, at normal quality. laser turret reaches 24, rocket
+                          -- turret 36: the melta is still the close-in weapon, but 16 is
+                          -- what makes its 2x2 hull and its slow fuel burn worth the space.
+-- Range grows with quality through the ENGINE's own multiplier: every quality
+-- prototype carries a `range_multiplier` (2.1.23: normal 1.0, uncommon 1.1, rare 1.2,
+-- epic 1.3, legendary 1.5) and the engine applies it to a turret's
+-- `attack_parameters.range` -- measured, not assumed: with the base at 12 a legendary
+-- melta acquired and burned fluid at 19 tiles while a normal one stopped at 13
+-- (docs/verification/harness/melta-range). So a legendary melta reaches
+-- 16 * 1.5 = 24 tiles with no help from this mod.
+-- What the script needs the multiplier for is the *drawn beam*: the lance must be
+-- exactly as long as the engine's real reach. The clamp is the part the engine cannot
+-- do -- a modded quality with a silly multiplier must not turn the melta into an
+-- artillery piece.
+C.range_max          = 24   -- tiles, hard ceiling on the beam (16 * vanilla legendary)
+C.range_scan_ticks   = 6    -- a turret handed a target it cannot reach (a neighbour's
+                            -- call_for_help, which ignores range) looks for a reachable
+                            -- one this often (ticks)
+
 C.cooldown        = 8     -- ticks between pulses (7.5/s, reads as one continuous beam)
 C.damage_cold     = 14    -- damage per pulse, cold barrel (85 % fire + 15 % physical)
 C.damage_hot      = 56    -- damage per pulse, fully spun up (same split)
@@ -64,16 +82,24 @@ C.asteroid_damage_multiplier = 1.6   -- x pulse damage per pulse, asteroids only
 
 
 -- aiming ----------------------------------------------------------------------
--- The engine turns the head at `rotation_speed` (prototypes/entity.lua: 0.006 turns
--- per tick = 2.16 deg/tick, measured with a headless probe) and only lets the
--- turret fire once the head is on the target. The script must not draw the beam any
--- earlier, so it reads the head's actual orientation and waits: while the barrel
--- swings onto the target it plays a charge-up glow at the mouth and spends no
--- cooldown, so the shot lands the moment the barrel arrives.
-C.aim_tolerance   = 0.006 -- turns (1 = full circle). 0.006 = 2.16 deg = one
-                          -- rotation step, i.e. the same "would be aligned this
-                          -- tick" rule the engine fires on.
-C.windup_ticks    = 9     -- 0.15 s of charge glow before the first shot at a newly
+-- The engine turns the head at `rotation_speed` (in turns per tick: 1 = a full
+-- circle). 0.03 = 10.8 deg/tick, i.e. a half turn in 17 ticks (0.28 s) -- twice
+-- the vanilla gun turret's 0.015, because a short-ranged turret has to swing
+-- faster than a long-ranged one to keep up: the angular speed needed to stay on a
+-- target is v/(2*pi*r), so a behemoth biter (0.3 tiles/tick) crossing at 4 tiles
+-- needs 0.012 turns/tick. The old 0.006 could not do that (it trailed by half a
+-- turn at close range) and needed 83 ticks -- 1.4 s -- for a half turn.
+-- Measured on 2.1.23 with the harness in docs/verification/harness.
+C.rotation_speed  = 0.03  -- turns per tick
+C.aim_tolerance   = 0.006 -- turns (1 = full circle). ~2 deg: the beam fires only when
+                          -- the barrel is this close to the bearing. Deliberately not
+                          -- a whole rotation step: the engine clamps onto the exact
+                          -- bearing, so a small threshold fires on the tick it arrives
+                          -- instead of letting a shot leave off-bore.
+C.windup_ticks    = 3     -- 0.05 s of charge glow before the first shot at a newly
+                          -- acquired target. Short on purpose: with the fast head the
+                          -- 45 deg swing takes 5 ticks, so a long wind-up would just
+                          -- delay the first pulse on every target switch.
                           -- acquired target (the 45 deg swing itself takes 21 ticks
                           -- = 0.35 s, so the glow normally rides the whole turn)
 

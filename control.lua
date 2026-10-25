@@ -93,6 +93,80 @@ local function beam_color(style, charge, profile)
   }
 end
 
+----------------------------------------------------------- quality range -----
+
+-- Range scales with quality through the engine itself: every quality prototype has a
+-- `range_multiplier` (normal 1.0 ... legendary 1.5 on 2.1.23) and the engine applies it
+-- to a turret's `attack_parameters.range`, so acquisition AND firing already reach
+-- further for a better melta -- measured on 2.1.23: with the base at 12 a legendary
+-- turret acquired and burned fluid at 19 tiles while a normal one stopped at 13.
+-- What the engine does not do is clamp it, and the *drawn beam* has to match the real
+-- reach or the lance is a lie (a 12-tile line while the turret burns a target at 19).
+-- So: read the same multiplier, multiply the base, clamp to C.range_max (vanilla
+-- legendary, 16 * 1.5 = 24). Guarded rather than assumed -- `quality` answers "normal"
+-- on entities that do not support it, and an older API could lack range_multiplier;
+-- a nil there would otherwise kill the whole tick handler.
+local function range_for(entity)
+  local quality = entity and entity.valid and entity.quality or nil
+  local multiplier = quality and quality.range_multiplier or 1
+  if type(multiplier) ~= "number" then
+    multiplier = 1
+  end
+  local range = C.range * multiplier
+  if range > C.range_max then
+    range = C.range_max
+  end
+  return range
+end
+
+-- Nearest live enemy military target inside `range`. Used when the engine hands this
+-- turret a target it cannot actually reach: a neighbour's `call_for_help_radius` (40
+-- tiles on the melta) ignores range, so a turret can end up aiming at a biter 19 tiles
+-- out with a 16-tile beam. Replacing that with the nearest reachable body keeps the
+-- turret useful. "Inside" follows the engine's own rule: it measures to the target's
+-- bounding box, not its centre (a biter spawner 17 tiles away with a 4-tile body is in
+-- range of a 16-tile turret), so this does too -- otherwise the turret would aim at and
+-- burn fluid on a body it never damages.
+local function target_half_extent(target)
+  local box = target.bounding_box
+  if not box then
+    return 0
+  end
+  return math.max(box.right_bottom.x - box.left_top.x, box.right_bottom.y - box.left_top.y) * 0.5
+end
+
+local function in_reach(turret, target, range)
+  if not target or not target.valid then
+    return false
+  end
+  local dx = target.position.x - turret.position.x
+  local dy = target.position.y - turret.position.y
+  return math.sqrt(dx * dx + dy * dy) <= range + target_half_extent(target)
+end
+
+local function nearest_enemy(turret, range)
+  local best, best_distance = nil, nil
+  local candidates = turret.surface.find_entities_filtered
+  {
+    position = turret.position,
+    radius = range + 2,
+    is_military_target = true
+  }
+  for _, candidate in pairs(candidates) do
+    if candidate.valid and candidate ~= turret and candidate.health and candidate.health > 0
+       and candidate.force and turret.force.is_enemy(candidate.force) then
+      local vx = candidate.position.x - turret.position.x
+      local vy = candidate.position.y - turret.position.y
+      local distance = vx * vx + vy * vy
+      if in_reach(turret, candidate, range)
+         and (not best_distance or distance < best_distance) then
+        best, best_distance = candidate, distance
+      end
+    end
+  end
+  return best
+end
+
 ---------------------------------------------------------------- aiming --------
 
 -- The head is turned by the engine at the prototype's `rotation_speed` and it only
@@ -188,6 +262,9 @@ local function state_for(entity)
     turrets[entity.unit_number] = state
   end
   state.entity = entity
+  -- refreshed here (build, and every reconcile) so a mod update that changes the
+  -- quality ladder is picked up without touching the entity
+  state.range = range_for(entity)
   return state
 end
 
@@ -266,10 +343,15 @@ local function pulse(turret, state, muzzle, dx, dy, reach)
       local vx = candidate.position.x - muzzle.x
       local vy = candidate.position.y - muzzle.y
       local along = vx * dx + vy * dy
-      if along > 0 and along <= reach then
+      local box = candidate.bounding_box
+      local radius = math.max(box.right_bottom.x - box.left_top.x, box.right_bottom.y - box.left_top.y) * 0.5
+      -- `along <= reach + radius`: a body whose *centre* is a fraction of a tile past the
+      -- end of the corridor still has its skin inside it, and that is exactly how far the
+      -- engine's own range test reaches (it measures to the bounding box). Without the
+      -- radius the turret would aim at and burn fluid on a spawner 17 tiles out with a
+      -- 16-tile beam and never hurt it.
+      if along > 0 and along <= reach + radius then
         local offset = math.sqrt((vx - dx * along) ^ 2 + (vy - dy * along) ^ 2)
-        local box = candidate.bounding_box
-        local radius = math.max(box.right_bottom.x - box.left_top.x, box.right_bottom.y - box.left_top.y) * 0.5
         if offset <= C.hit_half_width + radius then
           hits[#hits + 1] = {entity = candidate, along = along, position = candidate.position}
         end
@@ -500,8 +582,22 @@ local function update(turret, state, tick)
   -- `shooting_state` is character-only (it throws on a turret), so engagement is
   -- read off the turret's own target. The engine happily keeps *aiming* at a target
   -- with an empty magazine, so the fuel check has to be ours: no cell, no beam.
+  local range = state.range or C.range
   local target = turret.shooting_target
-  local firing = target ~= nil and target.valid and has_fuel(turret)
+  -- A target handed over by a neighbour's help call can sit outside this turret's own
+  -- reach, and the engine keeps aiming at it forever (it never re-checks whether the
+  -- help call was sensible). If a reachable enemy exists, hand the engine that one
+  -- instead; the beam then matches what the turret can actually burn.
+  local reachable = target ~= nil and target.valid and in_reach(turret, target, range)
+  if target ~= nil and not reachable and tick >= (state.scan_at or 0) then
+    state.scan_at = tick + C.range_scan_ticks
+    local better = nearest_enemy(turret, range)
+    if better then
+      target = better
+      turret.shooting_target = better
+    end
+  end
+  local firing = target ~= nil and target.valid and in_reach(turret, target, range) and has_fuel(turret)
   local aim = firing and target.position or nil
 
   if C.debug and firing ~= state.was_firing then
@@ -551,11 +647,12 @@ local function update(turret, state, tick)
     if aligned and elapsed >= C.windup_ticks then
       -- The beam runs from the mouth to the target and on through whatever stands
       -- behind it, and the corridor test runs along that same line -- so the bodies
-      -- the beam cuts are exactly the ones it visibly touches. It ends C.range from
-      -- the turret centre, so the per-direction muzzle offset cannot shorten the reach.
+      -- the beam cuts are exactly the ones it visibly touches. It ends `range` from
+      -- the turret centre (16 tiles plus the quality bonus), so the per-direction
+      -- muzzle offset cannot shorten the reach.
       local ax, ay = normalize(aim.x - muzzle.x, aim.y - muzzle.y)
       local along = (muzzle.x - turret.position.x) * ax + (muzzle.y - turret.position.y) * ay
-      local reach = math.max(1, C.range - along)
+      local reach = math.max(1, range - along)
 
       if tick >= state.pulse_at then
         state.pulse_at = tick + C.cooldown

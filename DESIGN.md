@@ -21,7 +21,8 @@ render-object leaks).
 | hull | own rendered emplacement, 2x2 footprint (collision +-1.2) | modelled in Blender, not vanilla art | see **Graphics** below |
 | head | rendered 64-direction cannon, 256x256, 8 sheets of 8 rows | see **Graphics** below |
 | health | 1200 | an emitter, not an armoured box (rocket turret: 1500) |
-| range | 12 tiles | laser 24, rocket 36: the melta has to be near the wall |
+| range | 16 tiles, scaling with quality through the engine's `range_multiplier` (17.6 / 19.2 / 20.8 / 24 at uncommon / rare / epic / legendary) | laser 24, rocket 36: the melta is still the close-in emitter, and quality is what buys the extra tiles. The engine does the scaling; the script mirrors it for the beam and clamps at 24 — see **Quality range** below |
+| head rotation | 0.03 turns/tick (10.8 deg/tick) | was 0.006 (2.16 deg/tick, inherited from the rocket turret): a half turn took 83 ticks (1.4 s) and the head could not track a behemoth biter (0.3 tiles/tick) crossing at 4 tiles, which needs 0.012 turns/tick. 0.03 = half a turn in 17 ticks (0.28 s), twice the vanilla gun turret's 0.015 |
 | pulse rate | 8 ticks (7.5/s) | fast enough that discrete pulses read as one beam |
 | damage / pulse | 14 cold → 56 hot | 105 → 420 dps single target, before pierce |
 | spin-up | 150 ticks (2.5 s) | one biter wave is not enough time to peak |
@@ -101,8 +102,9 @@ Two consequences, both handled:
 - **aiming gate** — the beam is not allowed to exist before the barrel points at the
   target. `LuaEntity::orientation` on a turret *is the weapon's* smooth orientation
   (0 = north, 0.25 = east), so each tick the script compares it with the bearing to the
-  target and only fires when the head is within `C.aim_tolerance` (0.006 turns = 2.16 deg
-  = one `rotation_speed` step, which is the rule the engine itself fires on). While the
+  target and only fires when the head is within `C.aim_tolerance` (0.006 turns = 2.16 deg;
+  deliberately tighter than one rotation step, so the shot leaves on the tick the engine
+  clamps onto the exact bearing instead of up to 11 deg off-bore). While the
   head is still swinging it plays a **charge-up glow at the mouth** instead: no beam, no
   damage, and `pulse_at` is not advanced, so the first shot leaves the moment the barrel
   arrives rather than a cooldown later. A target the barrel is *already* on does not pay
@@ -119,7 +121,8 @@ Two consequences, both handled:
   shipped sheets (`graphics/_blender/check_beam_anchor.py`: every start pixel is on the
   gun, 0.39-1.68 tiles from the pivot).
 - one **pulse** every 8 ticks: corridor hit test from the mouth along the mouth→target
-  line (12 bodies, 0.82 falloff, ending exactly `C.range` from the turret centre), two
+  line (12 bodies, 0.82 falloff, ending exactly that turret's `range` from the centre —
+  16 tiles plus its quality bonus), two
   `entity.damage()` calls per body — `fire` for 85 % of the pulse, `physical` for the
   other 15 % (the second is skipped if the first killed the body). Enemies only.
 - fuel surcharge: `extra_fluid_per_pulse_hot * charge` per pulse, removed with
@@ -127,6 +130,38 @@ Two consequences, both handled:
 - visuals: 4 stacked `rendering.draw_line` layers (haze / glow / hot / white core), a
   9-segment **boiling sheath** re-rolled every 3 ticks, a muzzle orb, a 3-tick muzzle
   flash and a burn pop on every body the beam cuts.
+
+## Quality range
+
+Base reach is **16 tiles**, and quality extends it through the **engine's own
+multiplier**: every quality prototype carries `range_multiplier` (2.1.23: normal 1.0,
+uncommon 1.1, rare 1.2, epic 1.3, legendary 1.5) and the engine applies it to a
+turret's `attack_parameters.range`. So a normal melta reaches 16 tiles, a legendary
+**24** — and that is both the acquisition *and* the firing range, no help needed.
+
+That was measured, not read off the docs: with the base still at 12, a legendary melta
+acquired and burned fluid on a target 19 tiles out while a normal one stopped at 13
+(`docs/verification/harness/melta-range`, scene ladder). `LuaQualityPrototype` exposes
+the same number as `range_multiplier`, which is what the script reads.
+
+The mod's part is the two things the engine does not do:
+
+| what | how |
+|---|---|
+| beam length | the drawn lance must equal the turret's real reach, so `control.lua` computes `C.range * quality.range_multiplier` per turret (cached in its state, refreshed on build / reconcile) and draws to that |
+| the clamp | a modded quality with a silly multiplier would otherwise give a 48-tile melta; the beam stops at `C.range_max` = 24 (16 × vanilla legendary). The engine still *targets* further, so a turret handed an unreachable target re-targets the nearest reachable one (`C.range_scan_ticks`) instead of burning fluid on something it cannot cut |
+
+`turret.quality` is read defensively: documented to answer `normal` when an entity does
+not support quality, and `range_multiplier` is type-checked, so a turret with the quality
+mod absent, a script-created turret, or a minified one never throws inside the tick
+handler. With the quality mod disabled the whole ladder collapses to 16 tiles, which the
+harness run `melta-noquality` proves.
+
+Side note that cost an hour: the melta's `call_for_help_radius` is 40, and a turret that
+starts shooting hands its target to every turret inside that radius **regardless of
+range**. A turret can therefore be aiming at a biter 19 tiles away with a 16-tile beam;
+that is what the re-target path above cleans up.
+
 
 ## Graphics
 

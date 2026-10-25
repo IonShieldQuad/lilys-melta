@@ -62,7 +62,10 @@ local turret =
   heating_energy = source.heating_energy,
   resistances = {{type = "fire", percent = 100}},
   turret_base_has_direction = true,
-  rotation_speed = 0.006,
+  -- turns per tick; C.rotation_speed = 0.03 (10.8 deg/tick, half a turn in 17 ticks).
+  -- The old 0.006 was inherited from the rocket turret and is why the head trailed a
+  -- biter crossing at close range -- see constants.lua for the tracking maths.
+  rotation_speed = C.rotation_speed,
   preparing_speed = 0.08,
   folding_speed = 0.08,
   attacking_speed = 0.55,
