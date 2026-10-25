@@ -51,9 +51,38 @@ Model space is **tiles**: 1 Blender unit = 1 tile, +Y is north (direction 0), an
 the camera is pitched 51 deg from vertical (vertical squash 0.63) which is what
 makes the turret sit on the ground the way vanilla turrets do.
 
-The number the beam code needs lives here too: the muzzle (the front face of the
-heat projector) is **1.79 tiles** from the pivot on the barrel axis. `constants.lua`
-`C.muzzle_offset` and `entity.lua` `gun_barrel_length` both read that value.
+The number the beam code needs lives here too, and it is **not** a distance in front
+of the pivot. The head sprite is a pitched-camera image, so a muzzle that is 1.512
+tiles forward *in the model* is drawn:
+
+| facing | drawn distance from the pivot |
+|---|---|
+| north | 1.51 tiles |
+| north-east / east | 1.63 / 1.61 tiles |
+| south-east | 1.08 tiles |
+| south | 0.39 tiles |
+
+because the forward reach is foreshortened by cos(51°) on the screen's vertical axis
+and the raised muzzle (barrel axis 0.722 tiles up) sits sin(51°) * 0.722 tiles further
+"up" the screen, i.e. north. `control.lua` computes the per-direction point from
+`C.muzzle_forward` (1.512), `C.muzzle_height` (0.722) and `C.camera_tilt_deg` (51);
+`prototypes/entity.lua` uses `C.muzzle_forward` for `gun_barrel_length`.
+
+Two scripts keep that honest — run them after any re-render:
+
+```bash
+D:/blender/blender_2.79b/blender.exe -b --factory-startup -P muzzle_marker.py
+python check_beam_anchor.py
+```
+
+* `muzzle_marker.py` builds the same camera as `melta_render.py` and projects the
+  model's own muzzle points (pivot / bore / front face / lip top) through Blender's
+  camera for all 64 directions. It prints where each one lands in the frame; the
+  formula in `control.lua` agrees with it to **< 0.001 tiles (0.02 art px)**.
+* `check_beam_anchor.py` takes that beam-start point for each of the 64 directions,
+  projects it onto the shipped sheet and asserts the pixel is on the gun, sits at the
+  mouth (at most a hair in front of the silhouette's front edge, never deeper than
+  0.75 tiles inside it) and is never at the pivot. It passes 64/64.
 
 ## Blender 2.79 quirks that cost time (do not "fix" them back)
 

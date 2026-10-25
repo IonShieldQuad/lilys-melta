@@ -32,10 +32,33 @@ C.spin_down_ticks = 60    -- 1 s to fall back to cold once the target is gone
 C.pierce_falloff  = 0.82  -- each further body in the line takes this fraction of the last hit
 C.pierce_max      = 12    -- hard cap on bodies a single pulse can cut through
 C.hit_half_width  = 0.45  -- tiles: half-width of the line hit test around the beam axis
-C.muzzle_offset   = 1.51  -- tiles in front of the turret centre the beam starts
-                          -- (measured off the rendered model: the heat projector's
-                          -- front face is 1.51 tiles from the pivot, see
-                          -- graphics/_blender/melta_render.py meta.json)
+
+-- aiming ----------------------------------------------------------------------
+-- The engine turns the head at `rotation_speed` (prototypes/entity.lua: 0.006 turns
+-- per tick = 2.16 deg/tick, measured with a headless probe) and only lets the
+-- turret fire once the head is on the target. The script must not draw the beam any
+-- earlier, so it reads the head's actual orientation and waits: while the barrel
+-- swings onto the target it plays a charge-up glow at the mouth and spends no
+-- cooldown, so the shot lands the moment the barrel arrives.
+C.aim_tolerance   = 0.006 -- turns (1 = full circle). 0.006 = 2.16 deg = one
+                          -- rotation step, i.e. the same "would be aligned this
+                          -- tick" rule the engine fires on.
+C.windup_ticks    = 9     -- 0.15 s of charge glow before the first shot at a newly
+                          -- acquired target (the 45 deg swing itself takes 21 ticks
+                          -- = 0.35 s, so the glow normally rides the whole turn)
+
+-- muzzle geometry ------------------------------------------------------------
+-- Where the beam starts is not "1.51 tiles in front of the pivot": the head sprite
+-- is a pitched-camera render, so a ground point has to be chosen that *looks* like
+-- the mouth of the heat projector. Two numbers do it, both read off the model
+-- (graphics/_blender/melta_render.py: muzzle at model y 1.80, barrel axis at z 0.86,
+-- gun root scaled 0.84) and verified against Blender's own camera projection for all
+-- 64 directions (graphics/_blender/muzzle_marker.py, agreement < 0.001 tiles).
+C.muzzle_forward  = 1.512 -- tiles along the barrel, pivot -> front face of the mouth
+C.muzzle_height   = 0.722 -- tiles above ground: the barrel axis height
+C.camera_tilt_deg = 51    -- the render camera's pitch from vertical. control.lua uses
+                          -- cos(tilt) to foreshorten the forward reach on screen and
+                          -- sin(tilt)*height to lift a raised muzzle up the screen.
 
 -- beam look ------------------------------------------------------------------
 -- Four stacked lines. Colours come from whichever fuel is burning (see C.fuels) and

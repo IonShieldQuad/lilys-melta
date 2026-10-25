@@ -125,10 +125,13 @@ local turret =
     fluid_consumption = C.fluid_consumption,
     fluids = fuels,
     ammo_category = C.ammo_category,
-    -- muzzle geometry, kept in step with constants.lua's C.muzzle_offset and the
-    -- rendered model: the projector mouth is 1.51 tiles ahead of the rotation
-    -- centre, and the rotation centre is the entity centre (no gun_center_shift)
-    gun_barrel_length = C.muzzle_offset,
+    -- muzzle geometry. `gun_barrel_length` is where the engine spawns the (invisible)
+    -- stream: the mouth of the projector, 1.512 tiles along the barrel. The *visible*
+    -- beam is drawn by control.lua, which also has to account for the sprite camera
+    -- (a raised muzzle is drawn further "up" the screen), so the per-direction part of
+    -- this lives in C.muzzle_forward / C.muzzle_height rather than in
+    -- gun_center_shift: the two must agree, and only one of them can be the owner.
+    gun_barrel_length = C.muzzle_forward,
     gun_center_shift = {north = {0, 0}, east = {0, 0}, south = {0, 0}, west = {0, 0}},
     ammo_type =
     {

@@ -93,6 +93,48 @@ local function beam_color(style, charge, profile)
   }
 end
 
+---------------------------------------------------------------- aiming --------
+
+-- The head is turned by the engine at the prototype's `rotation_speed` and it only
+-- fires once the head is on the target; the script has to agree with that or the beam
+-- appears while the barrel is still swinging. `LuaEntity::orientation` is the weapon's
+-- own smooth orientation (0 = north, 0.25 = east), so the script can ask "is the
+-- barrel pointing at the target yet" instead of assuming it.
+local TILT = math.rad(C.camera_tilt_deg)
+local COS_TILT = math.cos(TILT)              -- 0.629: ground foreshortening on screen
+local MUZZLE_LIFT = math.sin(TILT) * C.muzzle_height  -- 0.561: a raised point sits this
+                                             -- much further "up" (north) the screen
+-- Lua 5.2 has math.atan2, 5.3 folds it into math.atan(y, x)
+local atan2 = math.atan2 or math.atan
+
+-- Where the beam starts, in world tiles. The muzzle is 1.512 tiles along the barrel
+-- and 0.72 tiles up in the air; because the head sprite is a pitched-camera render,
+-- the ground point that *looks* like the mouth is not position + forward * length:
+--   * the forward reach is foreshortened by cos(tilt) on the screen's vertical axis
+--     (unchanged on the horizontal one), and
+--   * the raised muzzle appears sin(tilt) * height further up the screen, i.e. north.
+-- Verified against Blender's own camera projection for all 64 directions
+-- (graphics/_blender/muzzle_marker.py: agreement < 0.001 tiles).
+local function muzzle_point(turret, ux, uy)
+  return
+  {
+    x = turret.position.x + C.muzzle_forward * ux,
+    y = turret.position.y + COS_TILT * C.muzzle_forward * uy - MUZZLE_LIFT
+  }
+end
+
+-- facing of the head as a world unit vector (orientation 0 = north, clockwise)
+local function facing(orientation)
+  local turn = orientation * 2 * math.pi
+  return math.sin(turn), -math.cos(turn)
+end
+
+-- signed angle from the head's facing to the target, in turns (-0.5 .. 0.5)
+local function aim_error(orientation, dx, dy)
+  local wanted = atan2(dx, -dy) / (2 * math.pi)
+  return (orientation - wanted + 0.5) % 1 - 0.5
+end
+
 local function destroy_object(id)
   if not id then
     return
@@ -369,21 +411,16 @@ local function draw_beam(turret, state, muzzle, stop, tick)
   end
 end
 
--- The charge orb at the muzzle: two filled circles (a hot core inside a soft
--- halo) that grow with charge. Circles rather than draw_light on purpose -- a
--- light needs a sprite file, and `__core__/...` paths are not resolvable at
--- runtime ("Unknown type __core__"), so this keeps the mod asset-free.
-local function draw_glow(turret, state, muzzle)
-  local charge = state.charge
-  local color = beam_color(C.beam_layers[#C.beam_layers], charge, fuel_profile(turret))
-  local halo_color = {r = color.r, g = color.g * 0.7, b = color.b * 0.4, a = 0.18 + 0.35 * charge}
-  local core_color = {r = 1.0, g = lerp(0.55, 1.0, charge), b = lerp(0.25, 0.85, charge), a = 0.55 + 0.4 * charge}
-  local core_radius = 0.16 + 0.30 * charge
-  local halo_radius = 0.30 + 0.95 * charge
-
+-- Two filled circles at the muzzle: a hot core inside a soft halo. Circles rather than
+-- draw_light on purpose -- a light needs a sprite file, and `__core__/...` paths are
+-- not resolvable at runtime ("Unknown type __core__"), so this keeps the mod
+-- asset-free. Both effects below (heat bleeding off, and the charge-up while the
+-- barrel swings) are the same two circles with different colours and sizes.
+local function draw_orb(turret, state, muzzle, core_color, core_radius, halo_color, halo_radius)
   state.glow = state.glow or {}
+  local glow = state.glow
 
-  local core = state.glow.core and rendering.get_object_by_id(state.glow.core)
+  local core = glow.core and rendering.get_object_by_id(glow.core)
   if core and core.valid then
     core.target = {muzzle.x, muzzle.y}
     core.radius = core_radius
@@ -398,10 +435,10 @@ local function draw_glow(turret, state, muzzle)
       filled = true,
       render_layer = "projectile"
     }
-    state.glow.core = object.id
+    glow.core = object.id
   end
 
-  local halo = state.glow.halo and rendering.get_object_by_id(state.glow.halo)
+  local halo = glow.halo and rendering.get_object_by_id(glow.halo)
   if halo and halo.valid then
     halo.target = {muzzle.x, muzzle.y}
     halo.radius = halo_radius
@@ -416,9 +453,37 @@ local function draw_glow(turret, state, muzzle)
       filled = true,
       render_layer = "projectile"
     }
-    state.glow.halo = object.id
+    glow.halo = object.id
   end
 end
+
+-- the charge orb while the beam is burning / heat bleeding off the mouth
+local function draw_glow(turret, state, muzzle)
+  local charge = state.charge
+  local color = beam_color(C.beam_layers[#C.beam_layers], charge, fuel_profile(turret))
+  draw_orb(turret, state, muzzle,
+    {r = 1.0, g = lerp(0.55, 1.0, charge), b = lerp(0.25, 0.85, charge), a = 0.55 + 0.4 * charge},
+    0.16 + 0.30 * charge,
+    {r = color.r, g = color.g * 0.7, b = color.b * 0.4, a = 0.18 + 0.35 * charge},
+    0.30 + 0.95 * charge)
+end
+
+-- The charge-up that plays while the head is still swinging onto a target: a spot at
+-- the mouth that grows over C.windup_ticks and pulses, then hands the mouth over to
+-- the beam. Nothing is drawn along the barrel and nothing takes damage until the head
+-- is within C.aim_tolerance of the target, so the shot cannot outrun the rotation.
+local function draw_windup(turret, state, muzzle, elapsed, tick)
+  local progress = math.min(1, elapsed / C.windup_ticks)
+  local throb = 0.78 + 0.22 * math.sin(tick * 0.9)
+  local sheath = fuel_profile(turret).sheath
+  draw_orb(turret, state, muzzle,
+    {r = 1.0, g = lerp(0.40, 0.92, progress), b = lerp(0.12, 0.60, progress),
+     a = (0.28 + 0.55 * progress) * throb},
+    0.09 + 0.25 * progress,
+    {r = sheath.r, g = sheath.g, b = sheath.b, a = (0.08 + 0.26 * progress) * throb},
+    0.20 + 0.52 * progress)
+end
+
 
 ------------------------------------------------------------------ tick -------
 
@@ -447,31 +512,78 @@ local function update(turret, state, tick)
   end
 
   if firing and distance > 0.05 then
-    state.last_muzzle =
-    {
-      x = turret.position.x + dx * C.muzzle_offset,
-      y = turret.position.y + dy * C.muzzle_offset
-    }
-    local reach = math.max(1, C.range - C.muzzle_offset)
+    -- the barrel's own direction, not the target's: the beam has to leave the mouth
+    -- wherever the head currently points, and only once that IS the target
+    local orientation = turret.orientation
+    local fx, fy = facing(orientation or 0)
+    local muzzle = muzzle_point(turret, fx, fy)
+    state.last_muzzle = muzzle
 
-    if tick >= state.pulse_at then
-      state.pulse_at = tick + C.cooldown
-      state.beam_end = pulse(turret, state, state.last_muzzle, dx, dy, reach)
+    -- Is the head on the target? Compare the weapon's smooth orientation with the
+    -- bearing to the target. A turret whose orientation cannot be read (no vanilla
+    -- entity does this, but a modded one might) is treated as aligned rather than
+    -- silently mute.
+    local aligned = true
+    local error_turns = 0
+    if orientation then
+      error_turns = aim_error(orientation, dx, dy)
+      aligned = math.abs(error_turns) <= C.aim_tolerance
     end
 
-    -- the lance always runs its full length: it does not stop at the first body it
-    -- cuts, so whatever stands behind the current target is on the line too
-    local stop =
-    {
-      x = state.last_muzzle.x + dx * reach,
-      y = state.last_muzzle.y + dy * reach
-    }
-    draw_beam(turret, state, state.last_muzzle, stop, tick)
-    draw_glow(turret, state, state.last_muzzle)
+    -- a fresh target restarts the wind-up -- unless the barrel already points at it,
+    -- which is the common case when it finishes one biter and picks the next one on
+    -- the same line: charging up there would cost a pulse per kill for nothing.
+    if state.aim_target ~= target.unit_number then
+      state.aim_target = target.unit_number
+      state.aim_from = aligned and (tick - C.windup_ticks) or tick
+    end
+    local elapsed = tick - (state.aim_from or tick)
+
+    if aligned and elapsed >= C.windup_ticks then
+      -- The beam runs from the mouth to the target and on through whatever stands
+      -- behind it, and the corridor test runs along that same line -- so the bodies
+      -- the beam cuts are exactly the ones it visibly touches. It ends C.range from
+      -- the turret centre, so the per-direction muzzle offset cannot shorten the reach.
+      local ax, ay = normalize(aim.x - muzzle.x, aim.y - muzzle.y)
+      local along = (muzzle.x - turret.position.x) * ax + (muzzle.y - turret.position.y) * ay
+      local reach = math.max(1, C.range - along)
+
+      if tick >= state.pulse_at then
+        state.pulse_at = tick + C.cooldown
+        state.beam_end = pulse(turret, state, muzzle, ax, ay, reach)
+      end
+
+      -- the lance always runs its full length: it does not stop at the first body it
+      -- cuts, so whatever stands behind the current target is on the line too
+      local stop =
+      {
+        x = muzzle.x + ax * reach,
+        y = muzzle.y + ay * reach
+      }
+      draw_beam(turret, state, muzzle, stop, tick)
+      draw_glow(turret, state, muzzle)
+      if C.debug then
+        log(string.format("melta unit=%s beam err=%.2fdeg ori=%.4f muzzle=(%.3f,%.3f) at=(%.1f,%.1f) reach=%.2f",
+          tostring(turret.unit_number), error_turns * 360, orientation or -1,
+          muzzle.x, muzzle.y, turret.position.x, turret.position.y, reach))
+      end
+      return
+    end
+
+    -- still swinging onto the target: charge the mouth, draw no beam, deal no damage.
+    -- `state.pulse_at` is deliberately NOT advanced, so the first shot is due the
+    -- moment the barrel arrives instead of a cooldown later.
+    clear_beam(state)
+    draw_windup(turret, state, muzzle, elapsed, tick)
+    if C.debug then
+      log(string.format("melta unit=%s windup err=%.2fdeg aligned=%s elapsed=%d",
+        tostring(turret.unit_number), error_turns * 360, tostring(aligned), elapsed))
+    end
     return
   end
 
   -- not shooting: the beam is gone, the emitter bleeds off its heat
+  state.aim_target = nil
   state.pulse_at = tick + C.cooldown
   state.beam_end = nil
   clear_beam(state)

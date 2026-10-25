@@ -82,9 +82,30 @@ Two consequences, both handled:
 **Runtime (`control.lua`)**
 - `charge` per turret: +1/150 per tick while a target is held *and* the turret has fluid,
   −1/60 per tick otherwise.
-- one **pulse** every 8 ticks: corridor hit test along the beam axis (12 bodies, 0.82
-  falloff), two `entity.damage()` calls per body — `fire` for 85 % of the pulse, `physical`
-  for the other 15 % (the second is skipped if the first killed the body). Enemies only.
+- **aiming gate** — the beam is not allowed to exist before the barrel points at the
+  target. `LuaEntity::orientation` on a turret *is the weapon's* smooth orientation
+  (0 = north, 0.25 = east), so each tick the script compares it with the bearing to the
+  target and only fires when the head is within `C.aim_tolerance` (0.006 turns = 2.16 deg
+  = one `rotation_speed` step, which is the rule the engine itself fires on). While the
+  head is still swinging it plays a **charge-up glow at the mouth** instead: no beam, no
+  damage, and `pulse_at` is not advanced, so the first shot leaves the moment the barrel
+  arrives rather than a cooldown later. A target the barrel is *already* on does not pay
+  that wind-up (killing a biter and picking the next one on the same line stays at full
+  rate).
+- **muzzle** — the beam starts where the sprite *draws* the mouth, which is not
+  `position + forward * length`: the head is a pitched-camera render (51 deg from
+  vertical), so the forward reach is foreshortened by cos(51°) on the screen's vertical
+  axis and the raised muzzle sits sin(51°) * 0.722 tiles further up the screen (north).
+  `C.muzzle_forward` / `C.muzzle_height` / `C.camera_tilt_deg` carry the numbers; the
+  result differs per direction — 1.51 tiles north, 1.61 east/west, 0.39 south — and was
+  verified against Blender's own camera projection for all 64 directions
+  (`graphics/_blender/muzzle_marker.py`, agreement < 0.001 tiles) and against the
+  shipped sheets (`graphics/_blender/check_beam_anchor.py`: every start pixel is on the
+  gun, 0.39-1.68 tiles from the pivot).
+- one **pulse** every 8 ticks: corridor hit test from the mouth along the mouth→target
+  line (12 bodies, 0.82 falloff, ending exactly `C.range` from the turret centre), two
+  `entity.damage()` calls per body — `fire` for 85 % of the pulse, `physical` for the
+  other 15 % (the second is skipped if the first killed the body). Enemies only.
 - fuel surcharge: `extra_fluid_per_pulse_hot * charge` per pulse, removed with
   `remove_fluid(amount, 1)` — positional API, like `damage()`.
 - visuals: 4 stacked `rendering.draw_line` layers (haze / glow / hot / white core), a
@@ -134,6 +155,11 @@ brighter or flatter object pasted into the world.
 - `LuaEntity::shooting_state` **throws** on turrets ("Entity is not character") — use
   `shooting_target`. A turret keeps *aiming* with no fuel at all, so the fuel gate has to
   be script-side.
+- `LuaEntity::orientation` on a turret is the **weapon's** smooth orientation (0 = north,
+  0.25 = east), not the building's facing — that is what makes a rotation gate possible
+  without simulating the head's turn. The head turns in whole `rotation_speed` steps
+  (0.006 = 2.16 deg/tick here) and snaps onto the target, and the engine fires the tick
+  after it gets there.
 - `remove_fluid` / `damage` are **positional** APIs; calling them with a table errors.
 - `rendering.draw_light` needs a sprite and `__core__/...` is not resolvable at runtime
   ("Unknown type __core__") — circles instead.

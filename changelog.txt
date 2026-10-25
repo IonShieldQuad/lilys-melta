@@ -8,16 +8,29 @@ Date: 2026-10-25
       rendered for all 64 directions off one fixed top-down key light
     - The cannon is ~2.4x longer and ~2x fatter than the old drawn head, so it reads as a
       real gun next to the vanilla gun and laser turrets
-    - Muzzle now reaches 1.57 tiles from the pivot (was 0.66): the beam starts at the
-      barrel mouth, and gun_barrel_length / C.muzzle_offset follow the art
+    - The muzzle's front face is 1.512 tiles from the pivot (it was 0.66): the beam starts
+      at the barrel mouth, and gun_barrel_length / the beam anchors follow the art
     - The hull art is the mod's own render, so the turret looks the same with or without
       the Space Age rocket turret installed
     - selection_box widened to +-1.6 tiles and drawing_box_vertical_extension added so the
       big cannon is fully clickable and does not clip behind neighbours; collision_box is
       unchanged at +-1.2 tiles, so existing blueprints place exactly as before
+  Fixed:
+    - The beam no longer appears while the turret is still turning: it waits until the
+      head is within one rotation step (2.16 deg) of the target, and the muzzle plays a
+      short charge-up glow instead. dps is unchanged against a target the barrel is
+      already on (measured: 673.0 dps before and after)
+    - The beam now starts exactly at the barrel mouth in every direction, instead of at a
+      fixed point in front of the pivot: the rendered head is a pitched-camera image, so
+      the mouth sits 1.51 tiles from the pivot pointing north but only 0.39 pointing south
+      (a raised muzzle is drawn further up the screen)
   Notes:
     - Art pipeline lives in graphics/_blender/ (melta_render.py, assemble.py,
-      check_sheets.py, README.md); re-render with one command, no hand-drawn pixels
+      check_sheets.py, muzzle_marker.py, check_beam_anchor.py, README.md); re-render with
+      one command, no hand-drawn pixels
+    - muzzle_marker.py projects the model's own muzzle points through Blender's camera and
+      check_beam_anchor.py tests the result against every shipped frame, so the beam anchor
+      can be re-derived after any re-render instead of guessed
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 Version: 0.3.0
