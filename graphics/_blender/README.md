@@ -8,6 +8,12 @@ damage level by changing numbers instead of pixels.
                       cannon 64 times (5.625 deg apart)
     assemble.py       downsamples, applies the tone curve, bakes cast shadows,
                       writes the sheets the prototype loads
+    render_icons.py   imports that same model and renders the ICON stills (one
+                      direction at a time, supersampled, transparent)
+    assemble_icons.py fits those stills into vanilla-shaped icon files, including
+                      the packed mip chain, plus the mod thumbnail
+    check_icons.py    offline stand-in for the atlas: sizes, packed mips, framing,
+                      and that the prototypes point at these files
     preview.py        (scratch tool) lays renders on a ground tile for review
 
 ## Requirements
@@ -35,6 +41,42 @@ python assemble.py C:/tmp/melta/raw C:/tmp/melta/sheets
 
 Copies nothing: point the second argument at a scratch dir, then copy
 `sheets/graphics/entity/melta-turret/*.png` into the mod.
+
+## Icons and thumbnail
+
+The icon is a separate render of the whole machine, not a crop of a sheet frame
+(a sheet frame is one 4-tile-wide square of a 64-direction loop; an icon wants the
+whole turret fitted to 64 px, in a different colour register).
+
+```bash
+blender -b --factory-startup -P render_icons.py -- \
+    --out C:/tmp/melta/iconraw --dirs 40 --res 1024 --samples 56 --tilt 34
+python assemble_icons.py C:/tmp/melta/iconraw 40 --out "H:/Factorio Mods/lilys-melta"
+python check_icons.py "H:/Factorio Mods/lilys-melta"
+```
+
+`render_icons.py` imports `melta_render` rather than copying it, so `GUN_SCALE`, the
+materials and every part stay in one place: change the turret and the icon changes
+with it. `iconraw/icon-040.png` is the render the shipped icons came from, kept so
+the icons can be re-derived without Blender.
+
+Three things are deliberately different from the sheets:
+
+| | sheets | icon |
+|---|---|---|
+| camera pitch | 51 deg | **34 deg** -- at 51 the 2x2 emplacement only fills 63x44 of the 64 px box (a dead band); at 34 it fills 63x53 and the muzzle still reads |
+| tone | fitted to the vanilla base *sprites* (mean ~50, half near black) | fitted to the vanilla *icons* (mean 85-97, ~10% near black) -- the sprite curve on an icon reads as a murky disc at 32 px |
+| file shape | 256x2048 sheets | vanilla icon shape: 120x64 = 64 px icon + 32/16/8 mips packed right; 480x256 for the technology |
+
+The packed mip layout is measured, not assumed: vanilla's own `gun-turret.png` (120x64)
+and `technology/gun-turret.png` (480x256) are exactly base + halvings to the right, and
+a downsample of their base square matches the packed regions at alpha correlation 1.000.
+`icon_size` therefore stays 64 / 256 (the base square), never the file width.
+
+No headless Factorio run builds sprites, so `check_icons.py` stands in for the atlas:
+`icon_size` fits inside the image, each packed mip matches the base, no opaque pixel
+touches the frame border (no clipping), the silhouette fills >= 85% of the cell (no
+dead padding), and the prototypes reference these files rather than a vanilla icon.
 
 ## The contract with prototypes/graphics.lua
 

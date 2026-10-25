@@ -270,7 +270,12 @@ works without anyone touching us.
   only, so there is **no friendly fire** — verified with a friendly wall in the corridor:
   wall hp unchanged, biter behind it cooked).
 - Quality affects the turret like any other; no per-quality beam scaling.
-- `thumbnail.png` is still the radar-artillery leftover from the stub.
+- The icon, the placing item, the technology and `thumbnail.png` are all rendered from the
+  turret model (`graphics/_blender/render_icons.py`, `assemble_icons.py`). Honest limit: the
+  2x2 emplacement is wider than it is tall and its muzzle stops a hair short of the hull rim
+  (1.51 vs 1.56 tiles), so the icon reads as a compact industrial emplacement rather than as
+  vanilla's long-barrel silhouette; at 32 px the plate seams are denser than vanilla's icons.
+  The fix for that is a model change (fewer, larger plates), not an icon pass.
 
 ## Where to retune
 
