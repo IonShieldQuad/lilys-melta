@@ -120,17 +120,41 @@ local turret =
       }
     },
     -- synthesised jet exhaust + sizzle (sound/_generator/melta_sounds.py): a
-    -- high-pressure stream, not a flame loop borrowed from the flamethrower
+    -- high-pressure stream, not a flame loop borrowed from the flamethrower.
+    -- Loudness, measured (ffmpeg astats, effective = file dBFS + 20log10(volume)):
+    --   before  loop -26.4 dBFS RMS x 0.45 = -33.3 dBFS in the mix  (why it was quiet:
+    --           the generator normalises by PEAK, and this noise bed has a 25 dB crest)
+    --   after   loop -15.2 dBFS RMS x 0.70 = -18.3 dBFS in the mix
+    -- Reference points: vanilla flamethrower-turret-mid is -13.2 dBFS RMS x 0.5 =
+    -- -19.2 dBFS, gun-turret gunshot -17.6 x 0.4. So the melta now sits level with a
+    -- vanilla flamer loop and still under gun-turret spam, and its file peak (-1.6 dBFS)
+    -- leaves -4.7 dBFS per voice, i.e. two loops cannot sum over full scale.
+    -- `aggregation` is the anti-clipping clamp: at most 2 loops / 2 cues at once, so a
+    -- 5-turret wall raises the level instead of stacking. `audible_distance_modifier`
+    -- widens the falloff so it also *carries* further.
     cyclic_sound =
     {
-      begin_sound = {filename = "__lilys-melta__/sound/melta-start.ogg", volume = 0.55},
+      begin_sound =
+      {
+        filename = "__lilys-melta__/sound/melta-start.ogg",
+        volume = 0.7,
+        audible_distance_modifier = 1.3,
+        aggregation = {max_count = 2, remove = true, count_already_playing = true}
+      },
       middle_sound =
       {
         filename = "__lilys-melta__/sound/melta-burn.ogg",
-        volume = 0.45,
+        volume = 0.7,
+        audible_distance_modifier = 1.4,
         aggregation = {max_count = 2, remove = true, count_already_playing = true}
       },
-      end_sound = {filename = "__lilys-melta__/sound/melta-stop.ogg", volume = 0.5}
+      end_sound =
+      {
+        filename = "__lilys-melta__/sound/melta-stop.ogg",
+        volume = 0.7,
+        audible_distance_modifier = 1.3,
+        aggregation = {max_count = 2, remove = true, count_already_playing = true}
+      }
     }
   }
 }

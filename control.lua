@@ -245,7 +245,16 @@ local function pulse(turret, state, muzzle, dx, dy, reach)
     -- scenery are filtered out above, so your own base is never in the line of fire
     local dealt = damage * C.pierce_falloff ^ (index - 1)
     if dealt > 0 and victim.valid and victim.health then
-      victim.damage(dealt, force, C.damage_type, turret)
+      -- Fire is what a melta is; the physical share is the mass of the stream hitting
+      -- the body. Two calls because `damage()` takes one type per call (positional:
+      -- amount, force, type, cause). The total is unchanged -- the split is taken out
+      -- of `dealt`, so balance is identical and only the resistance maths differs:
+      -- a 100 % fire-resistant target still eats C.physical_share of the pulse.
+      victim.damage(dealt * (1 - C.physical_share), force, C.damage_type, turret)
+      -- the fire hit may have killed it; a dead entity has nothing left to damage
+      if victim.valid and victim.health and victim.health > 0 then
+        victim.damage(dealt * C.physical_share, force, C.damage_type_hit, turret)
+      end
       pop(turret.surface, hit.position, state.charge, 0.42 + 0.35 * state.charge, 0.85, "higher-object-above")
     end
     stop = hit.position

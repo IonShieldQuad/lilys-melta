@@ -1,13 +1,10 @@
 local C = require("constants")
 
--- Thermal is its own damage type: nothing in vanilla resists it, which is the
--- point of a melta. The turret pays for that with range, fuel and spin-up time.
+-- The beam deals vanilla `fire` plus a smaller `physical` slice (see constants.lua:
+-- C.damage_type / C.damage_type_hit / C.physical_share), so it needs no damage type
+-- of its own -- and no resistance table anywhere has to learn a new name.
 data:extend(
 {
-  {
-    type = "damage-type",
-    name = C.damage_type
-  },
   {
     type = "ammo-category",
     name = C.ammo_category
@@ -66,6 +63,9 @@ stream.particle_start_alpha = 0
 stream.particle_end_alpha = 0
 stream.particle_start_scale = 0.01
 stream.smoke_sources = nil
+-- The engine's own contact hit is the same split the script applies, scaled down to
+-- 1 damage: whichever path lands the hit, the damage type reads fire first and the
+-- physical slice is still there (0.85 fire + 0.15 physical).
 stream.action =
 {
   {
@@ -75,7 +75,8 @@ stream.action =
       type = "instant",
       target_effects =
       {
-        {type = "damage", damage = {amount = 1, type = C.damage_type}}
+        {type = "damage", damage = {amount = 1 * (1 - C.physical_share), type = C.damage_type}},
+        {type = "damage", damage = {amount = 1 * C.physical_share,       type = C.damage_type_hit}}
       }
     }
   }

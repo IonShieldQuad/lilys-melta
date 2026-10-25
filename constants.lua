@@ -10,14 +10,23 @@ C.turret        = "melta-turret"
 C.fluid         = "melta-fuel"
 C.stream        = "melta-stream"
 C.tech          = "melta-turret"
-C.damage_type   = "thermal"
 C.ammo_category = "melta"
+
+-- The beam is FIRE, and a slice of every pulse is physical: the lance carries mass
+-- as well as heat. Two damage types, one number split -- `physical_share` is taken
+-- out of the same total, so the turret's damage per pulse does not change.
+-- Why not one type: fire damage is what fire-vulnerable biters are supposed to eat
+-- (and what the flame/burn side of the game understands), while the physical slice
+-- keeps the turret useful against a 100 % fire-resistant target instead of useless.
+C.damage_type      = "fire"       -- primary: what the beam is made of
+C.damage_type_hit  = "physical"   -- secondary: the impact of the stream itself
+C.physical_share   = 0.15         -- 0.15 = 15 % of every pulse is physical, 85 % fire
 
 -- the beam -------------------------------------------------------------------
 C.range           = 12    -- tiles. laser turret reaches 24, rocket turret 36: the melta has to be close
 C.cooldown        = 8     -- ticks between pulses (7.5/s, reads as one continuous beam)
-C.damage_cold     = 14    -- thermal damage per pulse, cold barrel
-C.damage_hot      = 56    -- thermal damage per pulse, fully spun up
+C.damage_cold     = 14    -- damage per pulse, cold barrel (85 % fire + 15 % physical)
+C.damage_hot      = 56    -- damage per pulse, fully spun up (same split)
 C.spin_up_ticks   = 150   -- 2.5 s of unbroken fire from cold to white-hot
 C.spin_down_ticks = 60    -- 1 s to fall back to cold once the target is gone
 C.pierce_falloff  = 0.82  -- each further body in the line takes this fraction of the last hit

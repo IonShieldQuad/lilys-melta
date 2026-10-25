@@ -27,11 +27,32 @@ render-object leaks).
 | spin-up | 150 ticks (2.5 s) | one biter wave is not enough time to peak |
 | spin-down | 60 ticks (1 s) | it cools fast, so holding a line is the skill |
 | pierce | 12 bodies, 0.82 falloff each | front rank eats it, back ranks eat 82 % of the one in front |
-| damage type | `thermal` (new) | nothing in vanilla resists it — that is the fantasy |
+| damage type | `fire`, with 15 % of each pulse dealt as `physical` | fire is what a melta is (and fire-vulnerable biters take it in full); the physical slice is the mass of the stream, so a fire-immune target still takes 15 % instead of nothing |
 | fuel | light-oil 1.0x, petroleum-gas 0.85x, enriched melta-fuel 1.6x, incendiaries napalm 1.35x | each fuel sets damage *and* beam colour; see the fuel table below |
 | burn rate | 2.5 units/shot engine-side + 3.8 per pulse at full charge | ~19/s cold, ~47/s white-hot |
 
-Derived: a behemoth biter (3000 hp) dies in ~5 s of full-intensity fire.
+Derived — per pulse at full intensity, base damage 56 (47.6 fire + 8.4 physical), and what
+survives each biter's resistances (none of them resist fire; only physical is resisted):
+
+| target | physical resistance | lands per pulse | vs the old single-type 56 |
+|---|---|---|---|
+| small biter | none | 56.0 (47.6 + 8.4) | unchanged |
+| medium biter | decrease 4, 10 % | 51.6 (47.6 + 3.96) | −7.9 % |
+| big biter | decrease 8, 10 % | 48.0 (47.6 + 0.36) | −14.2 % |
+| behemoth biter | decrease 12, 10 % | 47.6 (fire only) | −15.0 % |
+| any 100 % fire-resistant target | — | 8.4 (physical only) | was 0 — the reason for the split |
+
+So the split is free against unarmoured bodies and costs up to 15 % against the armoured
+end of the biter line, because flat armour eats a small physical slice whole. Turn
+`C.physical_share` down if that trade is not worth it, or raise `damage_hot` by ~15 % if
+behemoth dps matters more than parity with everything else.
+
+Measured headlessly (harness mod, one target at a time, melta-fuel = 1.6x, full charge):
+89.59 / 13.44 / 77.44 per pulse on the plain / fire-resistant / behemoth-armour targets —
+i.e. exactly 56 x 1.6, 15 % of it, and 86.4 % of it.
+
+Derived: a behemoth biter (3000 hp) dies in ~8 s of full-intensity fire (was ~7 s): its
+flat 12 physical resistance swallows the physical slice whole (0.15 x 56 = 8.4).
 
 ## How it is built
 
@@ -55,13 +76,15 @@ Two consequences, both handled:
   damage set to 1 — **invisible on purpose**. It exists because the engine only lets a
   fluid turret consume fluid through a stream; the beam is not it.
 - `melta-fuel`: fluid + chemistry recipe from light oil.
-- `thermal` damage type, `melta` ammo category, turret recipe, technology.
+- `melta` ammo category, turret recipe, technology. (No damage type of its own any more:
+  the beam is vanilla `fire` plus a `physical` slice.)
 
 **Runtime (`control.lua`)**
 - `charge` per turret: +1/150 per tick while a target is held *and* the turret has fluid,
   −1/60 per tick otherwise.
 - one **pulse** every 8 ticks: corridor hit test along the beam axis (12 bodies, 0.82
-  falloff), `entity.damage()` with the `thermal` type. Enemies only.
+  falloff), two `entity.damage()` calls per body — `fire` for 85 % of the pulse, `physical`
+  for the other 15 % (the second is skipped if the first killed the body). Enemies only.
 - fuel surcharge: `extra_fluid_per_pulse_hot * charge` per pulse, removed with
   `remove_fluid(amount, 1)` — positional API, like `damage()`.
 - visuals: 4 stacked `rendering.draw_line` layers (haze / glow / hot / white core), a
@@ -129,6 +152,33 @@ circular filters -> inverse FFT, so the loop is seamless):
 They are wired as the turret's `cyclic_sound` (begin / middle loop / end), so the jet runs for as
 long as the trigger is held and stops with the beam. The engine cannot pitch a sound per entity,
 so the spin-up is carried by the visuals, not the audio.
+
+**Loudness (measured, not guessed).** The generator normalises by *peak*, and this noise bed has a
+25 dB crest factor, so the loop shipped 12.7 dB quieter than a vanilla flamer loop even though its
+`volume` was close to vanilla's:
+
+| | file RMS | volume | in the mix | file peak |
+|---|---|---|---|---|
+| before | −26.4 dBFS | 0.45 | −33.3 dBFS | −1.4 dBFS |
+| now | −15.2 dBFS | 0.70 | −18.3 dBFS | −1.6 dBFS |
+| reference: flamethrower-turret-mid | −13.2 dBFS | 0.5 | −19.2 dBFS | −2.3 dBFS |
+| reference: gun-turret gunshot | −17.6 dBFS | 0.4 | — | −0.5 dBFS |
+
+That is +15 dB in the mix: level with a vanilla flamer loop, still below gun-turret spam, and with
+−4.7 dBFS of headroom per voice so two loops cannot sum past full scale. `aggregation.max_count =
+2` on all three sounds is the anti-clipping clamp, and `audible_distance_modifier` 1.3–1.4 widens
+the falloff so it carries further than it did.
+
+The shipped `melta-burn.ogg` is the generator's output run through a limiter that raises the RMS
+without touching the loop point (causal, no tail), same 22050 Hz mono Vorbis:
+
+```bash
+ffmpeg -i melta-burn.ogg -af "volume=20dB,alimiter=limit=0.80:attack=3:release=60:level=disabled" \
+       -ac 1 -ar 22050 -c:a libvorbis -q:a 6 out.ogg
+```
+
+Re-running `melta_sounds.py` restores the quiet version — re-apply that command, or add the gain to
+the generator, before shipping a rebuild.
 
 ## Research and recipes
 
