@@ -32,7 +32,10 @@ C.spin_down_ticks = 60    -- 1 s to fall back to cold once the target is gone
 C.pierce_falloff  = 0.82  -- each further body in the line takes this fraction of the last hit
 C.pierce_max      = 12    -- hard cap on bodies a single pulse can cut through
 C.hit_half_width  = 0.45  -- tiles: half-width of the line hit test around the beam axis
-C.muzzle_offset   = 1.9   -- tiles in front of the turret centre the beam starts
+C.muzzle_offset   = 1.51  -- tiles in front of the turret centre the beam starts
+                          -- (measured off the rendered model: the heat projector's
+                          -- front face is 1.51 tiles from the pivot, see
+                          -- graphics/_blender/melta_render.py meta.json)
 
 -- beam look ------------------------------------------------------------------
 -- Four stacked lines. Colours come from whichever fuel is burning (see C.fuels) and

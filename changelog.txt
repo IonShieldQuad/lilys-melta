@@ -1,4 +1,25 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.4.0
+Date: 2026-10-25
+  Graphics:
+    - The turret is modelled and rendered in Blender now instead of drawn: a rusted
+      industrial emplacement plus a wide-bore melta cannon (chunky breech, ribbed copper
+      heat coils, vented shroud, welded seams, rivets, dents, chipped paint, rust streaks)
+      rendered for all 64 directions off one fixed top-down key light
+    - The cannon is ~2.4x longer and ~2x fatter than the old drawn head, so it reads as a
+      real gun next to the vanilla gun and laser turrets
+    - Muzzle now reaches 1.57 tiles from the pivot (was 0.66): the beam starts at the
+      barrel mouth, and gun_barrel_length / C.muzzle_offset follow the art
+    - The hull art is the mod's own render, so the turret looks the same with or without
+      the Space Age rocket turret installed
+    - selection_box widened to +-1.6 tiles and drawing_box_vertical_extension added so the
+      big cannon is fully clickable and does not clip behind neighbours; collision_box is
+      unchanged at +-1.2 tiles, so existing blueprints place exactly as before
+  Notes:
+    - Art pipeline lives in graphics/_blender/ (melta_render.py, assemble.py,
+      check_sheets.py, README.md); re-render with one command, no hand-drawn pixels
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 0.3.0
 Date: 2026-10-22
   Features:

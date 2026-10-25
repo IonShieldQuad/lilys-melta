@@ -18,8 +18,8 @@ render-object leaks).
 
 | thing | value | why |
 |---|---|---|
-| hull | rocket turret (2x2), base art untouched | her call: reuse the rocket turret |
-| head | purpose-drawn 64-direction emitter sheet | see **Graphics** below |
+| hull | own rendered emplacement, 2x2 footprint (collision +-1.2) | modelled in Blender, not vanilla art | see **Graphics** below |
+| head | rendered 64-direction cannon, 256x256, 8 sheets of 8 rows | see **Graphics** below |
 | health | 1200 | an emitter, not an armoured box (rocket turret: 1500) |
 | range | 12 tiles | laser 24, rocket 36: the melta has to be near the wall |
 | pulse rate | 8 ticks (7.5/s) | fast enough that discrete pulses read as one beam |
@@ -93,22 +93,41 @@ Two consequences, both handled:
 
 ## Graphics
 
-Not a recolour of the rocket pod. `graphics/_generator/melta_head.py` draws a new head
-procedurally at 4x supersampling and writes a sheet that drops straight into the vanilla
-rig (frame 160x164, 64 directions, 3 files of 22/22/20 rows, shift `by_pixel(0, -8.5)`,
-scale 0.5), so the base/hull stays the rocket turret's own art:
+The turret is a **modelled and rendered** asset now, not a drawn sprite: the whole
+emplacement (hull + cannon) is built procedurally in Blender and rendered from a
+top-down orthographic camera, which is the only way to get the chunky, welded,
+dented read of Factorio's own turret art.
 
-- everything on the head is drawn in a **barrel-aligned frame**, so the barrel, collar,
-  cooling rings, heat-sink vanes and sight glass all rotate together;
-- the housing is rotation-symmetric and drawn in **screen space**, so a rigid turn does not
-  squash it;
-- painter's order flips at the camera: pointing away → dome over barrel, pointing toward →
-  barrel over dome, which fixes the south-facing junction;
-- mounting plate + contact shadow so it sits on the hull instead of floating;
-- no fold/unfold strip: the emitter is always deployed, which keeps the head one sheet.
+Pipeline: `graphics/_blender/melta_render.py` (model + render) → `assemble.py`
+(downsample, tone curve, baked cast shadows, sheet packing) →
+`prototypes/graphics.lua` (frame geometry). `graphics/_blender/README.md` records
+the contract between the scripts and the prototype.
 
-`preview.png` (review only, never loaded) shows the turret at rest and at three beam
-intensities.
+- **hull** — static 256x256 sprite (scale 0.5 -> 3.1 tiles on screen): octagonal
+  cast pedestal, layered armour wedges with welded beads, radiator stack, coolant
+  drum, crate, hydraulic rams, copper fuel stubs at +-1.2 tiles (they line up with
+  `fluid_box.pipe_connections`), and a bearing well with spokes so pointing the gun
+  away does not expose a blank disc.
+- **cannon** — 64 directions, frame 256x256, 8 files of 8 rows (256x2048, power of
+  two): chunky breech with a heat-exchanger fin stack, ribbed copper heat coils with
+  a glow ring between them, vented shroud, wide-bore projector mouth with a
+  white-hot throat, hydraulic ram, optic block and a bent armour flap — asymmetric
+  on purpose.
+- **size** — the cannon's muzzle reaches 1.51 tiles from the pivot (it was 0.66):
+  ~2.3x longer and ~2x fatter, which is what "too small next to base turrets" was
+  about. The model is scaled 0.84 so the frame can hold the barrel at every angle.
+- **pivot** — the model rotates about the world origin and the camera aims at it, so
+  the pivot lands on the frame centre: `shift = {0, 0}`, no wobble in any direction.
+- **wear** — chipped paint over bare metal, edge wear on convex pointiness, rust
+  streaks stretched down Z, oil streaks, and grime packed into concave pointiness.
+  The palette (dark steel, muted warning yellow, rust, copper) is picked to sit next
+  to the vanilla gun/laser turret sprites.
+- no fold/unfold strip: the cannon is always deployed, which keeps the head one sheet.
+
+Brightness is tuned against vanilla art rather than by eye: the tone curve in
+`assemble.py` maps the render's range onto the spread measured from the vanilla
+turret sprites (p10 ~4, p50 ~26, p90 ~120), so the turret does not read as a
+brighter or flatter object pasted into the world.
 
 ## Engine facts this leans on (and the ones that bit)
 

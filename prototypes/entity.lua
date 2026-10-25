@@ -44,8 +44,15 @@ local turret =
   corpse = source.corpse,
   dying_explosion = source.dying_explosion,
   damaged_trigger_effect = source.damaged_trigger_effect,
-  collision_box = source.collision_box,
-  selection_box = source.selection_box,
+  -- 2x2 footprint, same as the rocket turret it started as, so existing saves and
+  -- blueprints place it exactly where they did before. The art overhangs the box
+  -- (barrel and skirt), which is normal for turrets -- the boxes only have to hug
+  -- the part the player and the enemy can touch.
+  collision_box = {{-1.2, -1.2}, {1.2, 1.2}},
+  selection_box = {{-1.6, -1.6}, {1.6, 1.6}},
+  -- the cannon stands ~1.2 tiles tall and reaches 1.8 tiles out; this keeps it
+  -- from being clipped/sorted behind neighbours when it points at them
+  drawing_box_vertical_extension = 0.5,
   heating_energy = source.heating_energy,
   resistances = {{type = "fire", percent = 100}},
   turret_base_has_direction = true,
@@ -71,7 +78,22 @@ local turret =
   attacking_animation = head.attacking_animation,
   ending_attack_animation = head.ending_attack_animation,
   folding_animation = head.folding_animation,
-  graphics_set = source.graphics_set,
+  -- the hull (base sprite, cast shadow, water reflection) is our own render now:
+  -- base_visualisation is the 2.1 shape, the cannon rides on top of it
+  graphics_set =
+  {
+    base_visualisation =
+    {
+      animation =
+      {
+        layers =
+        {
+          table.deepcopy(head.base)
+        }
+      }
+    },
+    water_reflection = source.graphics_set and source.graphics_set.water_reflection or nil
+  },
 
   ---------------------------------------------------------------- plumbing --
   fluid_box =
@@ -103,8 +125,11 @@ local turret =
     fluid_consumption = C.fluid_consumption,
     fluids = fuels,
     ammo_category = C.ammo_category,
-    gun_barrel_length = 0.4,
-    gun_center_shift = {north = {0, -1.5}, east = {1.5, 0}, south = {0, 1.5}, west = {-1.5, 0}},
+    -- muzzle geometry, kept in step with constants.lua's C.muzzle_offset and the
+    -- rendered model: the projector mouth is 1.51 tiles ahead of the rotation
+    -- centre, and the rotation centre is the entity centre (no gun_center_shift)
+    gun_barrel_length = C.muzzle_offset,
+    gun_center_shift = {north = {0, 0}, east = {0, 0}, south = {0, 0}, west = {0, 0}},
     ammo_type =
     {
       action =
