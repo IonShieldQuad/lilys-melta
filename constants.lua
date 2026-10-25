@@ -131,6 +131,21 @@ C.camera_tilt_deg = 51    -- the render camera's pitch from vertical. control.lu
 -- reads as a socket on the housing instead of a plate floating in the gap.
 C.pipe_reach = 1.12   -- tiles, all four sides
 
+--- Where each side's port sprite is drawn, in SCREEN tiles relative to the
+--- connection point (so +y is south on screen, whatever the world axis). The port is
+--- rendered once and turned by the render rig, so the same model lands at different
+--- screen distances per side; the south one also had to clear the hull's deeper south
+--- rim (silhouette 1.28 tiles) or its clamp collar hid behind the hull and only the
+--- mouth showed. graphics/_blender/pipe_join.py reads these numbers, so the sprite
+--- plane and the measurement cannot drift apart.
+C.pipe_shift =
+{
+  north = {0, 0},
+  east = {0, 0},
+  south = {0, 0.18},
+  west = {-0.22, 0}
+}
+
 
 -- beam look ------------------------------------------------------------------
 -- WIDTHS ARE IN TILES, except where a line is handed to the engine (it takes PIXELS,

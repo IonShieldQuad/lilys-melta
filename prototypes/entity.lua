@@ -128,10 +128,15 @@ local turret =
       {direction = defines.direction.south, position = {0, C.pipe_reach}},
       {direction = defines.direction.west, position = {-C.pipe_reach, 0}}
     },
-    -- the socket a pipe visibly ends in, one vanilla pipe-cover sprite per side
-    -- (prototypes/graphics.lua): drawn above the hull (extra-high vs high), so the
-    -- join reads as "pipe into port" instead of "pipe lying on the emplacement"
-    pipe_covers = head.pipe_covers
+    -- the port hardware: the open socket where a pipe arrives (pipe_picture) and the
+    -- blanked-off plate where none does (pipe_covers). Both are the mod's own renders
+    -- of one port model, per direction; see prototypes/graphics.lua for why 2.1 makes
+    -- these two different fields.
+    pipe_picture = head.pipe_picture,
+    pipe_covers = head.pipe_covers,
+    -- without pipe_picture the engine draws pipe_covers on *every* side, pipe or no
+    -- pipe (that was the bug: a cap lying on the deck next to each pipe end)
+    always_draw_covers = false
   },
   fluid_buffer_size = C.fluid_buffer,
   fluid_buffer_input_flow = 1.6,   -- units/tick: enough to feed ~50/s at full beam

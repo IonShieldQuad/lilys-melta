@@ -1,0 +1,60 @@
+{
+  "pipe_reach": 1.12,
+  "max_seam": 0.0,
+  "open": {
+    "north": {
+      "port": 1.948,
+      "pipe": 1.516,
+      "overlap": 0.433,
+      "seam": 0.0
+    },
+    "east": {
+      "port": 1.854,
+      "pipe": 1.5,
+      "overlap": 0.354,
+      "seam": 0.0
+    },
+    "south": {
+      "port": 1.738,
+      "pipe": 1.188,
+      "overlap": 0.55,
+      "seam": 0.0
+    },
+    "west": {
+      "port": 1.965,
+      "pipe": 1.516,
+      "overlap": 0.449,
+      "seam": 0.0
+    }
+  },
+  "cap": {
+    "north": {
+      "port": 1.979,
+      "pipe": 1.516,
+      "overlap": 0.464,
+      "seam": null,
+      "cap_px": 160
+    },
+    "east": {
+      "port": 1.886,
+      "pipe": 1.5,
+      "overlap": 0.386,
+      "seam": null,
+      "cap_px": 73
+    },
+    "south": {
+      "port": 1.769,
+      "pipe": 1.188,
+      "overlap": 0.581,
+      "seam": null,
+      "cap_px": 134
+    },
+    "west": {
+      "port": 2.012,
+      "pipe": 1.516,
+      "overlap": 0.496,
+      "seam": null,
+      "cap_px": 72
+    }
+  }
+}

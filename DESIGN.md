@@ -162,7 +162,6 @@ starts shooting hands its target to every turret inside that radius **regardless
 range**. A turret can therefore be aiming at a biter 19 tiles away with a 16-tile beam;
 that is what the re-target path above cleans up.
 
-
 ## Graphics
 
 The turret is a **modelled and rendered** asset now, not a drawn sprite: the whole
@@ -226,10 +225,62 @@ What the geometry actually allows — all measured, not assumed:
   shadow layers, `priority = "extra-high"` — above the hull's `"high"`, so no
   z-fighting and no re-ordering needed.
 
-So the ports are `+-1.12` tiles on the four axes, `flow_direction` left at the engine
-default (`"input-output"`, verified at runtime by reading
-`get_fluid_box_pipe_connections`) like the vanilla flamethrower turret, and
-`fluid_box.pipe_covers` carries the four vanilla cover sprites.
+So the ports are `+-1.12` tiles on the four axes and `flow_direction` is left at the
+engine default (`"input-output"`, verified at runtime by reading
+`get_fluid_box_pipe_connections`) like the vanilla flamethrower turret.
+
+### Why the pipes still looked disconnected, and what actually fixes it
+
+`pipe_covers` is **not** the connected-port picture. 2.1 splits the two cases:
+
+| field | drawn when |
+|---|---|
+| `pipe_picture` | a pipe *is* connected on that side — this is the machine's own stub (vanilla's `assembling-machine-2-pipe-N/E/S/W`) |
+| `pipe_covers` | nothing is connected on that side — a blanking cap |
+| `always_draw_covers` | defaults to **true when `pipe_picture` is absent**, i.e. covers are then drawn on every side |
+
+The 0.4.0 build set only `pipe_covers`, so the engine drew vanilla's *cap* — whose art
+sits 0.28-0.5 tiles inboard of the anchor, i.e. at 0.88-1.04 tiles from the centre —
+on all four sides whether a pipe was there or not: a collar lying on the deck, half a
+tile short of the pipe, and no port art at all where the pipe arrived.
+
+The fix is the native one and it is where the "render extra pipe models" instinct was
+right: the mod now renders its own port (`graphics/_blender/pipe_port.py`, one model:
+mount pad, neck with ribbed strain relief, bolted clamp collar, socket mouth with a
+bolt ring) in four orientations, and supplies it as **`pipe_picture`** for connected
+sides and as a blanked-off variant of the same port for **`pipe_covers`**.
+`always_draw_covers = false` makes the distinction explicit.
+
+- Frame centre = the connection point, `scale = 0.5` on a 128 px sprite (64 art px/tile,
+  the same density as the rest of the mod's art), so `C.pipe_reach` decides where the
+  socket sits and nothing guesses a `shift`.
+- One model, four renders through the same 51° camera: the projection lands it at a
+  different screen distance per side (the pipe's own art is asymmetric too — its near
+  edge is 1.52 tiles north but 1.19 south). `C.pipe_shift` carries the per-side
+  correction, screen tiles: south `+0.18` and west `-0.22`, because on those sides the
+  clamp collar otherwise hid behind the hull's deeper rim (south 1.28) or the west
+  vent block, and only the mouth showed — which read as a cap sitting on the pipe.
+
+Measured with `python graphics/_blender/pipe_join.py --check`, which composites the
+hull, the port and the real vanilla pipe sprite at 64 px/tile (Factorio zoom 2.0) and
+fails if the port does not reach the pipe or if any bare ground shows in between:
+
+| side | port reaches | pipe's near edge | overlap | bare ground between |
+|---|---|---|---|---|
+| north | 1.95 | 1.52 | +0.43 | 0 |
+| east | 1.85 | 1.50 | +0.35 | 0 |
+| south | 1.74 | 1.19 | +0.55 | 0 |
+| west | 1.97 | 1.52 | +0.45 | 0 |
+
+The capped sprite is checked the same way (`cap px`: pixels the blanking plate adds over
+the open port, 72-160 per side) so "no pipe connected" cannot silently revert to looking
+like an open socket.
+
+In game (Steam build, 15 screenshots in `docs/verification/in-game-pipes/`): all four
+pipes meet the turret with no bare floor and a visible socket, the three unconnected
+sides of a one-sided turret show blanked plates, and the straight / L / T / cross
+junctions plus a dead end all render clean — the dead end capped, not hollow.
+
 
 Measured join — distance from the turret centre to the hull's own silhouette vs to the
 pipe's near edge, at 64 px/tile, measured in a +-0.5 tile band around each pipe axis

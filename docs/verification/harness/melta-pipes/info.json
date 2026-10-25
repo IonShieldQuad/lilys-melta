@@ -1,0 +1,12 @@
+{
+	"name": "melta-pipes",
+	"version": "1.0.0",
+	"title": "melta pipe-join probe",
+	"author": "verification harness (never shipped)",
+	"description": "Builds a melta with pipes on every side, a one-sided melta and the four junction shapes, then screenshots them.",
+	"factorio_version": "2.1",
+	"dependencies": [
+		"base >= 2.1",
+		"lilys-melta"
+	]
+}
