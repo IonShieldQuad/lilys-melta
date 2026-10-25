@@ -68,3 +68,12 @@ heat projector) is **1.79 tiles** from the pivot on the barrel axis. `constants.
   world or the background node will not exist.
 * `util.by_pixel` divides by 32; at `scale = 0.5` one art pixel is 1/64 tile, which
   is why the pivot sits on the frame centre and no shift is needed at all.
+
+## Review images
+
+* `preview-rotations.png` — the eight cardinal/diagonal frames of the assembled
+  turret on a ground tile (`preview_rotations.py <sheet_dir> <out.png>`)
+* `preview-vs-vanilla.png` — vanilla gun turret, vanilla laser turret, the old drawn
+  head and the new turret at the same pixels-per-tile
+  (`compare_with_vanilla.py <sheet_dir> <out.png>`); both scripts read the installed
+  game's own sprites, so they only run on this machine
