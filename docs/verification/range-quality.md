@@ -106,9 +106,12 @@ belongs to the in-game verification pass (`t_e17c7b8c`). Checklist for it:
 
 ## Reproducing
 
+`docs/verification/harness/melta-range/stage.sh` builds the three environments (it uses
+`MELTA_PROBE_SCRATCH`, default her scratch dir) and prints the directory it staged:
+
 ```bash
-# from the repo
-bash ~/stage.sh new        # or head / noquality  (see this card's workspace)
+H="H:/Factorio Mods/lilys-melta/docs/verification/harness/melta-range"
+bash "$H/stage.sh" new         # or head <rev> / noquality
 W=C:/Users/Lily/AppData/Local/hermes/cache/scratch/melta-new
 "E:/SteamLibrary/steamapps/common/Factorio/bin/x64/Factorio.exe" \
   --config "$W/config.ini" --mod-directory "$W/mods" --create "$W/save.zip"
