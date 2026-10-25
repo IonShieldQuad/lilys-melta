@@ -1,0 +1,750 @@
+   0.003 2026-10-25 19:57:51; Factorio 2.1.23 (build 87750, win64, steam, space-age)
+   0.004 Operating system: Windows 10 (build 19045) 
+   0.000 Initializing Steam API.
+   0.004 Program arguments: "E:/SteamLibrary/steamapps/common/Factorio/bin/x64/Factorio.exe" "--config" "C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/config.ini" "--mod-directory" "C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/mods" "--load-game" "C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/write/scene.zip" 
+   0.004 Config path: C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/config.ini
+   0.004 Read data path: E:/SteamLibrary/steamapps/common/Factorio/data
+   0.004 Write data path: C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/write [31255/430791MB]
+   0.004 Binaries path: E:/SteamLibrary/steamapps/common/Factorio/bin
+   0.087 System info: [CPU: AMD FX(tm)-8350 Eight-Core Processor, 8 cores, RAM: 16334/16341 MB, page: 36810/44038 MB, virtual: 4346/134217727 MB, extended virtual: 0 MB]
+   0.186 Memory info:
+   0.186  [0]: Undefined          DGSB316GB1600 8192 MB 800 MHz  64|64
+   0.186  [1]: Undefined          DGSB316GB1600 8192 MB 800 MHz  64|64
+   0.664 Display options: [FullScreen: true] [VSync: true] [UIScale: automatic (100.0%)] [Native DPI: true] [Screen: 4294967295] [Special: lmw] [Lang: en]
+   1.042 Video driver: windows
+   1.042 Available displays: 2
+   1.042  [0]: \\.\DISPLAY1 - Radeon RX 580 Series {0x80005, [0,0], 1920x1080, 32bit, 59Hz}
+   1.044  [1]: \\.\DISPLAY2 - Radeon RX 580 Series {0x80001, [-1920,0], 1920x1080, 32bit, 60Hz}
+   2.109 [Direct3D11] Display: 4294967295, Output: 0, DisplayAdapter: 0, RenderingAdapter: -1; d3dcompiler_47.dll
+   8.816 Initialised Direct3D[0]: Radeon RX 580 Series; id: 1002-67df; driver: aticfx64.dll 31.0.21925.1001
+   8.816   D3D Feature Level: 11.1, DXGI 1.5+, SwapChain: 3,flip-discard,-,-,-,none
+   8.816   [Local Video Memory] Budget: 5622MB, CurrentUsage: 0MB, Reservation: 0/3811MB
+   8.816   [Non-Local Vid.Mem.] Budget: 7506MB, CurrentUsage: 0MB, Reservation: 0/3881MB
+   8.816   Tiled resources: Tier 2
+   8.816   Unified Memory Architecture: No
+   8.816   BGR 565 Supported: Yes
+   8.816   MaximumFrameLatency: 3, GPUThreadPriority: 0
+   9.335 Graphics settings preset: very-high
+   9.335   Dedicated video memory size 8135 MB
+  13.053 Desktop composition is active.
+  13.053 Graphics options: [Graphics quality: high] [Video memory usage: all] [DXT: high-quality]
+  13.053                   [Max threads (load/render): 32/8] [Max texture size: 4096] [Tex.Stream.: false] [Rotation quality: normal] [Other: STDCWTl] [B:0,C:0,S:100]
+  13.446 [Audio] Driver:wasapi, Device:Default device, Depth:32, Channels:2, Frequency:44100
+  21.452 Info ModManager.cpp:455: FeatureFlag: expansion, expansion-shaders, freezing, quality, rail-bridges, segmented-units, space-travel, spoiling
+  21.558 Loading mod core 0.0.0 (data.lua)
+  22.888 Loading mod base 2.1.23 (data.lua)
+  26.010 Loading mod elevated-rails 2.1.23 (data.lua)
+  26.849 Loading mod recycler 2.1.23 (data.lua)
+  27.035 Loading mod quality 2.1.23 (data.lua)
+  27.223 Loading mod space-age 2.1.23 (data.lua)
+  38.746 Loading mod lilys-melta 0.5.0 (data.lua)
+  38.911 Loading mod melta-combined 0.1.0 (data.lua)
+  40.418 Loading mod base 2.1.23 (data-updates.lua)
+  43.055 Loading mod recycler 2.1.23 (data-updates.lua)
+  44.736 Loading mod space-age 2.1.23 (data-updates.lua)
+  44.907 Loading mod lilys-melta 0.5.0 (data-updates.lua)
+  45.042 Script @__lilys-melta__/data-updates.lua:9: [lilys-melta] fuels accepted: light-oil, petroleum-gas, melta-fuel
+  46.412 Checksum for core: 3668028660
+  46.423 Checksum of base: 3864816957
+  46.423 Checksum of elevated-rails: 1429039930
+  46.423 Checksum of recycler: 3293728126
+  46.423 Checksum of quality: 3330349790
+  46.423 Checksum of space-age: 3787586506
+  46.423 Checksum of lilys-melta: 2227848678
+  46.423 Checksum of melta-combined: 1225596985
+  48.576 Prototype list checksum: 252881642
+  48.731 Loading sounds...
+  70.337 Info PlayerData.cpp:564: Cloud player-data.json available
+  70.531 Post-data load graphics options: [Light occlusion: YES]
+  74.708 Initial atlas bitmap size is 4096
+  74.730 Created an atlas bitmap (size 4096x4092) [none]
+  74.747 Created an atlas bitmap (size 4096x4080) [none]
+  74.774 Created an atlas bitmap (size 4096x4092) [none]
+  74.804 Created an atlas bitmap (size 4096x4064) [none]
+  74.828 Created an atlas bitmap (size 4096x4064) [none]
+  74.850 Created an atlas bitmap (size 4096x4060) [none]
+  74.870 Created an atlas bitmap (size 4096x4092) [none]
+  74.883 Created an atlas bitmap (size 4096x4088) [none]
+  74.899 Created an atlas bitmap (size 4096x4096) [none]
+  74.920 Created an atlas bitmap (size 4096x4068) [none]
+  74.937 Created an atlas bitmap (size 4096x4088) [none]
+  74.951 Created an atlas bitmap (size 4096x4084) [none]
+  74.964 Created an atlas bitmap (size 4096x4072) [none]
+  74.979 Created an atlas bitmap (size 4096x4084) [none]
+  74.996 Created an atlas bitmap (size 4096x4092) [none]
+  75.013 Created an atlas bitmap (size 4096x4096) [none]
+  75.029 Created an atlas bitmap (size 4096x4096) [none]
+  75.045 Created an atlas bitmap (size 4096x4088) [none]
+  75.061 Created an atlas bitmap (size 4096x4084) [none]
+  75.081 Created an atlas bitmap (size 4096x4064) [none]
+  75.102 Created an atlas bitmap (size 4096x4072) [none]
+  75.119 Created an atlas bitmap (size 4096x4092) [none]
+  75.133 Created an atlas bitmap (size 4096x4076) [none]
+  75.148 Created an atlas bitmap (size 4096x4096) [none]
+  75.160 Created an atlas bitmap (size 4096x4096) [none]
+  75.174 Created an atlas bitmap (size 4096x4092) [none]
+  75.188 Created an atlas bitmap (size 4096x4008) [none]
+  75.202 Created an atlas bitmap (size 4096x3988) [none]
+  75.220 Created an atlas bitmap (size 4096x4008) [none]
+  75.238 Created an atlas bitmap (size 4096x4088) [none]
+  75.273 Created an atlas bitmap (size 4096x4064) [none]
+  75.304 Created an atlas bitmap (size 4096x4096) [none]
+  75.335 Created an atlas bitmap (size 4096x4096) [none]
+  75.355 Created an atlas bitmap (size 4096x4092) [none]
+  75.367 Created an atlas bitmap (size 4096x4080) [none]
+  75.380 Created an atlas bitmap (size 4096x3984) [none]
+  75.405 Created an atlas bitmap (size 4096x4096) [none]
+  75.427 Created an atlas bitmap (size 4096x4096) [none]
+  75.444 Created an atlas bitmap (size 4096x4096) [none]
+  75.458 Created an atlas bitmap (size 4096x4096) [none]
+  75.465 Created an atlas bitmap (size 4096x4092) [none]
+  75.470 Created an atlas bitmap (size 4096x4096) [none]
+  75.476 Created an atlas bitmap (size 4096x4092) [none]
+  75.478 Created an atlas bitmap (size 4096x3816) [none]
+  75.481 Created an atlas bitmap (size 4096x4036) [none]
+  75.484 Created an atlas bitmap (size 4096x4088) [linear-magnification]
+  75.487 Created an atlas bitmap (size 4096x4056) [linear-magnification]
+  75.491 Created an atlas bitmap (size 4096x4060) [none]
+  75.493 Created an atlas bitmap (size 4096x4028) [none]
+  75.494 Created an atlas bitmap (size 4096x3976) [none]
+  75.497 Created an atlas bitmap (size 4096x4048) [none]
+  75.499 Created an atlas bitmap (size 4096x4092) [none]
+  75.501 Created an atlas bitmap (size 4096x4072) [none]
+  75.503 Created an atlas bitmap (size 4096x4084) [none]
+  75.504 Created an atlas bitmap (size 4096x4092) [none]
+  75.506 Created an atlas bitmap (size 4096x3952) [none]
+  75.507 Created an atlas bitmap (size 4096x4024) [none]
+  75.509 Created an atlas bitmap (size 4096x4016) [none]
+  75.510 Created an atlas bitmap (size 4096x4088) [none]
+  75.511 Created an atlas bitmap (size 4096x4048) [none]
+  75.512 Created an atlas bitmap (size 4096x4092) [none]
+  75.513 Created an atlas bitmap (size 4096x4080) [none]
+  75.514 Created an atlas bitmap (size 4096x4080) [none]
+  75.514 Created an atlas bitmap (size 4096x4052) [none]
+  75.515 Created an atlas bitmap (size 4096x4088) [none]
+  75.516 Created an atlas bitmap (size 4096x892) [none]
+  75.520 Created an atlas bitmap (size 4096x4096) [low-object]
+  75.522 Created an atlas bitmap (size 4096x4096) [low-object, linear-minification]
+  75.523 Created an atlas bitmap (size 4096x4064) [low-object]
+  75.526 Created an atlas bitmap (size 4096x4032) [low-object]
+  75.527 Created an atlas bitmap (size 4096x4032) [low-object]
+  75.528 Created an atlas bitmap (size 4096x4000) [low-object]
+  75.529 Created an atlas bitmap (size 4096x4096) [low-object]
+  75.530 Created an atlas bitmap (size 4096x4096) [low-object]
+  75.531 Created an atlas bitmap (size 4096x4096) [low-object]
+  75.533 Created an atlas bitmap (size 4096x4000) [low-object]
+  75.534 Created an atlas bitmap (size 4096x4096) [low-object]
+  75.536 Created an atlas bitmap (size 4096x4096) [low-object]
+  75.537 Created an atlas bitmap (size 4096x4032) [low-object]
+  75.537 Created an atlas bitmap (size 4096x4096) [low-object]
+  75.538 Created an atlas bitmap (size 4096x4096) [low-object]
+  75.539 Created an atlas bitmap (size 4096x4064) [low-object]
+  75.539 Created an atlas bitmap (size 4096x3872) [low-object]
+  75.541 Created an atlas bitmap (size 4096x4044) [corpse-decay]
+  75.542 Created an atlas bitmap (size 4096x3976) [corpse-decay]
+  75.543 Created an atlas bitmap (size 4096x4080) [corpse-decay]
+  75.545 Created an atlas bitmap (size 4096x4036) [corpse-decay]
+  75.547 Created an atlas bitmap (size 4096x4096) [corpse-decay]
+  75.548 Created an atlas bitmap (size 4096x3956) [corpse-decay]
+  75.548 Created an atlas bitmap (size 4096x4056) [corpse-decay]
+  75.549 Created an atlas bitmap (size 4096x4092) [corpse-decay]
+  75.550 Created an atlas bitmap (size 4096x4040) [corpse-decay]
+  75.550 Created an atlas bitmap (size 4096x4068) [corpse-decay]
+  75.551 Created an atlas bitmap (size 4096x4044) [corpse-decay]
+  75.551 Created an atlas bitmap (size 4096x4092) [corpse-decay]
+  75.552 Created an atlas bitmap (size 4096x4092) [corpse-decay]
+  75.553 Created an atlas bitmap (size 4096x3972) [corpse-decay]
+  75.553 Created an atlas bitmap (size 4096x3984) [corpse-decay]
+  75.553 Created an atlas bitmap (size 4096x4072) [corpse-decay]
+  75.553 Created an atlas bitmap (size 4096x4080) [corpse-decay]
+  75.554 Created an atlas bitmap (size 4096x2804) [corpse-decay]
+  75.554 Created an atlas bitmap (size 4096x3992) [decal]
+  75.555 Created an atlas bitmap (size 4096x4032) [decal]
+  75.555 Created an atlas bitmap (size 4096x4076) [decal]
+  75.555 Created an atlas bitmap (size 4096x4032) [decal]
+  75.556 Created an atlas bitmap (size 4096x4096) [decal]
+  75.556 Created an atlas bitmap (size 4096x4092) [decal]
+  75.556 Created an atlas bitmap (size 4096x4036) [decal]
+  75.557 Created an atlas bitmap (size 4096x3660) [decal]
+  75.557 Created an atlas bitmap (size 4096x4076) [decal]
+  75.557 Created an atlas bitmap (size 4096x4060) [decal]
+  75.557 Created an atlas bitmap (size 4096x4032) [none]
+  75.558 Created an atlas bitmap (size 4096x3944) [none]
+  75.558 Created an atlas bitmap (size 4096x3860) [none]
+  75.558 Created an atlas bitmap (size 4096x4016) [none]
+  75.558 Created an atlas bitmap (size 4096x3924) [none]
+  75.559 Created an atlas bitmap (size 4096x3732) [none]
+  75.560 Created an atlas bitmap (size 4096x1528) [none]
+  75.561 Created an atlas bitmap (size 4096x4088) [none]
+  75.562 Created an atlas bitmap (size 4096x1508) [linear-minification, linear-magnification]
+  75.562 Created an atlas bitmap (size 4096x3672) [procession-cover, linear-minification, linear-magnification]
+  75.562 Created an atlas bitmap (size 4096x4088) [procession-cover, linear-minification, linear-magnification]
+  75.562 Created an atlas bitmap (size 4096x3368) [procession-cover, linear-minification, linear-magnification]
+  75.563 Created an atlas bitmap (size 4096x4008) [procession-cover, linear-minification, linear-magnification]
+  75.563 Created an atlas bitmap (size 3852x1016) [procession-cover, linear-minification, linear-magnification]
+  75.563 Created an atlas bitmap (size 4096x1392) [none]
+  75.564 Created an atlas bitmap (size 1676x79) [not-compressed]
+  75.565 Created an atlas bitmap (size 4096x4080) [mipmap, linear-minification, linear-magnification, linear-mip-level]
+  75.566 Created an atlas bitmap (size 4096x3968) [mipmap]
+  75.567 Created an atlas bitmap (size 4096x4096) [mipmap, linear-minification, linear-magnification, linear-mip-level]
+  75.567 Created an atlas bitmap (size 4096x4032) [mipmap, linear-minification, linear-magnification, linear-mip-level]
+  75.568 Created an atlas bitmap (size 4096x1568) [mipmap]
+  75.568 Created an atlas bitmap (size 4096x3040) [smoke, mipmap, linear-minification, linear-magnification]
+  75.575 Created an atlas bitmap (size 4096x4080) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.581 Created an atlas bitmap (size 4096x4080) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.584 Created an atlas bitmap (size 4096x4080) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.588 Created an atlas bitmap (size 4096x4064) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.591 Created an atlas bitmap (size 4096x3904) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.594 Created an atlas bitmap (size 4096x4080) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.597 Created an atlas bitmap (size 4096x4096) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.600 Created an atlas bitmap (size 4096x4048) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.603 Created an atlas bitmap (size 4096x4080) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.605 Created an atlas bitmap (size 4096x4064) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.607 Created an atlas bitmap (size 4096x4032) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.608 Created an atlas bitmap (size 4096x4080) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.610 Created an atlas bitmap (size 4096x4048) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.612 Created an atlas bitmap (size 4096x4064) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.613 Created an atlas bitmap (size 4096x4000) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.614 Created an atlas bitmap (size 4096x4064) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.616 Created an atlas bitmap (size 4096x4080) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.618 Created an atlas bitmap (size 4096x4096) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.619 Created an atlas bitmap (size 4096x3984) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.619 Created an atlas bitmap (size 4096x4000) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.620 Created an atlas bitmap (size 4096x4048) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.621 Created an atlas bitmap (size 4096x3696) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.621 Created an atlas bitmap (size 4096x3984) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.622 Created an atlas bitmap (size 4096x3920) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.623 Created an atlas bitmap (size 4096x4064) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.623 Created an atlas bitmap (size 4096x4080) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.624 Created an atlas bitmap (size 4096x3968) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.624 Created an atlas bitmap (size 4096x2736) [terrain, mipmap, linear-minification, linear-mip-level]
+  75.625 Created an atlas bitmap (size 4096x4080) [terrain-effect-map, mipmap, linear-minification, linear-mip-level]
+  75.625 Created an atlas bitmap (size 4096x4080) [terrain-effect-map, mipmap, linear-minification, linear-mip-level]
+  75.625 Created an atlas bitmap (size 4096x4064) [terrain-effect-map, mipmap, linear-minification, linear-mip-level]
+  75.626 Created an atlas bitmap (size 4096x4064) [mipmap]
+  75.627 Created an atlas bitmap (size 4096x1632) [mipmap]
+  75.628 Created an atlas bitmap (size 4096x3984) [mipmap]
+  75.628 Created an atlas bitmap (size 4096x3984) [mipmap]
+  75.628 Created an atlas bitmap (size 4096x1136) [mipmap]
+  75.629 Created an atlas bitmap (size 4096x3984) [mipmap]
+  75.629 Created an atlas bitmap (size 4096x2848) [mipmap]
+  75.629 Created an atlas bitmap (size 3504x768) [mipmap]
+  75.630 Created an atlas bitmap (size 4096x3152) [mipmap]
+  75.630 Created an atlas bitmap (size 4096x3152) [mipmap]
+  75.631 Created an atlas bitmap (size 4096x3152) [mipmap]
+  75.633 Created an atlas bitmap (size 4096x4096) [icon, not-compressed, mipmap, linear-minification, linear-magnification, linear-mip-level, ]
+  75.634 Created an atlas bitmap (size 4096x3888) [icon, not-compressed, mipmap, linear-minification, linear-magnification, linear-mip-level, ]
+  75.640 Created an atlas bitmap (size 4096x4088) [alpha-mask]
+  75.644 Created an atlas bitmap (size 4096x4084) [alpha-mask]
+  75.648 Created an atlas bitmap (size 4096x4080) [alpha-mask]
+  75.650 Created an atlas bitmap (size 4096x4080) [alpha-mask]
+  75.656 Created an atlas bitmap (size 4096x4088) [alpha-mask]
+  75.661 Created an atlas bitmap (size 4096x4088) [alpha-mask]
+  75.663 Created an atlas bitmap (size 4096x4080) [alpha-mask]
+  75.665 Created an atlas bitmap (size 4096x4088) [alpha-mask]
+  75.667 Created an atlas bitmap (size 4096x4088) [alpha-mask]
+  75.669 Created an atlas bitmap (size 4096x4088) [alpha-mask]
+  75.669 Created an atlas bitmap (size 4096x136) [alpha-mask]
+  75.685 Created an atlas bitmap (size 4096x4096) [shadow, linear-magnification, alpha-mask]
+  75.693 Created an atlas bitmap (size 4096x4004) [shadow, linear-magnification, alpha-mask]
+  75.703 Created an atlas bitmap (size 4096x4092) [shadow, linear-magnification, alpha-mask]
+  75.712 Created an atlas bitmap (size 4096x4092) [shadow, linear-magnification, alpha-mask]
+  75.723 Created an atlas bitmap (size 4096x4084) [shadow, linear-magnification, alpha-mask]
+  75.733 Created an atlas bitmap (size 4096x4092) [shadow, linear-magnification, alpha-mask]
+  75.743 Created an atlas bitmap (size 4096x4084) [shadow, linear-magnification, alpha-mask]
+  75.751 Created an atlas bitmap (size 4096x4052) [shadow, linear-magnification, alpha-mask]
+  75.761 Created an atlas bitmap (size 4096x4080) [shadow, linear-magnification, alpha-mask]
+  75.782 Created an atlas bitmap (size 4096x4072) [shadow, linear-magnification, alpha-mask]
+  75.801 Created an atlas bitmap (size 4096x4096) [shadow, linear-magnification, alpha-mask]
+  75.807 Created an atlas bitmap (size 4096x4096) [shadow, linear-magnification, alpha-mask]
+  75.811 Created an atlas bitmap (size 4096x4076) [shadow, linear-magnification, alpha-mask]
+  75.815 Created an atlas bitmap (size 4096x4096) [shadow, linear-magnification, alpha-mask]
+  75.820 Created an atlas bitmap (size 4096x4096) [shadow, linear-magnification, alpha-mask]
+  75.824 Created an atlas bitmap (size 4096x4088) [shadow, linear-magnification, alpha-mask]
+  75.828 Created an atlas bitmap (size 4096x4096) [shadow, linear-magnification, alpha-mask]
+  75.830 Created an atlas bitmap (size 4096x4096) [shadow, linear-magnification, alpha-mask]
+  75.832 Created an atlas bitmap (size 4096x4092) [shadow, linear-magnification, alpha-mask]
+  75.833 Created an atlas bitmap (size 4096x4088) [shadow, linear-magnification, alpha-mask]
+  75.834 Created an atlas bitmap (size 4096x4084) [shadow, linear-magnification, alpha-mask]
+  75.836 Created an atlas bitmap (size 4096x4096) [shadow, linear-magnification, alpha-mask]
+  75.837 Created an atlas bitmap (size 4096x4072) [shadow, linear-magnification, alpha-mask]
+  75.837 Created an atlas bitmap (size 4096x3956) [shadow, linear-magnification, alpha-mask]
+  75.838 Created an atlas bitmap (size 4096x4076) [shadow, linear-magnification, alpha-mask]
+  75.839 Created an atlas bitmap (size 4096x4096) [shadow, linear-magnification, alpha-mask]
+  75.839 Created an atlas bitmap (size 4096x4040) [shadow, linear-magnification, alpha-mask]
+  75.840 Created an atlas bitmap (size 4096x4076) [shadow, linear-magnification, alpha-mask]
+  75.840 Created an atlas bitmap (size 4096x4080) [shadow, linear-magnification, alpha-mask]
+  75.841 Created an atlas bitmap (size 4096x3852) [shadow, linear-magnification, alpha-mask]
+  75.841 Created an atlas bitmap (size 4096x3996) [shadow, linear-magnification, alpha-mask]
+  75.843 Created an atlas bitmap (size 4096x4052) [shadow, linear-magnification, alpha-mask]
+  75.843 Created an atlas bitmap (size 4096x3912) [shadow, linear-magnification, alpha-mask]
+  75.844 Created an atlas bitmap (size 4096x3884) [shadow, linear-magnification, alpha-mask]
+  75.844 Created an atlas bitmap (size 4096x3952) [shadow, linear-magnification, alpha-mask]
+  75.844 Created an atlas bitmap (size 4096x3936) [shadow, linear-magnification, alpha-mask]
+  75.845 Created an atlas bitmap (size 4096x4096) [shadow, linear-magnification, alpha-mask]
+  75.846 Created an atlas bitmap (size 4096x4032) [shadow, linear-magnification, alpha-mask]
+  75.846 Created an atlas bitmap (size 4096x3672) [shadow, linear-magnification, alpha-mask]
+  75.848 Created an atlas bitmap (size 4096x4096) [shadow, mipmap, linear-magnification, alpha-mask]
+  75.849 Created an atlas bitmap (size 4096x4048) [shadow, mipmap, linear-magnification, alpha-mask]
+  75.849 Created an atlas bitmap (size 4096x2656) [shadow, mipmap, linear-magnification, alpha-mask]
+  75.850 Created an atlas bitmap (size 4096x336) [icon-background, not-compressed, mipmap, linear-minification, linear-magnification, linear-mip-level, ]
+  75.853 Loading 3D bitmaps: 20
+  76.401 Texture processor created (2048). GPU accelerated compression Supported: yes, Enabled: yes/yes. Test passed. YCoCgDXT PSNR: 35.83, BC3 PSNR: 33.82
+  77.830 Parallel sprite loader initialized (threads: 7, bitmaps: 8816)
+ 251.999 Sprites loaded
+ 252.021 Generated mipmaps (4) for atlas [66] of size 4096x4096   
+ 252.034 Generated mipmaps (4) for atlas [67] of size 4096x4096   
+ 252.046 Generated mipmaps (4) for atlas [68] of size 4096x4064   
+ 252.058 Generated mipmaps (4) for atlas [69] of size 4096x4032   
+ 252.070 Generated mipmaps (4) for atlas [70] of size 4096x4032   
+ 252.082 Generated mipmaps (4) for atlas [71] of size 4096x4000   
+ 252.094 Generated mipmaps (4) for atlas [72] of size 4096x4096   
+ 252.106 Generated mipmaps (4) for atlas [73] of size 4096x4096   
+ 252.118 Generated mipmaps (4) for atlas [74] of size 4096x4096   
+ 252.130 Generated mipmaps (4) for atlas [75] of size 4096x4000   
+ 252.142 Generated mipmaps (4) for atlas [76] of size 4096x4096   
+ 252.155 Generated mipmaps (4) for atlas [77] of size 4096x4096   
+ 252.167 Generated mipmaps (4) for atlas [78] of size 4096x4032   
+ 252.179 Generated mipmaps (4) for atlas [79] of size 4096x4096   
+ 252.191 Generated mipmaps (4) for atlas [80] of size 4096x4096   
+ 252.202 Generated mipmaps (4) for atlas [81] of size 4096x4064   
+ 252.215 Generated mipmaps (4) for atlas [82] of size 4096x3872   
+ 252.229 Generated mipmaps (3) for atlas [127] of size 4096x4080   
+ 252.242 Generated mipmaps (3) for atlas [128] of size 4096x3968   
+ 252.255 Generated mipmaps (3) for atlas [129] of size 4096x4096   
+ 252.267 Generated mipmaps (3) for atlas [130] of size 4096x4032   
+ 252.279 Generated mipmaps (3) for atlas [131] of size 4096x1568   
+ 252.291 Generated mipmaps (3) for atlas [132] of size 4096x3040   
+ 252.478 Generated mipmaps (3) for atlas [133] of size 4096x4080   
+ 252.873 Generated mipmaps (3) for atlas [134] of size 4096x4080   
+ 253.031 Generated mipmaps (3) for atlas [135] of size 4096x4080   
+ 253.239 Generated mipmaps (3) for atlas [136] of size 4096x4064   
+ 253.339 Generated mipmaps (3) for atlas [137] of size 4096x3904   
+ 253.418 Generated mipmaps (3) for atlas [138] of size 4096x4080   
+ 253.798 Generated mipmaps (3) for atlas [139] of size 4096x4096   
+ 254.061 Generated mipmaps (3) for atlas [140] of size 4096x4048   
+ 254.283 Generated mipmaps (3) for atlas [141] of size 4096x4080   
+ 254.351 Generated mipmaps (3) for atlas [142] of size 4096x4064   
+ 254.362 Generated mipmaps (3) for atlas [143] of size 4096x4032   
+ 254.375 Generated mipmaps (3) for atlas [144] of size 4096x4080   
+ 254.387 Generated mipmaps (3) for atlas [145] of size 4096x4048   
+ 254.399 Generated mipmaps (3) for atlas [146] of size 4096x4064   
+ 254.410 Generated mipmaps (3) for atlas [147] of size 4096x4000   
+ 254.421 Generated mipmaps (3) for atlas [148] of size 4096x4064   
+ 254.432 Generated mipmaps (3) for atlas [149] of size 4096x4080   
+ 254.444 Generated mipmaps (3) for atlas [150] of size 4096x4096   
+ 254.456 Generated mipmaps (3) for atlas [151] of size 4096x3984   
+ 254.468 Generated mipmaps (3) for atlas [152] of size 4096x4000   
+ 254.480 Generated mipmaps (3) for atlas [153] of size 4096x4048   
+ 254.492 Generated mipmaps (3) for atlas [154] of size 4096x3696   
+ 254.504 Generated mipmaps (3) for atlas [155] of size 4096x3984   
+ 254.516 Generated mipmaps (3) for atlas [156] of size 4096x3920   
+ 254.528 Generated mipmaps (3) for atlas [157] of size 4096x4064   
+ 254.540 Generated mipmaps (3) for atlas [158] of size 4096x4080   
+ 254.552 Generated mipmaps (3) for atlas [159] of size 4096x3968   
+ 254.564 Generated mipmaps (3) for atlas [160] of size 4096x2736   
+ 254.575 Generated mipmaps (3) for atlas [161] of size 4096x4080   
+ 254.587 Generated mipmaps (3) for atlas [162] of size 4096x4080   
+ 254.599 Generated mipmaps (3) for atlas [163] of size 4096x4064   
+ 254.785 Generated mipmaps (3) for atlas [164] of size 4096x4064   
+ 254.823 Generated mipmaps (3) for atlas [165] of size 4096x1632   
+ 254.908 Generated mipmaps (3) for atlas [166] of size 4096x3984   
+ 255.001 Generated mipmaps (3) for atlas [167] of size 4096x3984   
+ 255.040 Generated mipmaps (3) for atlas [168] of size 4096x1136   
+ 255.688 Generated mipmaps (3) for atlas [169] of size 4096x3984   <total: 639.04, render: 0.01, convert: 0.01, copy: 0.01>
+ 255.699 Generated mipmaps (3) for atlas [170] of size 4096x2848   
+ 255.711 Generated mipmaps (3) for atlas [171] of size 3504x768   
+ 255.722 Generated mipmaps (3) for atlas [172] of size 4096x3152   
+ 255.778 Generated mipmaps (3) for atlas [173] of size 4096x3152   
+ 255.790 Generated mipmaps (3) for atlas [174] of size 4096x3152   
+ 255.802 Generated mipmaps (5) for atlas [175] of size 4096x4096   
+ 255.814 Generated mipmaps (5) for atlas [176] of size 4096x3888   
+ 255.827 Generated mipmaps (3) for atlas [227] of size 4096x4096   
+ 255.840 Generated mipmaps (3) for atlas [228] of size 4096x4048   
+ 255.852 Generated mipmaps (3) for atlas [229] of size 4096x2656   
+ 256.064 Custom mipmaps uploaded (3524)
+ 256.392 Estimated VRAM usage for textures: 4023.80 MB (Atlases: 3923.97 MB, Textures: 99.82 MB)
+ 256.392 Real VRAM usage for the whole program: 4043.76 MB
+ 256.652 Info GlobalContext.cpp:1346: Resetting config.
+ 260.061 Factorio initialised
+ 260.161 Steam Storage Quota: 19422/23841
+ 260.280 Loading map C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/write/scene.zip: 776688 bytes.
+ 260.804 Loading level.dat: 1076073 bytes.
+ 260.804 Info Scenario.cpp:152: Map version 2.1.23-2
+ 260.889 Loading blueprint storage: Local timestamp -1, Cloud timestamp 1748098661
+ 262.645 Loading script.dat: 6467 bytes.
+ 262.668 Checksum for script __level__/control.lua: 2385776952
+ 262.712 Checksum for script __lilys-melta__/control.lua: 1658563399
+ 262.733 Checksum for script __melta-combined__/control.lua: 2096259902
+ 262.882 Script @__melta-combined__/control.lua:82: [comb] t=0      objects total=0 melta=0
+ 262.882 Script @__melta-combined__/control.lua:82: [comb] t=0      beam 1 fuel=light-oil  status=1 target=- fluid=370 drops=0 median_recent=-1.00
+ 262.882 Script @__melta-combined__/control.lua:82: [comb] t=0      beam 2 fuel=light-oil  status=1 target=- fluid=370 drops=0 median_recent=-1.00
+ 262.882 Script @__melta-combined__/control.lua:82: [comb] t=0      beam 3 fuel=light-oil  status=1 target=- fluid=370 drops=0 median_recent=-1.00
+ 262.882 Script @__melta-combined__/control.lua:82: [comb] t=0      beam 4 fuel=melta-fuel status=1 target=- fluid=370 drops=0 median_recent=-1.00
+ 262.882 Script @__melta-combined__/control.lua:82: [comb] t=0      beam 5 fuel=melta-fuel status=1 target=- fluid=370 drops=0 median_recent=-1.00
+ 262.883 Script @__melta-combined__/control.lua:82: [comb] t=0      beam 6 fuel=melta-fuel status=1 target=- fluid=370 drops=0 median_recent=-1.00
+ 262.883 Script @__melta-combined__/control.lua:82: [comb] t=0      reach normal_15      dist=15 status=1 target=- hits=false
+ 262.883 Script @__melta-combined__/control.lua:82: [comb] t=0      reach normal_19      dist=19 status=1 target=- hits=false
+ 262.883 Script @__melta-combined__/control.lua:82: [comb] t=0      reach legendary_23   dist=23 status=1 target=- hits=false
+ 262.883 Script @__melta-combined__/control.lua:82: [comb] t=0      reach legendary_27   dist=27 status=1 target=- hits=false
+ 265.294 Script @__melta-combined__/control.lua:82: [comb] t=9      reach normal_15: FIRST DAMAGE at tick 9
+ 265.450 Script @__melta-combined__/control.lua:82: [comb] t=16     beam 6 pulse #1 drop=28.25
+ 265.464 Script @__melta-combined__/control.lua:82: [comb] t=18     beam 1 pulse #1 drop=17.63
+ 265.506 Script @__melta-combined__/control.lua:82: [comb] t=21     reach legendary_23: FIRST DAMAGE at tick 21
+ 265.590 Script @__melta-combined__/control.lua:82: [comb] t=24     beam 2 pulse #1 drop=17.63
+ 265.590 Script @__melta-combined__/control.lua:82: [comb] t=24     beam 6 pulse #2 drop=31.81
+ 265.623 Script @__melta-combined__/control.lua:82: [comb] t=26     beam 1 pulse #2 drop=19.88
+ 265.689 Script @__melta-combined__/control.lua:82: [comb] t=30     beam 3 pulse #1 drop=17.63
+ 265.723 Script @__melta-combined__/control.lua:82: [comb] t=32     beam 2 pulse #2 drop=19.88
+ 265.723 Script @__melta-combined__/control.lua:82: [comb] t=32     beam 6 pulse #3 drop=35.38
+ 265.756 Script @__melta-combined__/control.lua:82: [comb] t=34     beam 1 pulse #3 drop=22.13
+ 265.790 Script @__melta-combined__/control.lua:82: [comb] t=36     beam 4 pulse #1 drop=28.25
+ 265.842 Script @__melta-combined__/control.lua:82: [comb] t=38     beam 3 pulse #2 drop=19.88
+ 265.873 Script @__melta-combined__/control.lua:82: [comb] t=40     beam 2 pulse #3 drop=22.13
+ 265.873 Script @__melta-combined__/control.lua:82: [comb] t=40     beam 6 pulse #4 drop=39.00
+ 265.906 Script @__melta-combined__/control.lua:82: [comb] t=42     beam 1 pulse #4 drop=24.31
+ 265.907 Script @__melta-combined__/control.lua:82: [comb] t=42     beam 5 pulse #1 drop=28.25
+ 265.939 Script @__melta-combined__/control.lua:82: [comb] t=44     beam 4 pulse #2 drop=31.81
+ 265.962 Script @__melta-combined__/control.lua:82: [comb] t=45     KILL rock 1 (small-metallic-asteroid) at tick 45 pulses=3 start_hp=100.0
+ 265.973 Script @__melta-combined__/control.lua:82: [comb] t=46     beam 3 pulse #3 drop=22.13
+ 266.006 Script @__melta-combined__/control.lua:82: [comb] t=48     beam 2 pulse #4 drop=24.31
+ 266.006 Script @__melta-combined__/control.lua:82: [comb] t=48     beam 6 pulse #5 drop=42.56
+ 266.040 Script @__melta-combined__/control.lua:82: [comb] t=50     beam 1 pulse #5 drop=26.63
+ 266.040 Script @__melta-combined__/control.lua:82: [comb] t=50     beam 5 pulse #2 drop=31.81
+ 266.081 Script @__melta-combined__/control.lua:82: [comb] t=52     beam 4 pulse #3 drop=35.38
+ 266.107 Script @__melta-combined__/control.lua:82: [comb] t=54     beam 3 pulse #4 drop=24.31
+ 266.139 Script @__melta-combined__/control.lua:82: [comb] t=56     beam 2 pulse #5 drop=26.63
+ 266.139 Script @__melta-combined__/control.lua:82: [comb] t=56     beam 6 pulse #6 drop=46.19
+ 266.173 Script @__melta-combined__/control.lua:82: [comb] t=58     beam 1 pulse #6 drop=28.81
+ 266.173 Script @__melta-combined__/control.lua:82: [comb] t=58     beam 5 pulse #3 drop=35.38
+ 266.206 Script @__melta-combined__/control.lua:82: [comb] t=60     beam 4 pulse #4 drop=39.00
+ 266.240 Script @__melta-combined__/control.lua:82: [comb] t=62     beam 3 pulse #5 drop=26.63
+ 266.273 Script @__melta-combined__/control.lua:82: [comb] t=64     beam 2 pulse #6 drop=28.81
+ 266.274 Script @__melta-combined__/control.lua:82: [comb] t=64     beam 6 pulse #7 drop=49.69
+ 266.307 Script @__melta-combined__/control.lua:82: [comb] t=66     beam 1 pulse #7 drop=31.13
+ 266.307 Script @__melta-combined__/control.lua:82: [comb] t=66     beam 5 pulse #4 drop=39.00
+ 266.340 Script @__melta-combined__/control.lua:82: [comb] t=68     beam 4 pulse #5 drop=42.56
+ 266.372 Script @__melta-combined__/control.lua:82: [comb] t=70     beam 3 pulse #6 drop=28.81
+ 266.406 Script @__melta-combined__/control.lua:82: [comb] t=72     beam 2 pulse #7 drop=31.13
+ 266.406 Script @__melta-combined__/control.lua:82: [comb] t=72     beam 6 pulse #8 drop=53.31
+ 266.441 Script @__melta-combined__/control.lua:82: [comb] t=74     beam 1 pulse #8 drop=33.31
+ 266.441 Script @__melta-combined__/control.lua:82: [comb] t=74     beam 5 pulse #5 drop=42.56
+ 266.473 Script @__melta-combined__/control.lua:82: [comb] t=76     beam 4 pulse #6 drop=46.19
+ 266.509 Script @__melta-combined__/control.lua:82: [comb] t=78     beam 3 pulse #7 drop=31.13
+ 266.540 Script @__melta-combined__/control.lua:82: [comb] t=80     beam 2 pulse #8 drop=33.31
+ 266.540 Script @__melta-combined__/control.lua:82: [comb] t=80     beam 6 pulse #9 drop=56.94
+ 266.573 Script @__melta-combined__/control.lua:82: [comb] t=82     beam 1 pulse #9 drop=35.56
+ 266.573 Script @__melta-combined__/control.lua:82: [comb] t=82     beam 5 pulse #6 drop=46.19
+ 266.591 Script @__melta-combined__/control.lua:82: [comb] t=83     KILL rock 2 (medium-metallic-asteroid) at tick 83 pulses=7 start_hp=400.0
+ 266.607 Script @__melta-combined__/control.lua:82: [comb] t=84     beam 4 pulse #7 drop=49.69
+ 266.652 Script @__melta-combined__/control.lua:82: [comb] t=86     beam 3 pulse #8 drop=33.31
+ 266.677 Script @__melta-combined__/control.lua:82: [comb] t=88     beam 2 pulse #9 drop=35.56
+ 266.677 Script @__melta-combined__/control.lua:82: [comb] t=88     beam 6 pulse #10 drop=60.50
+ 266.707 Script @__melta-combined__/control.lua:82: [comb] t=90     beam 1 pulse #10 drop=37.81
+ 266.707 Script @__melta-combined__/control.lua:82: [comb] t=90     beam 5 pulse #7 drop=49.69
+ 266.739 Script @__melta-combined__/control.lua:82: [comb] t=92     beam 4 pulse #8 drop=53.31
+ 266.773 Script @__melta-combined__/control.lua:82: [comb] t=94     beam 3 pulse #9 drop=35.56
+ 266.807 Script @__melta-combined__/control.lua:82: [comb] t=96     beam 2 pulse #10 drop=37.81
+ 266.807 Script @__melta-combined__/control.lua:82: [comb] t=96     beam 6 pulse #11 drop=64.06
+ 266.840 Script @__melta-combined__/control.lua:82: [comb] t=98     beam 1 pulse #11 drop=40.06
+ 266.840 Script @__melta-combined__/control.lua:82: [comb] t=98     beam 5 pulse #8 drop=53.31
+ 266.883 Script @__melta-combined__/control.lua:82: [comb] t=100    beam 4 pulse #9 drop=56.94
+ 266.906 Script @__melta-combined__/control.lua:82: [comb] t=102    beam 3 pulse #10 drop=37.81
+ 266.940 Script @__melta-combined__/control.lua:82: [comb] t=104    beam 2 pulse #11 drop=40.06
+ 266.940 Script @__melta-combined__/control.lua:82: [comb] t=104    beam 6 pulse #12 drop=67.63
+ 266.974 Script @__melta-combined__/control.lua:82: [comb] t=106    beam 1 pulse #12 drop=42.25
+ 266.974 Script @__melta-combined__/control.lua:82: [comb] t=106    beam 5 pulse #9 drop=56.94
+ 267.006 Script @__melta-combined__/control.lua:82: [comb] t=108    beam 4 pulse #10 drop=60.50
+ 267.065 Script @__melta-combined__/control.lua:82: [comb] t=110    beam 3 pulse #11 drop=40.06
+ 267.090 Script @__melta-combined__/control.lua:82: [comb] t=112    beam 2 pulse #12 drop=42.25
+ 267.133 Script @__melta-combined__/control.lua:82: [comb] t=114    beam 5 pulse #10 drop=60.50
+ 267.157 Script @__melta-combined__/control.lua:82: [comb] t=116    beam 4 pulse #11 drop=64.06
+ 267.189 Script @__melta-combined__/control.lua:82: [comb] t=118    beam 3 pulse #12 drop=42.25
+ 267.248 Script @__melta-combined__/control.lua:86: [tooltip] HOVER_Q_NORMAL leg=1 subject=0.0,100.0 camera=0.0,102.0 character=true
+ 267.277 Script @__melta-combined__/control.lua:82: [comb] t=122    beam 5 pulse #11 drop=64.06
+ 267.539 Script @__melta-combined__/control.lua:82: [comb] t=124    beam 4 pulse #12 drop=67.63
+ 267.639 Script @__melta-combined__/control.lua:82: [comb] t=130    beam 5 pulse #12 drop=67.63
+ 269.140 Script @__melta-combined__/control.lua:82: [comb] t=200 asteroids pinned, beam firing
+ 269.163 Script @__melta-combined__/control.lua:82: [comb] t=201    KILL rock 3 (big-metallic-asteroid) at tick 201 pulses=21 start_hp=2000.0
+ 272.807 Script @__melta-combined__/control.lua:82: [comb] t=400    swing START from orient=0.9824 (target now 4 south)
+ 272.807 Script @__melta-combined__/control.lua:82: [comb] t=400    swing orient=0.9824 want=0.5226 err=-0.4598
+ 272.822 Script @__melta-combined__/control.lua:82: [comb] t=401    swing orient=0.9524 want=0.5226 err=-0.4298
+ 272.858 Script @__melta-combined__/control.lua:82: [comb] t=402    swing orient=0.9224 want=0.5226 err=-0.3998
+ 272.872 Script @__melta-combined__/control.lua:82: [comb] t=403    swing orient=0.8924 want=0.5226 err=-0.3698
+ 272.891 Script @__melta-combined__/control.lua:82: [comb] t=404    swing orient=0.8624 want=0.5226 err=-0.3398
+ 272.929 Script @__melta-combined__/control.lua:82: [comb] t=405    swing orient=0.8324 want=0.5226 err=-0.3098
+ 272.940 Script @__melta-combined__/control.lua:82: [comb] t=406    swing orient=0.8024 want=0.5226 err=-0.2798
+ 272.956 Script @__melta-combined__/control.lua:82: [comb] t=407    swing orient=0.7724 want=0.5226 err=-0.2498
+ 272.972 Script @__melta-combined__/control.lua:82: [comb] t=408    swing orient=0.7424 want=0.5226 err=-0.2198
+ 273.001 Script @__melta-combined__/control.lua:82: [comb] t=409    swing orient=0.7124 want=0.5226 err=-0.1898
+ 273.009 Script @__melta-combined__/control.lua:82: [comb] t=410    swing orient=0.6824 want=0.5226 err=-0.1598
+ 273.036 Script @__melta-combined__/control.lua:82: [comb] t=411    swing orient=0.6524 want=0.5226 err=-0.1298
+ 273.043 Script @__melta-combined__/control.lua:82: [comb] t=412    swing orient=0.6224 want=0.5226 err=-0.0998
+ 273.064 Script @__melta-combined__/control.lua:82: [comb] t=413    swing orient=0.5924 want=0.5226 err=-0.0698
+ 273.078 Script @__melta-combined__/control.lua:82: [comb] t=414    swing orient=0.5624 want=0.5226 err=-0.0398
+ 273.095 Script @__melta-combined__/control.lua:82: [comb] t=415    swing orient=0.5324 want=0.5226 err=-0.0098
+ 273.111 Script @__melta-combined__/control.lua:82: [comb] t=416    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.112 Script @__melta-combined__/control.lua:82: [comb] t=416    swing ARRIVED after 16 ticks (0.27 s)
+ 273.128 Script @__melta-combined__/control.lua:82: [comb] t=417    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.146 Script @__melta-combined__/control.lua:82: [comb] t=418    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.162 Script @__melta-combined__/control.lua:82: [comb] t=419    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.178 Script @__melta-combined__/control.lua:82: [comb] t=420    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.197 Script @__melta-combined__/control.lua:82: [comb] t=421    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.212 Script @__melta-combined__/control.lua:82: [comb] t=422    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.229 Script @__melta-combined__/control.lua:82: [comb] t=423    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.245 Script @__melta-combined__/control.lua:82: [comb] t=424    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.262 Script @__melta-combined__/control.lua:82: [comb] t=425    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.278 Script @__melta-combined__/control.lua:82: [comb] t=426    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.295 Script @__melta-combined__/control.lua:82: [comb] t=427    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.313 Script @__melta-combined__/control.lua:82: [comb] t=428    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.347 Script @__melta-combined__/control.lua:82: [comb] t=429    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.356 Script @__melta-combined__/control.lua:82: [comb] t=430    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.373 Script @__melta-combined__/control.lua:82: [comb] t=431    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.391 Script @__melta-combined__/control.lua:82: [comb] t=432    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.408 Script @__melta-combined__/control.lua:82: [comb] t=433    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.422 Script @__melta-combined__/control.lua:82: [comb] t=434    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.441 Script @__melta-combined__/control.lua:82: [comb] t=435    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.456 Script @__melta-combined__/control.lua:82: [comb] t=436    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.489 Script @__melta-combined__/control.lua:82: [comb] t=437    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.497 Script @__melta-combined__/control.lua:82: [comb] t=438    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.506 Script @__melta-combined__/control.lua:82: [comb] t=439    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.523 Script @__melta-combined__/control.lua:82: [comb] t=440    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.539 Script @__melta-combined__/control.lua:82: [comb] t=441    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.557 Script @__melta-combined__/control.lua:82: [comb] t=442    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.572 Script @__melta-combined__/control.lua:82: [comb] t=443    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.590 Script @__melta-combined__/control.lua:82: [comb] t=444    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.607 Script @__melta-combined__/control.lua:82: [comb] t=445    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.622 Script @__melta-combined__/control.lua:82: [comb] t=446    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.639 Script @__melta-combined__/control.lua:82: [comb] t=447    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.656 Script @__melta-combined__/control.lua:82: [comb] t=448    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.695 Script @__melta-combined__/control.lua:82: [comb] t=449    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.705 Script @__melta-combined__/control.lua:82: [comb] t=450    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.722 Script @__melta-combined__/control.lua:82: [comb] t=451    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.739 Script @__melta-combined__/control.lua:82: [comb] t=452    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.756 Script @__melta-combined__/control.lua:82: [comb] t=453    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.773 Script @__melta-combined__/control.lua:82: [comb] t=454    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.789 Script @__melta-combined__/control.lua:82: [comb] t=455    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.805 Script @__melta-combined__/control.lua:82: [comb] t=456    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.823 Script @__melta-combined__/control.lua:82: [comb] t=457    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.840 Script @__melta-combined__/control.lua:82: [comb] t=458    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.857 Script @__melta-combined__/control.lua:82: [comb] t=459    swing orient=0.5226 want=0.5226 err=0.0000
+ 273.874 Script @__melta-combined__/control.lua:82: [comb] t=460    swing orient=0.5226 want=0.5226 err=0.0000
+ 274.406 Script @__melta-combined__/control.lua:82: [comb] t=490    crossing staged at 188,376
+ 276.257 Script @__melta-combined__/control.lua:82: [comb] t=600    crossing DONE max aim deviation after catch-up = 0.0297 turns (10.71 deg)
+ 276.258 Script @__melta-combined__/control.lua:82: [comb] t=600    objects total=188 melta=188
+ 276.259 Script @__melta-combined__/control.lua:82: [comb] t=600    beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=322 drops=73 median_recent=56.00
+ 276.259 Script @__melta-combined__/control.lua:82: [comb] t=600    beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=322 drops=73 median_recent=56.00
+ 276.259 Script @__melta-combined__/control.lua:82: [comb] t=600    beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=322 drops=72 median_recent=56.00
+ 276.260 Script @__melta-combined__/control.lua:82: [comb] t=600    beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=323 drops=71 median_recent=89.63
+ 276.260 Script @__melta-combined__/control.lua:82: [comb] t=600    beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=324 drops=70 median_recent=89.63
+ 276.260 Script @__melta-combined__/control.lua:82: [comb] t=600    beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=321 drops=74 median_recent=89.63
+ 276.260 Script @__melta-combined__/control.lua:82: [comb] t=600    reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+ 276.260 Script @__melta-combined__/control.lua:82: [comb] t=600    reach normal_19      dist=19 status=1 target=- hits=false
+ 276.260 Script @__melta-combined__/control.lua:82: [comb] t=600    reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+ 276.261 Script @__melta-combined__/control.lua:82: [comb] t=600    reach legendary_27   dist=27 status=1 target=- hits=false
+ 278.256 Script @__melta-combined__/control.lua:86: [tooltip] HOVER_Q_UNCOMMON leg=2 subject=12.0,100.0 camera=12.0,102.0 character=true
+ 286.291 Script @__melta-combined__/control.lua:82: [comb] t=1200   objects total=188 melta=188
+ 286.291 Script @__melta-combined__/control.lua:82: [comb] t=1200   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=303 drops=148 median_recent=56.00
+ 286.291 Script @__melta-combined__/control.lua:82: [comb] t=1200   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=303 drops=148 median_recent=56.00
+ 286.291 Script @__melta-combined__/control.lua:82: [comb] t=1200   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=303 drops=147 median_recent=56.00
+ 286.292 Script @__melta-combined__/control.lua:82: [comb] t=1200   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=303 drops=146 median_recent=89.63
+ 286.292 Script @__melta-combined__/control.lua:82: [comb] t=1200   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=303 drops=145 median_recent=89.63
+ 286.292 Script @__melta-combined__/control.lua:82: [comb] t=1200   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=303 drops=149 median_recent=89.63
+ 286.292 Script @__melta-combined__/control.lua:82: [comb] t=1200   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+ 286.292 Script @__melta-combined__/control.lua:82: [comb] t=1200   reach normal_19      dist=19 status=1 target=- hits=false
+ 286.292 Script @__melta-combined__/control.lua:82: [comb] t=1200   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+ 286.292 Script @__melta-combined__/control.lua:82: [comb] t=1200   reach legendary_27   dist=27 status=1 target=- hits=false
+ 288.374 Script @__melta-combined__/control.lua:86: [tooltip] HOVER_Q_RARE leg=3 subject=24.0,100.0 camera=24.0,102.0 character=true
+ 296.711 Script @__melta-combined__/control.lua:82: [comb] t=1800   objects total=188 melta=188
+ 296.711 Script @__melta-combined__/control.lua:82: [comb] t=1800   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=297 drops=223 median_recent=56.00
+ 296.711 Script @__melta-combined__/control.lua:82: [comb] t=1800   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=298 drops=223 median_recent=56.00
+ 296.711 Script @__melta-combined__/control.lua:82: [comb] t=1800   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=297 drops=222 median_recent=56.00
+ 296.711 Script @__melta-combined__/control.lua:82: [comb] t=1800   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=297 drops=221 median_recent=89.63
+ 296.712 Script @__melta-combined__/control.lua:82: [comb] t=1800   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=298 drops=220 median_recent=89.63
+ 296.712 Script @__melta-combined__/control.lua:82: [comb] t=1800   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=298 drops=224 median_recent=89.63
+ 296.712 Script @__melta-combined__/control.lua:82: [comb] t=1800   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+ 296.712 Script @__melta-combined__/control.lua:82: [comb] t=1800   reach normal_19      dist=19 status=1 target=- hits=false
+ 296.712 Script @__melta-combined__/control.lua:82: [comb] t=1800   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+ 296.712 Script @__melta-combined__/control.lua:82: [comb] t=1800   reach legendary_27   dist=27 status=1 target=- hits=false
+ 298.707 Script @__melta-combined__/control.lua:86: [tooltip] HOVER_Q_EPIC leg=4 subject=36.0,100.0 camera=36.0,102.0 character=true
+ 306.840 Script @__melta-combined__/control.lua:82: [comb] t=2400   objects total=188 melta=188
+ 306.840 Script @__melta-combined__/control.lua:82: [comb] t=2400   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=298 median_recent=56.00
+ 306.840 Script @__melta-combined__/control.lua:82: [comb] t=2400   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=298 median_recent=56.00
+ 306.840 Script @__melta-combined__/control.lua:82: [comb] t=2400   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=297 median_recent=56.00
+ 306.840 Script @__melta-combined__/control.lua:82: [comb] t=2400   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=296 median_recent=89.63
+ 306.840 Script @__melta-combined__/control.lua:82: [comb] t=2400   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=295 median_recent=89.63
+ 306.841 Script @__melta-combined__/control.lua:82: [comb] t=2400   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=299 median_recent=89.63
+ 306.841 Script @__melta-combined__/control.lua:82: [comb] t=2400   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+ 306.841 Script @__melta-combined__/control.lua:82: [comb] t=2400   reach normal_19      dist=19 status=1 target=- hits=false
+ 306.841 Script @__melta-combined__/control.lua:82: [comb] t=2400   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+ 306.841 Script @__melta-combined__/control.lua:82: [comb] t=2400   reach legendary_27   dist=27 status=1 target=- hits=false
+ 308.861 Script @__melta-combined__/control.lua:86: [tooltip] HOVER_Q_LEGENDARY leg=5 subject=48.0,100.0 camera=48.0,102.0 character=true
+ 317.057 Script @__melta-combined__/control.lua:82: [comb] t=3000   objects total=188 melta=188
+ 317.058 Script @__melta-combined__/control.lua:82: [comb] t=3000   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=373 median_recent=56.00
+ 317.058 Script @__melta-combined__/control.lua:82: [comb] t=3000   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=373 median_recent=56.00
+ 317.058 Script @__melta-combined__/control.lua:82: [comb] t=3000   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=372 median_recent=56.00
+ 317.058 Script @__melta-combined__/control.lua:82: [comb] t=3000   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=371 median_recent=89.63
+ 317.058 Script @__melta-combined__/control.lua:82: [comb] t=3000   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=370 median_recent=89.63
+ 317.058 Script @__melta-combined__/control.lua:82: [comb] t=3000   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=374 median_recent=89.63
+ 317.058 Script @__melta-combined__/control.lua:82: [comb] t=3000   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+ 317.058 Script @__melta-combined__/control.lua:82: [comb] t=3000   reach normal_19      dist=19 status=1 target=- hits=false
+ 317.058 Script @__melta-combined__/control.lua:82: [comb] t=3000   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+ 317.058 Script @__melta-combined__/control.lua:82: [comb] t=3000   reach legendary_27   dist=27 status=1 target=- hits=false
+ 322.177 Script @__melta-combined__/control.lua:82: [comb] t=3300   shot pipes/01-overview
+ 323.001 Script @__melta-combined__/control.lua:82: [comb] t=3345   shot pipes/02-four-way
+ 323.902 Script @__melta-combined__/control.lua:82: [comb] t=3390   shot pipes/03-join-north
+ 325.234 Script @__melta-combined__/control.lua:82: [comb] t=3435   shot pipes/04-join-east
+ 326.411 Script @__melta-combined__/control.lua:82: [comb] t=3480   shot pipes/05-capped-ports
+ 327.295 Script @__melta-combined__/control.lua:82: [comb] t=3525   shot pipes/06-shapes
+ 328.325 Script @__melta-combined__/control.lua:82: [comb] t=3570   shot pipes/07-straight
+ 329.040 Script @__melta-combined__/control.lua:82: [comb] t=3600   objects total=188 melta=188
+ 329.040 Script @__melta-combined__/control.lua:82: [comb] t=3600   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+ 329.040 Script @__melta-combined__/control.lua:82: [comb] t=3600   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+ 329.040 Script @__melta-combined__/control.lua:82: [comb] t=3600   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+ 329.040 Script @__melta-combined__/control.lua:82: [comb] t=3600   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+ 329.040 Script @__melta-combined__/control.lua:82: [comb] t=3600   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+ 329.040 Script @__melta-combined__/control.lua:82: [comb] t=3600   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+ 329.040 Script @__melta-combined__/control.lua:82: [comb] t=3600   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+ 329.040 Script @__melta-combined__/control.lua:82: [comb] t=3600   reach normal_19      dist=19 status=1 target=- hits=false
+ 329.040 Script @__melta-combined__/control.lua:82: [comb] t=3600   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+ 329.040 Script @__melta-combined__/control.lua:82: [comb] t=3600   reach legendary_27   dist=27 status=1 target=- hits=false
+ 329.307 Script @__melta-combined__/control.lua:82: [comb] t=3615   shot pipes/08-corner
+ 330.167 Script @__melta-combined__/control.lua:82: [comb] t=3660   shot pipes/09-t-junction
+ 331.368 Script @__melta-combined__/control.lua:82: [comb] t=3705   shot pipes/10-cross
+ 332.207 Script @__melta-combined__/control.lua:82: [comb] t=3750   shot pipes/11-dead-end
+ 333.037 Script @__melta-combined__/control.lua:82: [comb] t=3795   shot pipes/12-join-south
+ 333.838 Script @__melta-combined__/control.lua:82: [comb] t=3840   shot pipes/13-join-west
+ 334.753 Script @__melta-combined__/control.lua:82: [comb] t=3885   shot pipes/14-normal-zoom
+ 335.544 Script @__melta-combined__/control.lua:82: [comb] t=3930   shot pipes/15-capped-port-north
+ 336.505 Script @__melta-combined__/control.lua:82: [comb] t=3975   shot beam/01-six-firing
+ 337.468 Script @__melta-combined__/control.lua:82: [comb] t=4020   shot beam/02-close-lightoil
+ 338.592 Script @__melta-combined__/control.lua:82: [comb] t=4065   shot beam/03-close-meltafuel
+ 339.525 Script @__melta-combined__/control.lua:82: [comb] t=4110   shot beam/04-six-zoomed
+ 340.519 Script @__melta-combined__/control.lua:82: [comb] t=4128   shot beam/05-six-wide
+ 341.052 Script @__melta-combined__/control.lua:82: [comb] t=4155   shot reach/01-normal-15
+ 341.834 Script @__melta-combined__/control.lua:82: [comb] t=4200   shot reach/02-legendary-23
+ 341.835 Script @__melta-combined__/control.lua:82: [comb] t=4200   objects total=188 melta=188
+ 341.835 Script @__melta-combined__/control.lua:82: [comb] t=4200   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+ 341.835 Script @__melta-combined__/control.lua:82: [comb] t=4200   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+ 341.835 Script @__melta-combined__/control.lua:82: [comb] t=4200   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+ 341.835 Script @__melta-combined__/control.lua:82: [comb] t=4200   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+ 341.835 Script @__melta-combined__/control.lua:82: [comb] t=4200   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+ 341.836 Script @__melta-combined__/control.lua:82: [comb] t=4200   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+ 341.836 Script @__melta-combined__/control.lua:82: [comb] t=4200   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+ 341.836 Script @__melta-combined__/control.lua:82: [comb] t=4200   reach normal_19      dist=19 status=1 target=- hits=false
+ 341.836 Script @__melta-combined__/control.lua:82: [comb] t=4200   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+ 341.836 Script @__melta-combined__/control.lua:82: [comb] t=4200   reach legendary_27   dist=27 status=1 target=- hits=false
+ 342.574 Script @__melta-combined__/control.lua:82: [comb] t=4243   display rocks for the screenshots: 3 spawned
+ 342.642 Script @__melta-combined__/control.lua:82: [comb] t=4245   shot asteroids/01-overview
+ 343.706 Script @__melta-combined__/control.lua:82: [comb] t=4288   display rocks for the screenshots: 0 spawned
+ 343.755 Script @__melta-combined__/control.lua:82: [comb] t=4290   shot asteroids/02-small-cut
+ 344.575 Script @__melta-combined__/control.lua:82: [comb] t=4333   display rocks for the screenshots: 1 spawned
+ 344.624 Script @__melta-combined__/control.lua:82: [comb] t=4335   shot asteroids/03-big-cut
+ 345.823 Script @__melta-combined__/control.lua:82: [comb] t=4400   profiler START (window 300 ticks)
+ 351.096 Script @__melta-combined__/control.lua:629: ##### PROFILER ms/tick over 300 ticks: Duration: 17.562624ms
+ 351.096 Script @__melta-combined__/control.lua:82: [comb] t=4700   profiler STOP
+ 351.097 Script @__melta-combined__/control.lua:82: [comb] t=4700   objects total=194 melta=194
+ 351.097 Script @__melta-combined__/control.lua:82: [comb] t=4700   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=268 drops=400 median_recent=56.00
+ 351.097 Script @__melta-combined__/control.lua:82: [comb] t=4700   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=270 drops=400 median_recent=56.00
+ 351.097 Script @__melta-combined__/control.lua:82: [comb] t=4700   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=270 drops=400 median_recent=56.00
+ 351.097 Script @__melta-combined__/control.lua:82: [comb] t=4700   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=267 drops=400 median_recent=89.63
+ 351.097 Script @__melta-combined__/control.lua:82: [comb] t=4700   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=268 drops=400 median_recent=89.63
+ 351.097 Script @__melta-combined__/control.lua:82: [comb] t=4700   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=270 drops=400 median_recent=89.63
+ 351.098 Script @__melta-combined__/control.lua:82: [comb] t=4700   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+ 351.098 Script @__melta-combined__/control.lua:82: [comb] t=4700   reach normal_19      dist=19 status=1 target=- hits=false
+ 351.098 Script @__melta-combined__/control.lua:82: [comb] t=4700   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+ 351.098 Script @__melta-combined__/control.lua:82: [comb] t=4700   reach legendary_27   dist=27 status=1 target=- hits=false
+ 352.774 Script @__melta-combined__/control.lua:82: [comb] t=4800   objects total=188 melta=188
+ 352.774 Script @__melta-combined__/control.lua:82: [comb] t=4800   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+ 352.774 Script @__melta-combined__/control.lua:82: [comb] t=4800   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+ 352.775 Script @__melta-combined__/control.lua:82: [comb] t=4800   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+ 352.775 Script @__melta-combined__/control.lua:82: [comb] t=4800   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+ 352.775 Script @__melta-combined__/control.lua:82: [comb] t=4800   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+ 352.775 Script @__melta-combined__/control.lua:82: [comb] t=4800   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+ 352.775 Script @__melta-combined__/control.lua:82: [comb] t=4800   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+ 352.776 Script @__melta-combined__/control.lua:82: [comb] t=4800   reach normal_19      dist=19 status=1 target=- hits=false
+ 352.776 Script @__melta-combined__/control.lua:82: [comb] t=4800   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+ 352.776 Script @__melta-combined__/control.lua:82: [comb] t=4800   reach legendary_27   dist=27 status=1 target=- hits=false
+ 352.776 Script @__melta-combined__/control.lua:82: [comb] t=4800   KILL all six beam dummies (objects total=188 melta=188)
+ 352.850 Script @__melta-combined__/control.lua:82: [comb] t=4803   shot beam/05-fade-3ticks
+ 352.850 Script @__melta-combined__/control.lua:82: [comb] t=4803   objects after kill total=188 melta=188
+ 353.087 Script @__melta-combined__/control.lua:82: [comb] t=4815   shot beam/06-fade-gone
+ 353.088 Script @__melta-combined__/control.lua:82: [comb] t=4815   objects after kill total=86 melta=86
+ 353.373 Script @__melta-combined__/control.lua:82: [comb] t=4830   objects after kill total=89 melta=89
+ 354.557 Script @__melta-combined__/control.lua:82: [comb] t=4900   beam dummies respawned, objects total=77 melta=77
+ 354.789 Script @__melta-combined__/control.lua:82: [comb] t=4914   beam 1 pulse #1 drop=17.63
+ 354.890 Script @__melta-combined__/control.lua:82: [comb] t=4920   beam 2 pulse #1 drop=17.63
+ 354.922 Script @__melta-combined__/control.lua:82: [comb] t=4922   beam 1 pulse #2 drop=19.88
+ 354.989 Script @__melta-combined__/control.lua:82: [comb] t=4926   beam 3 pulse #1 drop=17.63
+ 355.023 Script @__melta-combined__/control.lua:82: [comb] t=4928   beam 2 pulse #2 drop=19.88
+ 355.056 Script @__melta-combined__/control.lua:82: [comb] t=4930   beam 1 pulse #3 drop=22.13
+ 355.093 Script @__melta-combined__/control.lua:82: [comb] t=4932   beam 4 pulse #1 drop=28.25
+ 355.160 Script @__melta-combined__/control.lua:82: [comb] t=4934   beam 3 pulse #2 drop=19.88
+ 355.189 Script @__melta-combined__/control.lua:82: [comb] t=4936   beam 2 pulse #3 drop=22.13
+ 355.223 Script @__melta-combined__/control.lua:82: [comb] t=4938   beam 1 pulse #4 drop=24.31
+ 355.224 Script @__melta-combined__/control.lua:82: [comb] t=4938   beam 5 pulse #1 drop=28.25
+ 355.258 Script @__melta-combined__/control.lua:82: [comb] t=4940   beam 4 pulse #2 drop=31.81
+ 355.291 Script @__melta-combined__/control.lua:82: [comb] t=4942   beam 3 pulse #3 drop=22.13
+ 355.323 Script @__melta-combined__/control.lua:82: [comb] t=4944   beam 2 pulse #4 drop=24.31
+ 355.323 Script @__melta-combined__/control.lua:82: [comb] t=4944   beam 6 pulse #1 drop=28.25
+ 355.358 Script @__melta-combined__/control.lua:82: [comb] t=4946   beam 1 pulse #5 drop=26.63
+ 355.358 Script @__melta-combined__/control.lua:82: [comb] t=4946   beam 5 pulse #2 drop=31.81
+ 355.389 Script @__melta-combined__/control.lua:82: [comb] t=4948   beam 4 pulse #3 drop=35.38
+ 355.435 Script @__melta-combined__/control.lua:82: [comb] t=4950   beam 3 pulse #4 drop=24.31
+ 355.457 Script @__melta-combined__/control.lua:82: [comb] t=4952   beam 2 pulse #5 drop=26.63
+ 355.458 Script @__melta-combined__/control.lua:82: [comb] t=4952   beam 6 pulse #2 drop=31.81
+ 355.507 Script @__melta-combined__/control.lua:82: [comb] t=4954   beam 1 pulse #6 drop=28.81
+ 355.507 Script @__melta-combined__/control.lua:82: [comb] t=4954   beam 5 pulse #3 drop=35.38
+ 355.539 Script @__melta-combined__/control.lua:82: [comb] t=4956   beam 4 pulse #4 drop=39.00
+ 355.572 Script @__melta-combined__/control.lua:82: [comb] t=4958   beam 3 pulse #5 drop=26.63
+ 355.606 Script @__melta-combined__/control.lua:82: [comb] t=4960   beam 2 pulse #6 drop=28.81
+ 355.606 Script @__melta-combined__/control.lua:82: [comb] t=4960   beam 6 pulse #3 drop=35.38
+ 355.639 Script @__melta-combined__/control.lua:82: [comb] t=4962   beam 1 pulse #7 drop=31.13
+ 355.640 Script @__melta-combined__/control.lua:82: [comb] t=4962   beam 5 pulse #4 drop=39.00
+ 355.673 Script @__melta-combined__/control.lua:82: [comb] t=4964   beam 4 pulse #5 drop=42.56
+ 355.706 Script @__melta-combined__/control.lua:82: [comb] t=4966   beam 3 pulse #6 drop=28.81
+ 355.749 Script @__melta-combined__/control.lua:82: [comb] t=4968   beam 2 pulse #7 drop=31.13
+ 355.749 Script @__melta-combined__/control.lua:82: [comb] t=4968   beam 6 pulse #4 drop=39.00
+ 355.773 Script @__melta-combined__/control.lua:82: [comb] t=4970   beam 1 pulse #8 drop=33.31
+ 355.774 Script @__melta-combined__/control.lua:82: [comb] t=4970   beam 5 pulse #5 drop=42.56
+ 355.806 Script @__melta-combined__/control.lua:82: [comb] t=4972   beam 4 pulse #6 drop=46.19
+ 355.839 Script @__melta-combined__/control.lua:82: [comb] t=4974   beam 3 pulse #7 drop=31.13
+ 355.874 Script @__melta-combined__/control.lua:82: [comb] t=4976   beam 2 pulse #8 drop=33.31
+ 355.874 Script @__melta-combined__/control.lua:82: [comb] t=4976   beam 6 pulse #5 drop=42.56
+ 355.906 Script @__melta-combined__/control.lua:82: [comb] t=4978   beam 1 pulse #9 drop=35.56
+ 355.906 Script @__melta-combined__/control.lua:82: [comb] t=4978   beam 5 pulse #6 drop=46.19
+ 355.940 Script @__melta-combined__/control.lua:82: [comb] t=4980   beam 4 pulse #7 drop=49.69
+ 355.941 Script @__melta-combined__/control.lua:82: [comb] t=4980   objects total=194 melta=194
+ 355.942 Script @__melta-combined__/control.lua:82: [comb] t=4980   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=284 drops=9 median_recent=26.63
+ 355.942 Script @__melta-combined__/control.lua:82: [comb] t=4980   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=286 drops=8 median_recent=24.31
+ 355.942 Script @__melta-combined__/control.lua:82: [comb] t=4980   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=287 drops=7 median_recent=24.31
+ 355.942 Script @__melta-combined__/control.lua:82: [comb] t=4980   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=286 drops=7 median_recent=39.00
+ 355.942 Script @__melta-combined__/control.lua:82: [comb] t=4980   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=288 drops=6 median_recent=35.38
+ 355.942 Script @__melta-combined__/control.lua:82: [comb] t=4980   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=290 drops=5 median_recent=35.38
+ 355.942 Script @__melta-combined__/control.lua:82: [comb] t=4980   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+ 355.942 Script @__melta-combined__/control.lua:82: [comb] t=4980   reach normal_19      dist=19 status=1 target=- hits=false
+ 355.942 Script @__melta-combined__/control.lua:82: [comb] t=4980   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+ 355.942 Script @__melta-combined__/control.lua:82: [comb] t=4980   reach legendary_27   dist=27 status=1 target=- hits=false
+ 355.943 Script @__melta-combined__/control.lua:82: [comb] t=4980   COMBINED PROBE DONE objects total=194 melta=194
+ 355.973 Script @__melta-combined__/control.lua:82: [comb] t=4982   beam 3 pulse #8 drop=33.31
+ 356.007 Script @__melta-combined__/control.lua:82: [comb] t=4984   beam 2 pulse #9 drop=35.56
+ 356.007 Script @__melta-combined__/control.lua:82: [comb] t=4984   beam 6 pulse #6 drop=46.19
+ 356.040 Script @__melta-combined__/control.lua:82: [comb] t=4986   beam 1 pulse #10 drop=37.81
+ 356.041 Script @__melta-combined__/control.lua:82: [comb] t=4986   beam 5 pulse #7 drop=49.69
+ 356.073 Script @__melta-combined__/control.lua:82: [comb] t=4988   beam 4 pulse #8 drop=53.31
+ 356.107 Script @__melta-combined__/control.lua:82: [comb] t=4990   beam 3 pulse #9 drop=35.56
+ 356.158 Script @__melta-combined__/control.lua:82: [comb] t=4992   beam 2 pulse #10 drop=37.81
+ 356.158 Script @__melta-combined__/control.lua:82: [comb] t=4992   beam 6 pulse #7 drop=49.69
+ 356.189 Script @__melta-combined__/control.lua:82: [comb] t=4994   beam 1 pulse #11 drop=40.06
+ 356.189 Script @__melta-combined__/control.lua:82: [comb] t=4994   beam 5 pulse #8 drop=53.31
+ 356.223 Script @__melta-combined__/control.lua:82: [comb] t=4996   beam 4 pulse #9 drop=56.94
+ 356.256 Script @__melta-combined__/control.lua:82: [comb] t=4998   beam 3 pulse #10 drop=37.81
+ 356.289 Script @__melta-combined__/control.lua:82: [comb] t=5000   beam 2 pulse #11 drop=40.06
+ 356.289 Script @__melta-combined__/control.lua:82: [comb] t=5000   beam 6 pulse #8 drop=53.31
+ 356.290 Script @__melta-combined__/control.lua:82: [comb] t=5000   IDLE window: beam targets removed, objects total=188 melta=188
+ 356.456 Script @__melta-combined__/control.lua:82: [comb] t=5010   profiler B START (idle window, 300 ticks)
+ 358.308 Quitting: window closed.
+ 358.330 Info GlobalContext.cpp:763: Deleting active scenario.
+ 362.511 Info SDLWindow.cpp:456: Leaking D3D GraphicsInterface to prevent AMD graphics driver crash.
+ 364.445 Steam API shutdown.
+ 365.728 Goodbye

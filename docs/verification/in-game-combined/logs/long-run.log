@@ -1,0 +1,701 @@
+   0.006 2026-10-25 20:07:38; Factorio 2.1.23 (build 87750, win64, steam, space-age)
+   0.007 Operating system: Windows 10 (build 19045) 
+   0.008 Program arguments: "E:/SteamLibrary/steamapps/common/Factorio/bin/x64/Factorio.exe" "--config" "C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/config.ini" "--mod-directory" "C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/mods" "--benchmark" "C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/write/scene.zip" "--benchmark-ticks" "18000" 
+   0.008 Config path: C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/config.ini
+   0.008 Read data path: E:/SteamLibrary/steamapps/common/Factorio/data
+   0.008 Write data path: C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/write [25399/430791MB]
+   0.008 Binaries path: E:/SteamLibrary/steamapps/common/Factorio/bin
+   0.174 System info: [CPU: AMD FX(tm)-8350 Eight-Core Processor, 8 cores, RAM: 15660/16341 MB, page: 38142/49228 MB, virtual: 4271/134217727 MB, extended virtual: 0 MB]
+   0.289 Memory info:
+   0.289  [0]: Undefined          DGSB316GB1600 8192 MB 800 MHz  64|64
+   0.290  [1]: Undefined          DGSB316GB1600 8192 MB 800 MHz  64|64
+   2.309 Running in headless mode
+   2.309 Audio is disabled
+   2.375 Info ModManager.cpp:455: FeatureFlag: expansion, expansion-shaders, freezing, quality, rail-bridges, segmented-units, space-travel, spoiling
+   2.780 Loading mod core 0.0.0 (data.lua)
+   3.416 Loading mod base 2.1.23 (data.lua)
+   8.637 Loading mod elevated-rails 2.1.23 (data.lua)
+  10.450 Loading mod recycler 2.1.23 (data.lua)
+  10.832 Loading mod quality 2.1.23 (data.lua)
+  11.061 Loading mod space-age 2.1.23 (data.lua)
+  17.726 Loading mod lilys-melta 0.5.0 (data.lua)
+  17.773 Loading mod melta-combined 0.1.0 (data.lua)
+  17.821 Loading mod base 2.1.23 (data-updates.lua)
+  17.908 Loading mod recycler 2.1.23 (data-updates.lua)
+  18.010 Loading mod space-age 2.1.23 (data-updates.lua)
+  18.069 Loading mod lilys-melta 0.5.0 (data-updates.lua)
+  18.071 Script @__lilys-melta__/data-updates.lua:9: [lilys-melta] fuels accepted: light-oil, petroleum-gas, melta-fuel
+  18.512 Checksum for core: 3668028660
+  18.512 Checksum of base: 3864816957
+  18.512 Checksum of elevated-rails: 1429039930
+  18.512 Checksum of recycler: 3293728126
+  18.512 Checksum of quality: 3330349790
+  18.512 Checksum of space-age: 3787586506
+  18.512 Checksum of lilys-melta: 2227848678
+  18.512 Checksum of melta-combined: 1225596985
+  22.365 Prototype list checksum: 252881642
+  22.821 Info PlayerData.cpp:566: Cloud player-data.json unavailable
+  22.821 Info PlayerData.cpp:582: Local player-data.json unavailable
+  22.906 Info GlobalContext.cpp:1346: Resetting config.
+  22.928 Factorio initialised
+  22.952 Loading map C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/write/scene.zip: 776688 bytes.
+  23.256 Loading level.dat: 1076073 bytes.
+  23.256 Info Scenario.cpp:152: Map version 2.1.23-2
+  23.319 Blueprint storage "blueprint-storage-2.dat" was not found, trying to load previous version storage "blueprint-storage.dat"
+  23.321 Loading script.dat: 6467 bytes.
+  23.421 Checksum for script __level__/control.lua: 2385776952
+  23.430 Checksum for script __lilys-melta__/control.lua: 1658563399
+  23.434 Checksum for script __melta-combined__/control.lua: 2096259902
+  23.461 Script @__melta-combined__/control.lua:82: [comb] t=0      objects total=0 melta=0
+  23.462 Script @__melta-combined__/control.lua:82: [comb] t=0      beam 1 fuel=light-oil  status=1 target=- fluid=370 drops=0 median_recent=-1.00
+  23.462 Script @__melta-combined__/control.lua:82: [comb] t=0      beam 2 fuel=light-oil  status=1 target=- fluid=370 drops=0 median_recent=-1.00
+  23.462 Script @__melta-combined__/control.lua:82: [comb] t=0      beam 3 fuel=light-oil  status=1 target=- fluid=370 drops=0 median_recent=-1.00
+  23.462 Script @__melta-combined__/control.lua:82: [comb] t=0      beam 4 fuel=melta-fuel status=1 target=- fluid=370 drops=0 median_recent=-1.00
+  23.462 Script @__melta-combined__/control.lua:82: [comb] t=0      beam 5 fuel=melta-fuel status=1 target=- fluid=370 drops=0 median_recent=-1.00
+  23.463 Script @__melta-combined__/control.lua:82: [comb] t=0      beam 6 fuel=melta-fuel status=1 target=- fluid=370 drops=0 median_recent=-1.00
+  23.463 Script @__melta-combined__/control.lua:82: [comb] t=0      reach normal_15      dist=15 status=1 target=- hits=false
+  23.463 Script @__melta-combined__/control.lua:82: [comb] t=0      reach normal_19      dist=19 status=1 target=- hits=false
+  23.463 Script @__melta-combined__/control.lua:82: [comb] t=0      reach legendary_23   dist=23 status=1 target=- hits=false
+  23.463 Script @__melta-combined__/control.lua:82: [comb] t=0      reach legendary_27   dist=27 status=1 target=- hits=false
+  23.502 Script @__melta-combined__/control.lua:82: [comb] t=9      reach normal_15: FIRST DAMAGE at tick 9
+  23.512 Script @__melta-combined__/control.lua:82: [comb] t=16     beam 6 pulse #1 drop=28.25
+  23.516 Script @__melta-combined__/control.lua:82: [comb] t=18     beam 1 pulse #1 drop=17.63
+  23.522 Script @__melta-combined__/control.lua:82: [comb] t=21     reach legendary_23: FIRST DAMAGE at tick 21
+  23.530 Script @__melta-combined__/control.lua:82: [comb] t=24     beam 2 pulse #1 drop=17.63
+  23.530 Script @__melta-combined__/control.lua:82: [comb] t=24     beam 6 pulse #2 drop=31.81
+  23.534 Script @__melta-combined__/control.lua:82: [comb] t=26     beam 1 pulse #2 drop=19.88
+  23.547 Script @__melta-combined__/control.lua:82: [comb] t=30     beam 3 pulse #1 drop=17.63
+  23.552 Script @__melta-combined__/control.lua:82: [comb] t=32     beam 2 pulse #2 drop=19.88
+  23.552 Script @__melta-combined__/control.lua:82: [comb] t=32     beam 6 pulse #3 drop=35.38
+  23.562 Script @__melta-combined__/control.lua:82: [comb] t=34     beam 1 pulse #3 drop=22.13
+  23.569 Script @__melta-combined__/control.lua:82: [comb] t=36     beam 4 pulse #1 drop=28.25
+  23.577 Script @__melta-combined__/control.lua:82: [comb] t=38     beam 3 pulse #2 drop=19.88
+  23.584 Script @__melta-combined__/control.lua:82: [comb] t=40     beam 2 pulse #3 drop=22.13
+  23.585 Script @__melta-combined__/control.lua:82: [comb] t=40     beam 6 pulse #4 drop=39.00
+  23.594 Script @__melta-combined__/control.lua:82: [comb] t=42     beam 1 pulse #4 drop=24.31
+  23.594 Script @__melta-combined__/control.lua:82: [comb] t=42     beam 5 pulse #1 drop=28.25
+  23.601 Script @__melta-combined__/control.lua:82: [comb] t=44     beam 4 pulse #2 drop=31.81
+  23.609 Script @__melta-combined__/control.lua:82: [comb] t=45     KILL rock 1 (small-metallic-asteroid) at tick 45 pulses=3 start_hp=100.0
+  23.611 Script @__melta-combined__/control.lua:82: [comb] t=46     beam 3 pulse #3 drop=22.13
+  23.620 Script @__melta-combined__/control.lua:82: [comb] t=48     beam 2 pulse #4 drop=24.31
+  23.620 Script @__melta-combined__/control.lua:82: [comb] t=48     beam 6 pulse #5 drop=42.56
+  23.631 Script @__melta-combined__/control.lua:82: [comb] t=50     beam 1 pulse #5 drop=26.63
+  23.631 Script @__melta-combined__/control.lua:82: [comb] t=50     beam 5 pulse #2 drop=31.81
+  23.639 Script @__melta-combined__/control.lua:82: [comb] t=52     beam 4 pulse #3 drop=35.38
+  23.647 Script @__melta-combined__/control.lua:82: [comb] t=54     beam 3 pulse #4 drop=24.31
+  23.657 Script @__melta-combined__/control.lua:82: [comb] t=56     beam 2 pulse #5 drop=26.63
+  23.657 Script @__melta-combined__/control.lua:82: [comb] t=56     beam 6 pulse #6 drop=46.19
+  23.665 Script @__melta-combined__/control.lua:82: [comb] t=58     beam 1 pulse #6 drop=28.81
+  23.665 Script @__melta-combined__/control.lua:82: [comb] t=58     beam 5 pulse #3 drop=35.38
+  23.672 Script @__melta-combined__/control.lua:82: [comb] t=60     beam 4 pulse #4 drop=39.00
+  23.681 Script @__melta-combined__/control.lua:82: [comb] t=62     beam 3 pulse #5 drop=26.63
+  23.690 Script @__melta-combined__/control.lua:82: [comb] t=64     beam 2 pulse #6 drop=28.81
+  23.690 Script @__melta-combined__/control.lua:82: [comb] t=64     beam 6 pulse #7 drop=49.69
+  23.698 Script @__melta-combined__/control.lua:82: [comb] t=66     beam 1 pulse #7 drop=31.13
+  23.698 Script @__melta-combined__/control.lua:82: [comb] t=66     beam 5 pulse #4 drop=39.00
+  23.706 Script @__melta-combined__/control.lua:82: [comb] t=68     beam 4 pulse #5 drop=42.56
+  23.715 Script @__melta-combined__/control.lua:82: [comb] t=70     beam 3 pulse #6 drop=28.81
+  23.721 Script @__melta-combined__/control.lua:82: [comb] t=72     beam 2 pulse #7 drop=31.13
+  23.722 Script @__melta-combined__/control.lua:82: [comb] t=72     beam 6 pulse #8 drop=53.31
+  23.729 Script @__melta-combined__/control.lua:82: [comb] t=74     beam 1 pulse #8 drop=33.31
+  23.729 Script @__melta-combined__/control.lua:82: [comb] t=74     beam 5 pulse #5 drop=42.56
+  23.739 Script @__melta-combined__/control.lua:82: [comb] t=76     beam 4 pulse #6 drop=46.19
+  23.746 Script @__melta-combined__/control.lua:82: [comb] t=78     beam 3 pulse #7 drop=31.13
+  23.753 Script @__melta-combined__/control.lua:82: [comb] t=80     beam 2 pulse #8 drop=33.31
+  23.753 Script @__melta-combined__/control.lua:82: [comb] t=80     beam 6 pulse #9 drop=56.94
+  23.762 Script @__melta-combined__/control.lua:82: [comb] t=82     beam 1 pulse #9 drop=35.56
+  23.762 Script @__melta-combined__/control.lua:82: [comb] t=82     beam 5 pulse #6 drop=46.19
+  23.768 Script @__melta-combined__/control.lua:82: [comb] t=83     KILL rock 2 (medium-metallic-asteroid) at tick 83 pulses=7 start_hp=400.0
+  23.770 Script @__melta-combined__/control.lua:82: [comb] t=84     beam 4 pulse #7 drop=49.69
+  23.779 Script @__melta-combined__/control.lua:82: [comb] t=86     beam 3 pulse #8 drop=33.31
+  23.785 Script @__melta-combined__/control.lua:82: [comb] t=88     beam 2 pulse #9 drop=35.56
+  23.785 Script @__melta-combined__/control.lua:82: [comb] t=88     beam 6 pulse #10 drop=60.50
+  23.795 Script @__melta-combined__/control.lua:82: [comb] t=90     beam 1 pulse #10 drop=37.81
+  23.796 Script @__melta-combined__/control.lua:82: [comb] t=90     beam 5 pulse #7 drop=49.69
+  23.802 Script @__melta-combined__/control.lua:82: [comb] t=92     beam 4 pulse #8 drop=53.31
+  23.811 Script @__melta-combined__/control.lua:82: [comb] t=94     beam 3 pulse #9 drop=35.56
+  23.817 Script @__melta-combined__/control.lua:82: [comb] t=96     beam 2 pulse #10 drop=37.81
+  23.817 Script @__melta-combined__/control.lua:82: [comb] t=96     beam 6 pulse #11 drop=64.06
+  23.828 Script @__melta-combined__/control.lua:82: [comb] t=98     beam 1 pulse #11 drop=40.06
+  23.828 Script @__melta-combined__/control.lua:82: [comb] t=98     beam 5 pulse #8 drop=53.31
+  23.834 Script @__melta-combined__/control.lua:82: [comb] t=100    beam 4 pulse #9 drop=56.94
+  23.844 Script @__melta-combined__/control.lua:82: [comb] t=102    beam 3 pulse #10 drop=37.81
+  23.855 Script @__melta-combined__/control.lua:82: [comb] t=104    beam 2 pulse #11 drop=40.06
+  23.855 Script @__melta-combined__/control.lua:82: [comb] t=104    beam 6 pulse #12 drop=67.63
+  23.863 Script @__melta-combined__/control.lua:82: [comb] t=106    beam 1 pulse #12 drop=42.25
+  23.863 Script @__melta-combined__/control.lua:82: [comb] t=106    beam 5 pulse #9 drop=56.94
+  23.869 Script @__melta-combined__/control.lua:82: [comb] t=108    beam 4 pulse #10 drop=60.50
+  23.878 Script @__melta-combined__/control.lua:82: [comb] t=110    beam 3 pulse #11 drop=40.06
+  23.888 Script @__melta-combined__/control.lua:82: [comb] t=112    beam 2 pulse #12 drop=42.25
+  23.897 Script @__melta-combined__/control.lua:82: [comb] t=114    beam 5 pulse #10 drop=60.50
+  23.907 Script @__melta-combined__/control.lua:82: [comb] t=116    beam 4 pulse #11 drop=64.06
+  23.917 Script @__melta-combined__/control.lua:82: [comb] t=118    beam 3 pulse #12 drop=42.25
+  23.934 Script @__melta-combined__/control.lua:82: [comb] t=122    beam 5 pulse #11 drop=64.06
+  23.944 Script @__melta-combined__/control.lua:82: [comb] t=124    beam 4 pulse #12 drop=67.63
+  23.967 Script @__melta-combined__/control.lua:82: [comb] t=130    beam 5 pulse #12 drop=67.63
+  24.294 Script @__melta-combined__/control.lua:82: [comb] t=200 asteroids pinned, beam firing
+  24.299 Script @__melta-combined__/control.lua:82: [comb] t=201    KILL rock 3 (big-metallic-asteroid) at tick 201 pulses=21 start_hp=2000.0
+  25.082 Script @__melta-combined__/control.lua:82: [comb] t=400    swing START from orient=0.9824 (target now 4 south)
+  25.082 Script @__melta-combined__/control.lua:82: [comb] t=400    swing orient=0.9824 want=0.5226 err=-0.4598
+  25.085 Script @__melta-combined__/control.lua:82: [comb] t=401    swing orient=0.9524 want=0.5226 err=-0.4298
+  25.089 Script @__melta-combined__/control.lua:82: [comb] t=402    swing orient=0.9224 want=0.5226 err=-0.3998
+  25.092 Script @__melta-combined__/control.lua:82: [comb] t=403    swing orient=0.8924 want=0.5226 err=-0.3698
+  25.095 Script @__melta-combined__/control.lua:82: [comb] t=404    swing orient=0.8624 want=0.5226 err=-0.3398
+  25.098 Script @__melta-combined__/control.lua:82: [comb] t=405    swing orient=0.8324 want=0.5226 err=-0.3098
+  25.102 Script @__melta-combined__/control.lua:82: [comb] t=406    swing orient=0.8024 want=0.5226 err=-0.2798
+  25.105 Script @__melta-combined__/control.lua:82: [comb] t=407    swing orient=0.7724 want=0.5226 err=-0.2498
+  25.109 Script @__melta-combined__/control.lua:82: [comb] t=408    swing orient=0.7424 want=0.5226 err=-0.2198
+  25.112 Script @__melta-combined__/control.lua:82: [comb] t=409    swing orient=0.7124 want=0.5226 err=-0.1898
+  25.115 Script @__melta-combined__/control.lua:82: [comb] t=410    swing orient=0.6824 want=0.5226 err=-0.1598
+  25.117 Script @__melta-combined__/control.lua:82: [comb] t=411    swing orient=0.6524 want=0.5226 err=-0.1298
+  25.120 Script @__melta-combined__/control.lua:82: [comb] t=412    swing orient=0.6224 want=0.5226 err=-0.0998
+  25.124 Script @__melta-combined__/control.lua:82: [comb] t=413    swing orient=0.5924 want=0.5226 err=-0.0698
+  25.128 Script @__melta-combined__/control.lua:82: [comb] t=414    swing orient=0.5624 want=0.5226 err=-0.0398
+  25.131 Script @__melta-combined__/control.lua:82: [comb] t=415    swing orient=0.5324 want=0.5226 err=-0.0098
+  25.134 Script @__melta-combined__/control.lua:82: [comb] t=416    swing orient=0.5226 want=0.5226 err=0.0000
+  25.134 Script @__melta-combined__/control.lua:82: [comb] t=416    swing ARRIVED after 16 ticks (0.27 s)
+  25.141 Script @__melta-combined__/control.lua:82: [comb] t=417    swing orient=0.5226 want=0.5226 err=0.0000
+  25.146 Script @__melta-combined__/control.lua:82: [comb] t=418    swing orient=0.5226 want=0.5226 err=0.0000
+  25.149 Script @__melta-combined__/control.lua:82: [comb] t=419    swing orient=0.5226 want=0.5226 err=0.0000
+  25.152 Script @__melta-combined__/control.lua:82: [comb] t=420    swing orient=0.5226 want=0.5226 err=0.0000
+  25.160 Script @__melta-combined__/control.lua:82: [comb] t=421    swing orient=0.5226 want=0.5226 err=0.0000
+  25.163 Script @__melta-combined__/control.lua:82: [comb] t=422    swing orient=0.5226 want=0.5226 err=0.0000
+  25.166 Script @__melta-combined__/control.lua:82: [comb] t=423    swing orient=0.5226 want=0.5226 err=0.0000
+  25.169 Script @__melta-combined__/control.lua:82: [comb] t=424    swing orient=0.5226 want=0.5226 err=0.0000
+  25.174 Script @__melta-combined__/control.lua:82: [comb] t=425    swing orient=0.5226 want=0.5226 err=0.0000
+  25.177 Script @__melta-combined__/control.lua:82: [comb] t=426    swing orient=0.5226 want=0.5226 err=0.0000
+  25.180 Script @__melta-combined__/control.lua:82: [comb] t=427    swing orient=0.5226 want=0.5226 err=0.0000
+  25.183 Script @__melta-combined__/control.lua:82: [comb] t=428    swing orient=0.5226 want=0.5226 err=0.0000
+  25.187 Script @__melta-combined__/control.lua:82: [comb] t=429    swing orient=0.5226 want=0.5226 err=0.0000
+  25.192 Script @__melta-combined__/control.lua:82: [comb] t=430    swing orient=0.5226 want=0.5226 err=0.0000
+  25.195 Script @__melta-combined__/control.lua:82: [comb] t=431    swing orient=0.5226 want=0.5226 err=0.0000
+  25.198 Script @__melta-combined__/control.lua:82: [comb] t=432    swing orient=0.5226 want=0.5226 err=0.0000
+  25.201 Script @__melta-combined__/control.lua:82: [comb] t=433    swing orient=0.5226 want=0.5226 err=0.0000
+  25.205 Script @__melta-combined__/control.lua:82: [comb] t=434    swing orient=0.5226 want=0.5226 err=0.0000
+  25.209 Script @__melta-combined__/control.lua:82: [comb] t=435    swing orient=0.5226 want=0.5226 err=0.0000
+  25.214 Script @__melta-combined__/control.lua:82: [comb] t=436    swing orient=0.5226 want=0.5226 err=0.0000
+  25.217 Script @__melta-combined__/control.lua:82: [comb] t=437    swing orient=0.5226 want=0.5226 err=0.0000
+  25.220 Script @__melta-combined__/control.lua:82: [comb] t=438    swing orient=0.5226 want=0.5226 err=0.0000
+  25.224 Script @__melta-combined__/control.lua:82: [comb] t=439    swing orient=0.5226 want=0.5226 err=0.0000
+  25.227 Script @__melta-combined__/control.lua:82: [comb] t=440    swing orient=0.5226 want=0.5226 err=0.0000
+  25.230 Script @__melta-combined__/control.lua:82: [comb] t=441    swing orient=0.5226 want=0.5226 err=0.0000
+  25.233 Script @__melta-combined__/control.lua:82: [comb] t=442    swing orient=0.5226 want=0.5226 err=0.0000
+  25.236 Script @__melta-combined__/control.lua:82: [comb] t=443    swing orient=0.5226 want=0.5226 err=0.0000
+  25.241 Script @__melta-combined__/control.lua:82: [comb] t=444    swing orient=0.5226 want=0.5226 err=0.0000
+  25.244 Script @__melta-combined__/control.lua:82: [comb] t=445    swing orient=0.5226 want=0.5226 err=0.0000
+  25.247 Script @__melta-combined__/control.lua:82: [comb] t=446    swing orient=0.5226 want=0.5226 err=0.0000
+  25.250 Script @__melta-combined__/control.lua:82: [comb] t=447    swing orient=0.5226 want=0.5226 err=0.0000
+  25.253 Script @__melta-combined__/control.lua:82: [comb] t=448    swing orient=0.5226 want=0.5226 err=0.0000
+  25.257 Script @__melta-combined__/control.lua:82: [comb] t=449    swing orient=0.5226 want=0.5226 err=0.0000
+  25.260 Script @__melta-combined__/control.lua:82: [comb] t=450    swing orient=0.5226 want=0.5226 err=0.0000
+  25.264 Script @__melta-combined__/control.lua:82: [comb] t=451    swing orient=0.5226 want=0.5226 err=0.0000
+  25.267 Script @__melta-combined__/control.lua:82: [comb] t=452    swing orient=0.5226 want=0.5226 err=0.0000
+  25.270 Script @__melta-combined__/control.lua:82: [comb] t=453    swing orient=0.5226 want=0.5226 err=0.0000
+  25.273 Script @__melta-combined__/control.lua:82: [comb] t=454    swing orient=0.5226 want=0.5226 err=0.0000
+  25.276 Script @__melta-combined__/control.lua:82: [comb] t=455    swing orient=0.5226 want=0.5226 err=0.0000
+  25.279 Script @__melta-combined__/control.lua:82: [comb] t=456    swing orient=0.5226 want=0.5226 err=0.0000
+  25.283 Script @__melta-combined__/control.lua:82: [comb] t=457    swing orient=0.5226 want=0.5226 err=0.0000
+  25.286 Script @__melta-combined__/control.lua:82: [comb] t=458    swing orient=0.5226 want=0.5226 err=0.0000
+  25.290 Script @__melta-combined__/control.lua:82: [comb] t=459    swing orient=0.5226 want=0.5226 err=0.0000
+  25.293 Script @__melta-combined__/control.lua:82: [comb] t=460    swing orient=0.5226 want=0.5226 err=0.0000
+  25.393 Script @__melta-combined__/control.lua:82: [comb] t=490    crossing staged at 188,376
+  25.765 Script @__melta-combined__/control.lua:82: [comb] t=600    crossing DONE max aim deviation after catch-up = 0.0297 turns (10.71 deg)
+  25.765 Script @__melta-combined__/control.lua:82: [comb] t=600    objects total=188 melta=188
+  25.765 Script @__melta-combined__/control.lua:82: [comb] t=600    beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=322 drops=73 median_recent=56.00
+  25.765 Script @__melta-combined__/control.lua:82: [comb] t=600    beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=322 drops=73 median_recent=56.00
+  25.765 Script @__melta-combined__/control.lua:82: [comb] t=600    beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=322 drops=72 median_recent=56.00
+  25.766 Script @__melta-combined__/control.lua:82: [comb] t=600    beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=323 drops=71 median_recent=89.63
+  25.766 Script @__melta-combined__/control.lua:82: [comb] t=600    beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=324 drops=70 median_recent=89.63
+  25.766 Script @__melta-combined__/control.lua:82: [comb] t=600    beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=321 drops=74 median_recent=89.63
+  25.766 Script @__melta-combined__/control.lua:82: [comb] t=600    reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  25.766 Script @__melta-combined__/control.lua:82: [comb] t=600    reach normal_19      dist=19 status=1 target=- hits=false
+  25.766 Script @__melta-combined__/control.lua:82: [comb] t=600    reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  25.766 Script @__melta-combined__/control.lua:82: [comb] t=600    reach legendary_27   dist=27 status=1 target=- hits=false
+  27.972 Script @__melta-combined__/control.lua:82: [comb] t=1200   objects total=188 melta=188
+  27.973 Script @__melta-combined__/control.lua:82: [comb] t=1200   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=303 drops=148 median_recent=56.00
+  27.973 Script @__melta-combined__/control.lua:82: [comb] t=1200   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=303 drops=148 median_recent=56.00
+  27.973 Script @__melta-combined__/control.lua:82: [comb] t=1200   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=303 drops=147 median_recent=56.00
+  27.973 Script @__melta-combined__/control.lua:82: [comb] t=1200   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=303 drops=146 median_recent=89.63
+  27.973 Script @__melta-combined__/control.lua:82: [comb] t=1200   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=303 drops=145 median_recent=89.63
+  27.973 Script @__melta-combined__/control.lua:82: [comb] t=1200   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=303 drops=149 median_recent=89.63
+  27.973 Script @__melta-combined__/control.lua:82: [comb] t=1200   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  27.973 Script @__melta-combined__/control.lua:82: [comb] t=1200   reach normal_19      dist=19 status=1 target=- hits=false
+  27.973 Script @__melta-combined__/control.lua:82: [comb] t=1200   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  27.974 Script @__melta-combined__/control.lua:82: [comb] t=1200   reach legendary_27   dist=27 status=1 target=- hits=false
+  30.519 Script @__melta-combined__/control.lua:82: [comb] t=1800   objects total=188 melta=188
+  30.519 Script @__melta-combined__/control.lua:82: [comb] t=1800   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=297 drops=223 median_recent=56.00
+  30.519 Script @__melta-combined__/control.lua:82: [comb] t=1800   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=298 drops=223 median_recent=56.00
+  30.519 Script @__melta-combined__/control.lua:82: [comb] t=1800   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=297 drops=222 median_recent=56.00
+  30.520 Script @__melta-combined__/control.lua:82: [comb] t=1800   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=297 drops=221 median_recent=89.63
+  30.520 Script @__melta-combined__/control.lua:82: [comb] t=1800   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=298 drops=220 median_recent=89.63
+  30.520 Script @__melta-combined__/control.lua:82: [comb] t=1800   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=298 drops=224 median_recent=89.63
+  30.520 Script @__melta-combined__/control.lua:82: [comb] t=1800   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  30.520 Script @__melta-combined__/control.lua:82: [comb] t=1800   reach normal_19      dist=19 status=1 target=- hits=false
+  30.520 Script @__melta-combined__/control.lua:82: [comb] t=1800   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  30.520 Script @__melta-combined__/control.lua:82: [comb] t=1800   reach legendary_27   dist=27 status=1 target=- hits=false
+  33.294 Script @__melta-combined__/control.lua:82: [comb] t=2400   objects total=188 melta=188
+  33.295 Script @__melta-combined__/control.lua:82: [comb] t=2400   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=298 median_recent=56.00
+  33.295 Script @__melta-combined__/control.lua:82: [comb] t=2400   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=298 median_recent=56.00
+  33.295 Script @__melta-combined__/control.lua:82: [comb] t=2400   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=297 median_recent=56.00
+  33.295 Script @__melta-combined__/control.lua:82: [comb] t=2400   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=296 median_recent=89.63
+  33.295 Script @__melta-combined__/control.lua:82: [comb] t=2400   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=295 median_recent=89.63
+  33.295 Script @__melta-combined__/control.lua:82: [comb] t=2400   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=299 median_recent=89.63
+  33.295 Script @__melta-combined__/control.lua:82: [comb] t=2400   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  33.295 Script @__melta-combined__/control.lua:82: [comb] t=2400   reach normal_19      dist=19 status=1 target=- hits=false
+  33.295 Script @__melta-combined__/control.lua:82: [comb] t=2400   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  33.295 Script @__melta-combined__/control.lua:82: [comb] t=2400   reach legendary_27   dist=27 status=1 target=- hits=false
+  35.518 Script @__melta-combined__/control.lua:82: [comb] t=3000   objects total=188 melta=188
+  35.518 Script @__melta-combined__/control.lua:82: [comb] t=3000   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=373 median_recent=56.00
+  35.518 Script @__melta-combined__/control.lua:82: [comb] t=3000   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=373 median_recent=56.00
+  35.518 Script @__melta-combined__/control.lua:82: [comb] t=3000   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=372 median_recent=56.00
+  35.518 Script @__melta-combined__/control.lua:82: [comb] t=3000   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=371 median_recent=89.63
+  35.518 Script @__melta-combined__/control.lua:82: [comb] t=3000   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=370 median_recent=89.63
+  35.518 Script @__melta-combined__/control.lua:82: [comb] t=3000   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=374 median_recent=89.63
+  35.519 Script @__melta-combined__/control.lua:82: [comb] t=3000   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  35.519 Script @__melta-combined__/control.lua:82: [comb] t=3000   reach normal_19      dist=19 status=1 target=- hits=false
+  35.519 Script @__melta-combined__/control.lua:82: [comb] t=3000   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  35.519 Script @__melta-combined__/control.lua:82: [comb] t=3000   reach legendary_27   dist=27 status=1 target=- hits=false
+  37.728 Script @__melta-combined__/control.lua:82: [comb] t=3600   objects total=188 melta=188
+  37.728 Script @__melta-combined__/control.lua:82: [comb] t=3600   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  37.728 Script @__melta-combined__/control.lua:82: [comb] t=3600   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  37.728 Script @__melta-combined__/control.lua:82: [comb] t=3600   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  37.728 Script @__melta-combined__/control.lua:82: [comb] t=3600   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  37.728 Script @__melta-combined__/control.lua:82: [comb] t=3600   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  37.728 Script @__melta-combined__/control.lua:82: [comb] t=3600   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  37.728 Script @__melta-combined__/control.lua:82: [comb] t=3600   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  37.728 Script @__melta-combined__/control.lua:82: [comb] t=3600   reach normal_19      dist=19 status=1 target=- hits=false
+  37.728 Script @__melta-combined__/control.lua:82: [comb] t=3600   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  37.728 Script @__melta-combined__/control.lua:82: [comb] t=3600   reach legendary_27   dist=27 status=1 target=- hits=false
+  40.063 Script @__melta-combined__/control.lua:82: [comb] t=4200   objects total=188 melta=188
+  40.064 Script @__melta-combined__/control.lua:82: [comb] t=4200   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  40.064 Script @__melta-combined__/control.lua:82: [comb] t=4200   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  40.064 Script @__melta-combined__/control.lua:82: [comb] t=4200   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  40.064 Script @__melta-combined__/control.lua:82: [comb] t=4200   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  40.064 Script @__melta-combined__/control.lua:82: [comb] t=4200   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  40.064 Script @__melta-combined__/control.lua:82: [comb] t=4200   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  40.064 Script @__melta-combined__/control.lua:82: [comb] t=4200   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  40.064 Script @__melta-combined__/control.lua:82: [comb] t=4200   reach normal_19      dist=19 status=1 target=- hits=false
+  40.064 Script @__melta-combined__/control.lua:82: [comb] t=4200   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  40.064 Script @__melta-combined__/control.lua:82: [comb] t=4200   reach legendary_27   dist=27 status=1 target=- hits=false
+  40.247 Script @__melta-combined__/control.lua:82: [comb] t=4243   display rocks for the screenshots: 3 spawned
+  40.442 Script @__melta-combined__/control.lua:82: [comb] t=4288   display rocks for the screenshots: 0 spawned
+  40.651 Script @__melta-combined__/control.lua:82: [comb] t=4333   display rocks for the screenshots: 1 spawned
+  40.946 Script @__melta-combined__/control.lua:82: [comb] t=4400   profiler START (window 300 ticks)
+  42.270 Script @__melta-combined__/control.lua:629: ##### PROFILER ms/tick over 300 ticks: Duration: 4.412980ms
+  42.270 Script @__melta-combined__/control.lua:82: [comb] t=4700   profiler STOP
+  42.270 Script @__melta-combined__/control.lua:82: [comb] t=4700   objects total=194 melta=194
+  42.270 Script @__melta-combined__/control.lua:82: [comb] t=4700   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=268 drops=400 median_recent=56.00
+  42.270 Script @__melta-combined__/control.lua:82: [comb] t=4700   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=270 drops=400 median_recent=56.00
+  42.271 Script @__melta-combined__/control.lua:82: [comb] t=4700   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=270 drops=400 median_recent=56.00
+  42.271 Script @__melta-combined__/control.lua:82: [comb] t=4700   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=267 drops=400 median_recent=89.63
+  42.271 Script @__melta-combined__/control.lua:82: [comb] t=4700   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=268 drops=400 median_recent=89.63
+  42.271 Script @__melta-combined__/control.lua:82: [comb] t=4700   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=270 drops=400 median_recent=89.63
+  42.271 Script @__melta-combined__/control.lua:82: [comb] t=4700   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  42.271 Script @__melta-combined__/control.lua:82: [comb] t=4700   reach normal_19      dist=19 status=1 target=- hits=false
+  42.271 Script @__melta-combined__/control.lua:82: [comb] t=4700   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  42.271 Script @__melta-combined__/control.lua:82: [comb] t=4700   reach legendary_27   dist=27 status=1 target=- hits=false
+  42.666 Script @__melta-combined__/control.lua:82: [comb] t=4800   objects total=188 melta=188
+  42.667 Script @__melta-combined__/control.lua:82: [comb] t=4800   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  42.667 Script @__melta-combined__/control.lua:82: [comb] t=4800   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  42.667 Script @__melta-combined__/control.lua:82: [comb] t=4800   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  42.667 Script @__melta-combined__/control.lua:82: [comb] t=4800   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  42.667 Script @__melta-combined__/control.lua:82: [comb] t=4800   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  42.667 Script @__melta-combined__/control.lua:82: [comb] t=4800   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  42.667 Script @__melta-combined__/control.lua:82: [comb] t=4800   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  42.667 Script @__melta-combined__/control.lua:82: [comb] t=4800   reach normal_19      dist=19 status=1 target=- hits=false
+  42.667 Script @__melta-combined__/control.lua:82: [comb] t=4800   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  42.667 Script @__melta-combined__/control.lua:82: [comb] t=4800   reach legendary_27   dist=27 status=1 target=- hits=false
+  42.667 Script @__melta-combined__/control.lua:82: [comb] t=4800   KILL all six beam dummies (objects total=188 melta=188)
+  42.682 Script @__melta-combined__/control.lua:82: [comb] t=4803   objects after kill total=188 melta=188
+  42.717 Script @__melta-combined__/control.lua:82: [comb] t=4815   objects after kill total=86 melta=86
+  42.749 Script @__melta-combined__/control.lua:82: [comb] t=4830   objects after kill total=89 melta=89
+  42.884 Script @__melta-combined__/control.lua:82: [comb] t=4900   beam dummies respawned, objects total=77 melta=77
+  42.914 Script @__melta-combined__/control.lua:82: [comb] t=4914   beam 1 pulse #1 drop=17.63
+  42.930 Script @__melta-combined__/control.lua:82: [comb] t=4920   beam 2 pulse #1 drop=17.63
+  42.935 Script @__melta-combined__/control.lua:82: [comb] t=4922   beam 1 pulse #2 drop=19.88
+  42.947 Script @__melta-combined__/control.lua:82: [comb] t=4926   beam 3 pulse #1 drop=17.63
+  42.953 Script @__melta-combined__/control.lua:82: [comb] t=4928   beam 2 pulse #2 drop=19.88
+  42.961 Script @__melta-combined__/control.lua:82: [comb] t=4930   beam 1 pulse #3 drop=22.13
+  42.967 Script @__melta-combined__/control.lua:82: [comb] t=4932   beam 4 pulse #1 drop=28.25
+  42.971 Script @__melta-combined__/control.lua:82: [comb] t=4934   beam 3 pulse #2 drop=19.88
+  42.980 Script @__melta-combined__/control.lua:82: [comb] t=4936   beam 2 pulse #3 drop=22.13
+  42.986 Script @__melta-combined__/control.lua:82: [comb] t=4938   beam 1 pulse #4 drop=24.31
+  42.986 Script @__melta-combined__/control.lua:82: [comb] t=4938   beam 5 pulse #1 drop=28.25
+  42.994 Script @__melta-combined__/control.lua:82: [comb] t=4940   beam 4 pulse #2 drop=31.81
+  43.000 Script @__melta-combined__/control.lua:82: [comb] t=4942   beam 3 pulse #3 drop=22.13
+  43.008 Script @__melta-combined__/control.lua:82: [comb] t=4944   beam 2 pulse #4 drop=24.31
+  43.008 Script @__melta-combined__/control.lua:82: [comb] t=4944   beam 6 pulse #1 drop=28.25
+  43.016 Script @__melta-combined__/control.lua:82: [comb] t=4946   beam 1 pulse #5 drop=26.63
+  43.016 Script @__melta-combined__/control.lua:82: [comb] t=4946   beam 5 pulse #2 drop=31.81
+  43.022 Script @__melta-combined__/control.lua:82: [comb] t=4948   beam 4 pulse #3 drop=35.38
+  43.030 Script @__melta-combined__/control.lua:82: [comb] t=4950   beam 3 pulse #4 drop=24.31
+  43.039 Script @__melta-combined__/control.lua:82: [comb] t=4952   beam 2 pulse #5 drop=26.63
+  43.039 Script @__melta-combined__/control.lua:82: [comb] t=4952   beam 6 pulse #2 drop=31.81
+  43.047 Script @__melta-combined__/control.lua:82: [comb] t=4954   beam 1 pulse #6 drop=28.81
+  43.047 Script @__melta-combined__/control.lua:82: [comb] t=4954   beam 5 pulse #3 drop=35.38
+  43.054 Script @__melta-combined__/control.lua:82: [comb] t=4956   beam 4 pulse #4 drop=39.00
+  43.061 Script @__melta-combined__/control.lua:82: [comb] t=4958   beam 3 pulse #5 drop=26.63
+  43.070 Script @__melta-combined__/control.lua:82: [comb] t=4960   beam 2 pulse #6 drop=28.81
+  43.070 Script @__melta-combined__/control.lua:82: [comb] t=4960   beam 6 pulse #3 drop=35.38
+  43.079 Script @__melta-combined__/control.lua:82: [comb] t=4962   beam 1 pulse #7 drop=31.13
+  43.079 Script @__melta-combined__/control.lua:82: [comb] t=4962   beam 5 pulse #4 drop=39.00
+  43.086 Script @__melta-combined__/control.lua:82: [comb] t=4964   beam 4 pulse #5 drop=42.56
+  43.094 Script @__melta-combined__/control.lua:82: [comb] t=4966   beam 3 pulse #6 drop=28.81
+  43.102 Script @__melta-combined__/control.lua:82: [comb] t=4968   beam 2 pulse #7 drop=31.13
+  43.102 Script @__melta-combined__/control.lua:82: [comb] t=4968   beam 6 pulse #4 drop=39.00
+  43.110 Script @__melta-combined__/control.lua:82: [comb] t=4970   beam 1 pulse #8 drop=33.31
+  43.110 Script @__melta-combined__/control.lua:82: [comb] t=4970   beam 5 pulse #5 drop=42.56
+  43.117 Script @__melta-combined__/control.lua:82: [comb] t=4972   beam 4 pulse #6 drop=46.19
+  43.126 Script @__melta-combined__/control.lua:82: [comb] t=4974   beam 3 pulse #7 drop=31.13
+  43.138 Script @__melta-combined__/control.lua:82: [comb] t=4976   beam 2 pulse #8 drop=33.31
+  43.139 Script @__melta-combined__/control.lua:82: [comb] t=4976   beam 6 pulse #5 drop=42.56
+  43.152 Script @__melta-combined__/control.lua:82: [comb] t=4978   beam 1 pulse #9 drop=35.56
+  43.152 Script @__melta-combined__/control.lua:82: [comb] t=4978   beam 5 pulse #6 drop=46.19
+  43.160 Script @__melta-combined__/control.lua:82: [comb] t=4980   beam 4 pulse #7 drop=49.69
+  43.161 Script @__melta-combined__/control.lua:82: [comb] t=4980   objects total=194 melta=194
+  43.161 Script @__melta-combined__/control.lua:82: [comb] t=4980   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=284 drops=9 median_recent=26.63
+  43.161 Script @__melta-combined__/control.lua:82: [comb] t=4980   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=286 drops=8 median_recent=24.31
+  43.161 Script @__melta-combined__/control.lua:82: [comb] t=4980   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=287 drops=7 median_recent=24.31
+  43.161 Script @__melta-combined__/control.lua:82: [comb] t=4980   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=286 drops=7 median_recent=39.00
+  43.161 Script @__melta-combined__/control.lua:82: [comb] t=4980   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=288 drops=6 median_recent=35.38
+  43.161 Script @__melta-combined__/control.lua:82: [comb] t=4980   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=290 drops=5 median_recent=35.38
+  43.161 Script @__melta-combined__/control.lua:82: [comb] t=4980   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  43.161 Script @__melta-combined__/control.lua:82: [comb] t=4980   reach normal_19      dist=19 status=1 target=- hits=false
+  43.161 Script @__melta-combined__/control.lua:82: [comb] t=4980   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  43.161 Script @__melta-combined__/control.lua:82: [comb] t=4980   reach legendary_27   dist=27 status=1 target=- hits=false
+  43.162 Script @__melta-combined__/control.lua:82: [comb] t=4980   COMBINED PROBE DONE objects total=194 melta=194
+  43.169 Script @__melta-combined__/control.lua:82: [comb] t=4982   beam 3 pulse #8 drop=33.31
+  43.177 Script @__melta-combined__/control.lua:82: [comb] t=4984   beam 2 pulse #9 drop=35.56
+  43.177 Script @__melta-combined__/control.lua:82: [comb] t=4984   beam 6 pulse #6 drop=46.19
+  43.184 Script @__melta-combined__/control.lua:82: [comb] t=4986   beam 1 pulse #10 drop=37.81
+  43.184 Script @__melta-combined__/control.lua:82: [comb] t=4986   beam 5 pulse #7 drop=49.69
+  43.190 Script @__melta-combined__/control.lua:82: [comb] t=4988   beam 4 pulse #8 drop=53.31
+  43.200 Script @__melta-combined__/control.lua:82: [comb] t=4990   beam 3 pulse #9 drop=35.56
+  43.207 Script @__melta-combined__/control.lua:82: [comb] t=4992   beam 2 pulse #10 drop=37.81
+  43.208 Script @__melta-combined__/control.lua:82: [comb] t=4992   beam 6 pulse #7 drop=49.69
+  43.215 Script @__melta-combined__/control.lua:82: [comb] t=4994   beam 1 pulse #11 drop=40.06
+  43.215 Script @__melta-combined__/control.lua:82: [comb] t=4994   beam 5 pulse #8 drop=53.31
+  43.221 Script @__melta-combined__/control.lua:82: [comb] t=4996   beam 4 pulse #9 drop=56.94
+  43.231 Script @__melta-combined__/control.lua:82: [comb] t=4998   beam 3 pulse #10 drop=37.81
+  43.237 Script @__melta-combined__/control.lua:82: [comb] t=5000   beam 2 pulse #11 drop=40.06
+  43.237 Script @__melta-combined__/control.lua:82: [comb] t=5000   beam 6 pulse #8 drop=53.31
+  43.237 Script @__melta-combined__/control.lua:82: [comb] t=5000   IDLE window: beam targets removed, objects total=188 melta=188
+  43.268 Script @__melta-combined__/control.lua:82: [comb] t=5010   profiler B START (idle window, 300 ticks)
+  43.870 Script @__melta-combined__/control.lua:678: ##### PROFILER B idle ms/tick over 300 ticks: Duration: 2.005349ms
+  43.870 Script @__melta-combined__/control.lua:82: [comb] t=5310   profiler B STOP
+  43.870 Script @__melta-combined__/control.lua:82: [comb] t=5310   objects total=77 melta=77
+  43.870 Script @__melta-combined__/control.lua:82: [comb] t=5310   beam 1 fuel=light-oil  status=1 target=- fluid=347 drops=11 median_recent=28.81
+  43.870 Script @__melta-combined__/control.lua:82: [comb] t=5310   beam 2 fuel=light-oil  status=1 target=- fluid=347 drops=11 median_recent=28.81
+  43.870 Script @__melta-combined__/control.lua:82: [comb] t=5310   beam 3 fuel=light-oil  status=1 target=- fluid=348 drops=10 median_recent=26.63
+  43.870 Script @__melta-combined__/control.lua:82: [comb] t=5310   beam 4 fuel=melta-fuel status=1 target=- fluid=348 drops=9 median_recent=42.56
+  43.870 Script @__melta-combined__/control.lua:82: [comb] t=5310   beam 5 fuel=melta-fuel status=1 target=- fluid=349 drops=8 median_recent=39.00
+  43.870 Script @__melta-combined__/control.lua:82: [comb] t=5310   beam 6 fuel=melta-fuel status=1 target=- fluid=350 drops=8 median_recent=39.00
+  43.871 Script @__melta-combined__/control.lua:82: [comb] t=5310   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  43.871 Script @__melta-combined__/control.lua:82: [comb] t=5310   reach normal_19      dist=19 status=1 target=- hits=false
+  43.871 Script @__melta-combined__/control.lua:82: [comb] t=5310   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  43.871 Script @__melta-combined__/control.lua:82: [comb] t=5310   reach legendary_27   dist=27 status=1 target=- hits=false
+  43.910 Script @__melta-combined__/control.lua:82: [comb] t=5330   beam dummies back, firing resumes, objects total=80 melta=80
+  43.950 Script @__melta-combined__/control.lua:82: [comb] t=5348   beam 4 pulse #1 drop=28.25
+  43.965 Script @__melta-combined__/control.lua:82: [comb] t=5354   beam 5 pulse #1 drop=28.25
+  43.970 Script @__melta-combined__/control.lua:82: [comb] t=5356   beam 4 pulse #2 drop=31.81
+  43.983 Script @__melta-combined__/control.lua:82: [comb] t=5360   beam 6 pulse #1 drop=28.25
+  43.989 Script @__melta-combined__/control.lua:82: [comb] t=5362   beam 1 pulse #1 drop=17.63
+  43.989 Script @__melta-combined__/control.lua:82: [comb] t=5362   beam 5 pulse #2 drop=31.81
+  43.998 Script @__melta-combined__/control.lua:82: [comb] t=5364   beam 4 pulse #3 drop=35.38
+  44.011 Script @__melta-combined__/control.lua:82: [comb] t=5368   beam 2 pulse #1 drop=17.63
+  44.011 Script @__melta-combined__/control.lua:82: [comb] t=5368   beam 6 pulse #2 drop=31.81
+  44.019 Script @__melta-combined__/control.lua:82: [comb] t=5370   beam 1 pulse #2 drop=19.88
+  44.019 Script @__melta-combined__/control.lua:82: [comb] t=5370   beam 5 pulse #3 drop=35.38
+  44.025 Script @__melta-combined__/control.lua:82: [comb] t=5372   beam 4 pulse #4 drop=39.00
+  44.033 Script @__melta-combined__/control.lua:82: [comb] t=5374   beam 3 pulse #1 drop=17.63
+  44.039 Script @__melta-combined__/control.lua:82: [comb] t=5376   beam 2 pulse #2 drop=19.88
+  44.040 Script @__melta-combined__/control.lua:82: [comb] t=5376   beam 6 pulse #3 drop=35.38
+  44.051 Script @__melta-combined__/control.lua:82: [comb] t=5378   beam 1 pulse #3 drop=22.13
+  44.052 Script @__melta-combined__/control.lua:82: [comb] t=5378   beam 5 pulse #4 drop=39.00
+  44.062 Script @__melta-combined__/control.lua:82: [comb] t=5380   beam 4 pulse #5 drop=42.56
+  44.069 Script @__melta-combined__/control.lua:82: [comb] t=5382   beam 3 pulse #2 drop=19.88
+  44.076 Script @__melta-combined__/control.lua:82: [comb] t=5384   beam 2 pulse #3 drop=22.13
+  44.077 Script @__melta-combined__/control.lua:82: [comb] t=5384   beam 6 pulse #4 drop=39.00
+  44.085 Script @__melta-combined__/control.lua:82: [comb] t=5386   beam 1 pulse #4 drop=24.31
+  44.085 Script @__melta-combined__/control.lua:82: [comb] t=5386   beam 5 pulse #5 drop=42.56
+  44.090 Script @__melta-combined__/control.lua:82: [comb] t=5388   beam 4 pulse #6 drop=46.19
+  44.099 Script @__melta-combined__/control.lua:82: [comb] t=5390   beam 3 pulse #3 drop=22.13
+  44.105 Script @__melta-combined__/control.lua:82: [comb] t=5392   beam 2 pulse #4 drop=24.31
+  44.105 Script @__melta-combined__/control.lua:82: [comb] t=5392   beam 6 pulse #5 drop=42.56
+  44.116 Script @__melta-combined__/control.lua:82: [comb] t=5394   beam 1 pulse #5 drop=26.63
+  44.116 Script @__melta-combined__/control.lua:82: [comb] t=5394   beam 5 pulse #6 drop=46.19
+  44.122 Script @__melta-combined__/control.lua:82: [comb] t=5396   beam 4 pulse #7 drop=49.69
+  44.135 Script @__melta-combined__/control.lua:82: [comb] t=5398   beam 3 pulse #4 drop=24.31
+  44.152 Script @__melta-combined__/control.lua:82: [comb] t=5400   beam 2 pulse #5 drop=26.63
+  44.152 Script @__melta-combined__/control.lua:82: [comb] t=5400   beam 6 pulse #6 drop=46.19
+  44.153 Script @__melta-combined__/control.lua:82: [comb] t=5400   objects total=188 melta=188
+  44.153 Script @__melta-combined__/control.lua:82: [comb] t=5400   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=361 drops=5 median_recent=22.13
+  44.153 Script @__melta-combined__/control.lua:82: [comb] t=5400   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=362 drops=5 median_recent=22.13
+  44.153 Script @__melta-combined__/control.lua:82: [comb] t=5400   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=363 drops=4 median_recent=19.88
+  44.153 Script @__melta-combined__/control.lua:82: [comb] t=5400   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=360 drops=7 median_recent=39.00
+  44.153 Script @__melta-combined__/control.lua:82: [comb] t=5400   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=362 drops=6 median_recent=35.38
+  44.153 Script @__melta-combined__/control.lua:82: [comb] t=5400   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=362 drops=6 median_recent=35.38
+  44.153 Script @__melta-combined__/control.lua:82: [comb] t=5400   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  44.153 Script @__melta-combined__/control.lua:82: [comb] t=5400   reach normal_19      dist=19 status=1 target=- hits=false
+  44.153 Script @__melta-combined__/control.lua:82: [comb] t=5400   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  44.153 Script @__melta-combined__/control.lua:82: [comb] t=5400   reach legendary_27   dist=27 status=1 target=- hits=false
+  44.167 Script @__melta-combined__/control.lua:82: [comb] t=5402   beam 1 pulse #6 drop=28.81
+  44.167 Script @__melta-combined__/control.lua:82: [comb] t=5402   beam 5 pulse #7 drop=49.69
+  44.178 Script @__melta-combined__/control.lua:82: [comb] t=5404   beam 4 pulse #8 drop=53.31
+  44.185 Script @__melta-combined__/control.lua:82: [comb] t=5406   beam 3 pulse #5 drop=26.63
+  44.195 Script @__melta-combined__/control.lua:82: [comb] t=5408   beam 2 pulse #6 drop=28.81
+  44.196 Script @__melta-combined__/control.lua:82: [comb] t=5408   beam 6 pulse #7 drop=49.69
+  44.203 Script @__melta-combined__/control.lua:82: [comb] t=5410   beam 1 pulse #7 drop=31.13
+  44.203 Script @__melta-combined__/control.lua:82: [comb] t=5410   beam 5 pulse #8 drop=53.31
+  44.211 Script @__melta-combined__/control.lua:82: [comb] t=5412   beam 4 pulse #9 drop=56.94
+  44.217 Script @__melta-combined__/control.lua:82: [comb] t=5414   beam 3 pulse #6 drop=28.81
+  44.224 Script @__melta-combined__/control.lua:82: [comb] t=5416   beam 2 pulse #7 drop=31.13
+  44.225 Script @__melta-combined__/control.lua:82: [comb] t=5416   beam 6 pulse #8 drop=53.31
+  44.233 Script @__melta-combined__/control.lua:82: [comb] t=5418   beam 1 pulse #8 drop=33.31
+  44.233 Script @__melta-combined__/control.lua:82: [comb] t=5418   beam 5 pulse #9 drop=56.94
+  44.239 Script @__melta-combined__/control.lua:82: [comb] t=5420   beam 4 pulse #10 drop=60.50
+  44.248 Script @__melta-combined__/control.lua:82: [comb] t=5422   beam 3 pulse #7 drop=31.13
+  44.255 Script @__melta-combined__/control.lua:82: [comb] t=5424   beam 2 pulse #8 drop=33.31
+  44.256 Script @__melta-combined__/control.lua:82: [comb] t=5424   beam 6 pulse #9 drop=56.94
+  44.267 Script @__melta-combined__/control.lua:82: [comb] t=5426   beam 1 pulse #9 drop=35.56
+  44.268 Script @__melta-combined__/control.lua:82: [comb] t=5426   beam 5 pulse #10 drop=60.50
+  44.274 Script @__melta-combined__/control.lua:82: [comb] t=5428   beam 4 pulse #11 drop=64.06
+  44.283 Script @__melta-combined__/control.lua:82: [comb] t=5430   beam 3 pulse #8 drop=33.31
+  44.289 Script @__melta-combined__/control.lua:82: [comb] t=5432   beam 2 pulse #9 drop=35.56
+  44.289 Script @__melta-combined__/control.lua:82: [comb] t=5432   beam 6 pulse #10 drop=60.50
+  44.298 Script @__melta-combined__/control.lua:82: [comb] t=5434   beam 1 pulse #10 drop=37.81
+  44.298 Script @__melta-combined__/control.lua:82: [comb] t=5434   beam 5 pulse #11 drop=64.06
+  44.304 Script @__melta-combined__/control.lua:82: [comb] t=5436   beam 4 pulse #12 drop=67.63
+  44.315 Script @__melta-combined__/control.lua:82: [comb] t=5438   beam 3 pulse #9 drop=35.56
+  44.320 Script @__melta-combined__/control.lua:82: [comb] t=5440   beam 2 pulse #10 drop=37.81
+  44.321 Script @__melta-combined__/control.lua:82: [comb] t=5440   beam 6 pulse #11 drop=64.06
+  44.329 Script @__melta-combined__/control.lua:82: [comb] t=5442   beam 1 pulse #11 drop=40.06
+  44.329 Script @__melta-combined__/control.lua:82: [comb] t=5442   beam 5 pulse #12 drop=67.63
+  44.346 Script @__melta-combined__/control.lua:82: [comb] t=5446   beam 3 pulse #10 drop=37.81
+  44.352 Script @__melta-combined__/control.lua:82: [comb] t=5448   beam 2 pulse #11 drop=40.06
+  44.352 Script @__melta-combined__/control.lua:82: [comb] t=5448   beam 6 pulse #12 drop=67.63
+  44.359 Script @__melta-combined__/control.lua:82: [comb] t=5450   beam 1 pulse #12 drop=42.25
+  44.376 Script @__melta-combined__/control.lua:82: [comb] t=5454   beam 3 pulse #11 drop=40.06
+  44.384 Script @__melta-combined__/control.lua:82: [comb] t=5456   beam 2 pulse #12 drop=42.25
+  44.407 Script @__melta-combined__/control.lua:82: [comb] t=5462   beam 3 pulse #12 drop=42.25
+  46.702 Script @__melta-combined__/control.lua:82: [comb] t=6000   objects total=188 melta=188
+  46.702 Script @__melta-combined__/control.lua:82: [comb] t=6000   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=316 drops=80 median_recent=56.00
+  46.702 Script @__melta-combined__/control.lua:82: [comb] t=6000   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=317 drops=80 median_recent=56.00
+  46.702 Script @__melta-combined__/control.lua:82: [comb] t=6000   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=317 drops=79 median_recent=56.00
+  46.702 Script @__melta-combined__/control.lua:82: [comb] t=6000   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=315 drops=82 median_recent=89.63
+  46.702 Script @__melta-combined__/control.lua:82: [comb] t=6000   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=316 drops=81 median_recent=89.63
+  46.703 Script @__melta-combined__/control.lua:82: [comb] t=6000   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=317 drops=81 median_recent=89.63
+  46.703 Script @__melta-combined__/control.lua:82: [comb] t=6000   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  46.703 Script @__melta-combined__/control.lua:82: [comb] t=6000   reach normal_19      dist=19 status=1 target=- hits=false
+  46.703 Script @__melta-combined__/control.lua:82: [comb] t=6000   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  46.703 Script @__melta-combined__/control.lua:82: [comb] t=6000   reach legendary_27   dist=27 status=1 target=- hits=false
+  49.201 Script @__melta-combined__/control.lua:82: [comb] t=6600   objects total=188 melta=188
+  49.201 Script @__melta-combined__/control.lua:82: [comb] t=6600   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=301 drops=155 median_recent=56.00
+  49.201 Script @__melta-combined__/control.lua:82: [comb] t=6600   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=302 drops=155 median_recent=56.00
+  49.201 Script @__melta-combined__/control.lua:82: [comb] t=6600   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=301 drops=154 median_recent=56.00
+  49.202 Script @__melta-combined__/control.lua:82: [comb] t=6600   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=301 drops=157 median_recent=89.63
+  49.202 Script @__melta-combined__/control.lua:82: [comb] t=6600   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=301 drops=156 median_recent=89.63
+  49.202 Script @__melta-combined__/control.lua:82: [comb] t=6600   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=302 drops=156 median_recent=89.63
+  49.202 Script @__melta-combined__/control.lua:82: [comb] t=6600   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  49.202 Script @__melta-combined__/control.lua:82: [comb] t=6600   reach normal_19      dist=19 status=1 target=- hits=false
+  49.202 Script @__melta-combined__/control.lua:82: [comb] t=6600   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  49.202 Script @__melta-combined__/control.lua:82: [comb] t=6600   reach legendary_27   dist=27 status=1 target=- hits=false
+  51.469 Script @__melta-combined__/control.lua:82: [comb] t=7200   objects total=188 melta=188
+  51.470 Script @__melta-combined__/control.lua:82: [comb] t=7200   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=297 drops=230 median_recent=56.00
+  51.470 Script @__melta-combined__/control.lua:82: [comb] t=7200   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=297 drops=230 median_recent=56.00
+  51.470 Script @__melta-combined__/control.lua:82: [comb] t=7200   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=297 drops=229 median_recent=56.00
+  51.470 Script @__melta-combined__/control.lua:82: [comb] t=7200   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=297 drops=232 median_recent=89.63
+  51.470 Script @__melta-combined__/control.lua:82: [comb] t=7200   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=297 drops=231 median_recent=89.63
+  51.470 Script @__melta-combined__/control.lua:82: [comb] t=7200   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=297 drops=231 median_recent=89.63
+  51.470 Script @__melta-combined__/control.lua:82: [comb] t=7200   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  51.470 Script @__melta-combined__/control.lua:82: [comb] t=7200   reach normal_19      dist=19 status=1 target=- hits=false
+  51.470 Script @__melta-combined__/control.lua:82: [comb] t=7200   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  51.470 Script @__melta-combined__/control.lua:82: [comb] t=7200   reach legendary_27   dist=27 status=1 target=- hits=false
+  53.788 Script @__melta-combined__/control.lua:82: [comb] t=7800   objects total=188 melta=188
+  53.788 Script @__melta-combined__/control.lua:82: [comb] t=7800   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=305 median_recent=56.00
+  53.788 Script @__melta-combined__/control.lua:82: [comb] t=7800   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=305 median_recent=56.00
+  53.788 Script @__melta-combined__/control.lua:82: [comb] t=7800   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=304 median_recent=56.00
+  53.788 Script @__melta-combined__/control.lua:82: [comb] t=7800   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=307 median_recent=89.63
+  53.788 Script @__melta-combined__/control.lua:82: [comb] t=7800   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=306 median_recent=89.63
+  53.788 Script @__melta-combined__/control.lua:82: [comb] t=7800   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=306 median_recent=89.63
+  53.788 Script @__melta-combined__/control.lua:82: [comb] t=7800   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  53.788 Script @__melta-combined__/control.lua:82: [comb] t=7800   reach normal_19      dist=19 status=1 target=- hits=false
+  53.788 Script @__melta-combined__/control.lua:82: [comb] t=7800   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  53.788 Script @__melta-combined__/control.lua:82: [comb] t=7800   reach legendary_27   dist=27 status=1 target=- hits=false
+  56.334 Script @__melta-combined__/control.lua:82: [comb] t=8400   objects total=188 melta=188
+  56.334 Script @__melta-combined__/control.lua:82: [comb] t=8400   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=380 median_recent=56.00
+  56.334 Script @__melta-combined__/control.lua:82: [comb] t=8400   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=380 median_recent=56.00
+  56.334 Script @__melta-combined__/control.lua:82: [comb] t=8400   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=379 median_recent=56.00
+  56.334 Script @__melta-combined__/control.lua:82: [comb] t=8400   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=382 median_recent=89.63
+  56.334 Script @__melta-combined__/control.lua:82: [comb] t=8400   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=381 median_recent=89.63
+  56.334 Script @__melta-combined__/control.lua:82: [comb] t=8400   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=381 median_recent=89.63
+  56.334 Script @__melta-combined__/control.lua:82: [comb] t=8400   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  56.334 Script @__melta-combined__/control.lua:82: [comb] t=8400   reach normal_19      dist=19 status=1 target=- hits=false
+  56.334 Script @__melta-combined__/control.lua:82: [comb] t=8400   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  56.334 Script @__melta-combined__/control.lua:82: [comb] t=8400   reach legendary_27   dist=27 status=1 target=- hits=false
+  58.659 Script @__melta-combined__/control.lua:82: [comb] t=9000   objects total=188 melta=188
+  58.659 Script @__melta-combined__/control.lua:82: [comb] t=9000   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  58.659 Script @__melta-combined__/control.lua:82: [comb] t=9000   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  58.659 Script @__melta-combined__/control.lua:82: [comb] t=9000   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  58.660 Script @__melta-combined__/control.lua:82: [comb] t=9000   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  58.660 Script @__melta-combined__/control.lua:82: [comb] t=9000   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  58.660 Script @__melta-combined__/control.lua:82: [comb] t=9000   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  58.660 Script @__melta-combined__/control.lua:82: [comb] t=9000   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  58.660 Script @__melta-combined__/control.lua:82: [comb] t=9000   reach normal_19      dist=19 status=1 target=- hits=false
+  58.660 Script @__melta-combined__/control.lua:82: [comb] t=9000   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  58.660 Script @__melta-combined__/control.lua:82: [comb] t=9000   reach legendary_27   dist=27 status=1 target=- hits=false
+  60.953 Script @__melta-combined__/control.lua:82: [comb] t=9600   objects total=188 melta=188
+  60.953 Script @__melta-combined__/control.lua:82: [comb] t=9600   beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  60.953 Script @__melta-combined__/control.lua:82: [comb] t=9600   beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  60.953 Script @__melta-combined__/control.lua:82: [comb] t=9600   beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  60.953 Script @__melta-combined__/control.lua:82: [comb] t=9600   beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  60.953 Script @__melta-combined__/control.lua:82: [comb] t=9600   beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  60.953 Script @__melta-combined__/control.lua:82: [comb] t=9600   beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  60.953 Script @__melta-combined__/control.lua:82: [comb] t=9600   reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  60.954 Script @__melta-combined__/control.lua:82: [comb] t=9600   reach normal_19      dist=19 status=1 target=- hits=false
+  60.954 Script @__melta-combined__/control.lua:82: [comb] t=9600   reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  60.954 Script @__melta-combined__/control.lua:82: [comb] t=9600   reach legendary_27   dist=27 status=1 target=- hits=false
+  63.293 Script @__melta-combined__/control.lua:82: [comb] t=10200  objects total=188 melta=188
+  63.293 Script @__melta-combined__/control.lua:82: [comb] t=10200  beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  63.294 Script @__melta-combined__/control.lua:82: [comb] t=10200  beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  63.294 Script @__melta-combined__/control.lua:82: [comb] t=10200  beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  63.294 Script @__melta-combined__/control.lua:82: [comb] t=10200  beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  63.294 Script @__melta-combined__/control.lua:82: [comb] t=10200  beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  63.294 Script @__melta-combined__/control.lua:82: [comb] t=10200  beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  63.294 Script @__melta-combined__/control.lua:82: [comb] t=10200  reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  63.295 Script @__melta-combined__/control.lua:82: [comb] t=10200  reach normal_19      dist=19 status=1 target=- hits=false
+  63.295 Script @__melta-combined__/control.lua:82: [comb] t=10200  reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  63.295 Script @__melta-combined__/control.lua:82: [comb] t=10200  reach legendary_27   dist=27 status=1 target=- hits=false
+  65.530 Script @__melta-combined__/control.lua:82: [comb] t=10800  objects total=188 melta=188
+  65.530 Script @__melta-combined__/control.lua:82: [comb] t=10800  beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  65.530 Script @__melta-combined__/control.lua:82: [comb] t=10800  beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  65.530 Script @__melta-combined__/control.lua:82: [comb] t=10800  beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  65.531 Script @__melta-combined__/control.lua:82: [comb] t=10800  beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  65.531 Script @__melta-combined__/control.lua:82: [comb] t=10800  beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  65.531 Script @__melta-combined__/control.lua:82: [comb] t=10800  beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  65.531 Script @__melta-combined__/control.lua:82: [comb] t=10800  reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  65.531 Script @__melta-combined__/control.lua:82: [comb] t=10800  reach normal_19      dist=19 status=1 target=- hits=false
+  65.531 Script @__melta-combined__/control.lua:82: [comb] t=10800  reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  65.531 Script @__melta-combined__/control.lua:82: [comb] t=10800  reach legendary_27   dist=27 status=1 target=- hits=false
+  67.997 Script @__melta-combined__/control.lua:82: [comb] t=11400  objects total=188 melta=188
+  67.998 Script @__melta-combined__/control.lua:82: [comb] t=11400  beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  67.998 Script @__melta-combined__/control.lua:82: [comb] t=11400  beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  67.998 Script @__melta-combined__/control.lua:82: [comb] t=11400  beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  67.998 Script @__melta-combined__/control.lua:82: [comb] t=11400  beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  67.998 Script @__melta-combined__/control.lua:82: [comb] t=11400  beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  67.998 Script @__melta-combined__/control.lua:82: [comb] t=11400  beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  67.998 Script @__melta-combined__/control.lua:82: [comb] t=11400  reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  67.998 Script @__melta-combined__/control.lua:82: [comb] t=11400  reach normal_19      dist=19 status=1 target=- hits=false
+  67.998 Script @__melta-combined__/control.lua:82: [comb] t=11400  reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  67.998 Script @__melta-combined__/control.lua:82: [comb] t=11400  reach legendary_27   dist=27 status=1 target=- hits=false
+  70.626 Script @__melta-combined__/control.lua:82: [comb] t=12000  objects total=188 melta=188
+  70.626 Script @__melta-combined__/control.lua:82: [comb] t=12000  beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  70.626 Script @__melta-combined__/control.lua:82: [comb] t=12000  beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  70.627 Script @__melta-combined__/control.lua:82: [comb] t=12000  beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  70.627 Script @__melta-combined__/control.lua:82: [comb] t=12000  beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  70.627 Script @__melta-combined__/control.lua:82: [comb] t=12000  beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  70.627 Script @__melta-combined__/control.lua:82: [comb] t=12000  beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  70.627 Script @__melta-combined__/control.lua:82: [comb] t=12000  reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  70.627 Script @__melta-combined__/control.lua:82: [comb] t=12000  reach normal_19      dist=19 status=1 target=- hits=false
+  70.627 Script @__melta-combined__/control.lua:82: [comb] t=12000  reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  70.627 Script @__melta-combined__/control.lua:82: [comb] t=12000  reach legendary_27   dist=27 status=1 target=- hits=false
+  73.325 Script @__melta-combined__/control.lua:82: [comb] t=12600  objects total=188 melta=188
+  73.325 Script @__melta-combined__/control.lua:82: [comb] t=12600  beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  73.326 Script @__melta-combined__/control.lua:82: [comb] t=12600  beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  73.326 Script @__melta-combined__/control.lua:82: [comb] t=12600  beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  73.326 Script @__melta-combined__/control.lua:82: [comb] t=12600  beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  73.326 Script @__melta-combined__/control.lua:82: [comb] t=12600  beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  73.326 Script @__melta-combined__/control.lua:82: [comb] t=12600  beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  73.326 Script @__melta-combined__/control.lua:82: [comb] t=12600  reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  73.326 Script @__melta-combined__/control.lua:82: [comb] t=12600  reach normal_19      dist=19 status=1 target=- hits=false
+  73.326 Script @__melta-combined__/control.lua:82: [comb] t=12600  reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  73.326 Script @__melta-combined__/control.lua:82: [comb] t=12600  reach legendary_27   dist=27 status=1 target=- hits=false
+  75.993 Script @__melta-combined__/control.lua:82: [comb] t=13200  objects total=188 melta=188
+  75.993 Script @__melta-combined__/control.lua:82: [comb] t=13200  beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  75.993 Script @__melta-combined__/control.lua:82: [comb] t=13200  beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  75.993 Script @__melta-combined__/control.lua:82: [comb] t=13200  beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  75.993 Script @__melta-combined__/control.lua:82: [comb] t=13200  beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  75.993 Script @__melta-combined__/control.lua:82: [comb] t=13200  beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  75.993 Script @__melta-combined__/control.lua:82: [comb] t=13200  beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  75.993 Script @__melta-combined__/control.lua:82: [comb] t=13200  reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  75.993 Script @__melta-combined__/control.lua:82: [comb] t=13200  reach normal_19      dist=19 status=1 target=- hits=false
+  75.993 Script @__melta-combined__/control.lua:82: [comb] t=13200  reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  75.993 Script @__melta-combined__/control.lua:82: [comb] t=13200  reach legendary_27   dist=27 status=1 target=- hits=false
+  78.737 Script @__melta-combined__/control.lua:82: [comb] t=13800  objects total=188 melta=188
+  78.738 Script @__melta-combined__/control.lua:82: [comb] t=13800  beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  78.738 Script @__melta-combined__/control.lua:82: [comb] t=13800  beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  78.738 Script @__melta-combined__/control.lua:82: [comb] t=13800  beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  78.738 Script @__melta-combined__/control.lua:82: [comb] t=13800  beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  78.738 Script @__melta-combined__/control.lua:82: [comb] t=13800  beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  78.738 Script @__melta-combined__/control.lua:82: [comb] t=13800  beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  78.738 Script @__melta-combined__/control.lua:82: [comb] t=13800  reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  78.738 Script @__melta-combined__/control.lua:82: [comb] t=13800  reach normal_19      dist=19 status=1 target=- hits=false
+  78.738 Script @__melta-combined__/control.lua:82: [comb] t=13800  reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  78.738 Script @__melta-combined__/control.lua:82: [comb] t=13800  reach legendary_27   dist=27 status=1 target=- hits=false
+  81.666 Script @__melta-combined__/control.lua:82: [comb] t=14400  objects total=188 melta=188
+  81.667 Script @__melta-combined__/control.lua:82: [comb] t=14400  beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  81.667 Script @__melta-combined__/control.lua:82: [comb] t=14400  beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  81.667 Script @__melta-combined__/control.lua:82: [comb] t=14400  beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  81.667 Script @__melta-combined__/control.lua:82: [comb] t=14400  beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  81.667 Script @__melta-combined__/control.lua:82: [comb] t=14400  beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  81.667 Script @__melta-combined__/control.lua:82: [comb] t=14400  beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  81.667 Script @__melta-combined__/control.lua:82: [comb] t=14400  reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  81.667 Script @__melta-combined__/control.lua:82: [comb] t=14400  reach normal_19      dist=19 status=1 target=- hits=false
+  81.668 Script @__melta-combined__/control.lua:82: [comb] t=14400  reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  81.668 Script @__melta-combined__/control.lua:82: [comb] t=14400  reach legendary_27   dist=27 status=1 target=- hits=false
+  85.504 Script @__melta-combined__/control.lua:82: [comb] t=15000  objects total=188 melta=188
+  85.504 Script @__melta-combined__/control.lua:82: [comb] t=15000  beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  85.504 Script @__melta-combined__/control.lua:82: [comb] t=15000  beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  85.504 Script @__melta-combined__/control.lua:82: [comb] t=15000  beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  85.504 Script @__melta-combined__/control.lua:82: [comb] t=15000  beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  85.504 Script @__melta-combined__/control.lua:82: [comb] t=15000  beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  85.504 Script @__melta-combined__/control.lua:82: [comb] t=15000  beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  85.504 Script @__melta-combined__/control.lua:82: [comb] t=15000  reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  85.504 Script @__melta-combined__/control.lua:82: [comb] t=15000  reach normal_19      dist=19 status=1 target=- hits=false
+  85.504 Script @__melta-combined__/control.lua:82: [comb] t=15000  reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  85.504 Script @__melta-combined__/control.lua:82: [comb] t=15000  reach legendary_27   dist=27 status=1 target=- hits=false
+  88.679 Script @__melta-combined__/control.lua:82: [comb] t=15600  objects total=188 melta=188
+  88.679 Script @__melta-combined__/control.lua:82: [comb] t=15600  beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  88.680 Script @__melta-combined__/control.lua:82: [comb] t=15600  beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  88.680 Script @__melta-combined__/control.lua:82: [comb] t=15600  beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  88.680 Script @__melta-combined__/control.lua:82: [comb] t=15600  beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  88.680 Script @__melta-combined__/control.lua:82: [comb] t=15600  beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  88.680 Script @__melta-combined__/control.lua:82: [comb] t=15600  beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  88.680 Script @__melta-combined__/control.lua:82: [comb] t=15600  reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  88.680 Script @__melta-combined__/control.lua:82: [comb] t=15600  reach normal_19      dist=19 status=1 target=- hits=false
+  88.680 Script @__melta-combined__/control.lua:82: [comb] t=15600  reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  88.680 Script @__melta-combined__/control.lua:82: [comb] t=15600  reach legendary_27   dist=27 status=1 target=- hits=false
+  91.528 Script @__melta-combined__/control.lua:82: [comb] t=16200  objects total=188 melta=188
+  91.528 Script @__melta-combined__/control.lua:82: [comb] t=16200  beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  91.528 Script @__melta-combined__/control.lua:82: [comb] t=16200  beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  91.528 Script @__melta-combined__/control.lua:82: [comb] t=16200  beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  91.528 Script @__melta-combined__/control.lua:82: [comb] t=16200  beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  91.528 Script @__melta-combined__/control.lua:82: [comb] t=16200  beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  91.528 Script @__melta-combined__/control.lua:82: [comb] t=16200  beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  91.529 Script @__melta-combined__/control.lua:82: [comb] t=16200  reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  91.529 Script @__melta-combined__/control.lua:82: [comb] t=16200  reach normal_19      dist=19 status=1 target=- hits=false
+  91.529 Script @__melta-combined__/control.lua:82: [comb] t=16200  reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  91.529 Script @__melta-combined__/control.lua:82: [comb] t=16200  reach legendary_27   dist=27 status=1 target=- hits=false
+  94.382 Script @__melta-combined__/control.lua:82: [comb] t=16800  objects total=188 melta=188
+  94.382 Script @__melta-combined__/control.lua:82: [comb] t=16800  beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  94.382 Script @__melta-combined__/control.lua:82: [comb] t=16800  beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  94.382 Script @__melta-combined__/control.lua:82: [comb] t=16800  beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  94.382 Script @__melta-combined__/control.lua:82: [comb] t=16800  beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  94.382 Script @__melta-combined__/control.lua:82: [comb] t=16800  beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  94.383 Script @__melta-combined__/control.lua:82: [comb] t=16800  beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  94.383 Script @__melta-combined__/control.lua:82: [comb] t=16800  reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  94.383 Script @__melta-combined__/control.lua:82: [comb] t=16800  reach normal_19      dist=19 status=1 target=- hits=false
+  94.383 Script @__melta-combined__/control.lua:82: [comb] t=16800  reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  94.383 Script @__melta-combined__/control.lua:82: [comb] t=16800  reach legendary_27   dist=27 status=1 target=- hits=false
+  97.327 Script @__melta-combined__/control.lua:82: [comb] t=17400  objects total=188 melta=188
+  97.327 Script @__melta-combined__/control.lua:82: [comb] t=17400  beam 1 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  97.327 Script @__melta-combined__/control.lua:82: [comb] t=17400  beam 2 fuel=light-oil  status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=56.00
+  97.327 Script @__melta-combined__/control.lua:82: [comb] t=17400  beam 3 fuel=light-oil  status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=56.00
+  97.327 Script @__melta-combined__/control.lua:82: [comb] t=17400  beam 4 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  97.327 Script @__melta-combined__/control.lua:82: [comb] t=17400  beam 5 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=295 drops=400 median_recent=89.63
+  97.328 Script @__melta-combined__/control.lua:82: [comb] t=17400  beam 6 fuel=melta-fuel status=1 target=comb-probe-dummy fluid=296 drops=400 median_recent=89.63
+  97.328 Script @__melta-combined__/control.lua:82: [comb] t=17400  reach normal_15      dist=15 status=1 target=comb-probe-dummy hits=true
+  97.328 Script @__melta-combined__/control.lua:82: [comb] t=17400  reach normal_19      dist=19 status=1 target=- hits=false
+  97.329 Script @__melta-combined__/control.lua:82: [comb] t=17400  reach legendary_23   dist=23 status=1 target=comb-probe-dummy hits=true
+  97.329 Script @__melta-combined__/control.lua:82: [comb] t=17400  reach legendary_27   dist=27 status=1 target=- hits=false
+ 101.030 Goodbye

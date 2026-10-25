@@ -1,0 +1,81 @@
+   0.004 2026-10-25 19:30:07; Factorio 2.1.23 (build 87750, win64, steam, space-age)
+   0.004 Operating system: Windows 10 (build 19045) 
+   0.005 Program arguments: "E:/SteamLibrary/steamapps/common/Factorio/bin/x64/Factorio.exe" "--config" "C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/config.ini" "--mod-directory" "C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/mods" "--create" "C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/write/scene.zip" 
+   0.005 Config path: C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/config.ini
+   0.005 Read data path: E:/SteamLibrary/steamapps/common/Factorio/data
+   0.005 Write data path: C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/write [31366/430791MB]
+   0.005 Binaries path: E:/SteamLibrary/steamapps/common/Factorio/bin
+   0.025 System info: [CPU: AMD FX(tm)-8350 Eight-Core Processor, 8 cores, RAM: 9266/16341 MB, page: 23224/44038 MB, virtual: 4275/134217727 MB, extended virtual: 0 MB]
+   0.071 Memory info:
+   0.071  [0]: Undefined          DGSB316GB1600 8192 MB 800 MHz  64|64
+   0.071  [1]: Undefined          DGSB316GB1600 8192 MB 800 MHz  64|64
+   0.101 Running in headless mode
+   0.101 Audio is disabled
+   0.105 Info ModManager.cpp:455: FeatureFlag: expansion, expansion-shaders, freezing, quality, rail-bridges, segmented-units, space-travel, spoiling
+   0.112 Loading mod core 0.0.0 (data.lua)
+   0.141 Loading mod base 2.1.23 (data.lua)
+   0.576 Loading mod elevated-rails 2.1.23 (data.lua)
+   0.624 Loading mod recycler 2.1.23 (data.lua)
+   0.647 Loading mod quality 2.1.23 (data.lua)
+   0.665 Loading mod space-age 2.1.23 (data.lua)
+   1.376 Loading mod lilys-melta 0.5.0 (data.lua)
+   1.418 Loading mod melta-combined 0.1.0 (data.lua)
+   1.446 Loading mod base 2.1.23 (data-updates.lua)
+   1.474 Loading mod recycler 2.1.23 (data-updates.lua)
+   1.517 Loading mod space-age 2.1.23 (data-updates.lua)
+   1.543 Loading mod lilys-melta 0.5.0 (data-updates.lua)
+   1.544 Script @__lilys-melta__/data-updates.lua:9: [lilys-melta] fuels accepted: light-oil, petroleum-gas, melta-fuel
+   1.747 Checksum for core: 3668028660
+   1.747 Checksum of base: 3864816957
+   1.747 Checksum of elevated-rails: 1429039930
+   1.747 Checksum of recycler: 3293728126
+   1.748 Checksum of quality: 3330349790
+   1.748 Checksum of space-age: 3787586506
+   1.748 Checksum of lilys-melta: 2227848678
+   1.748 Checksum of melta-combined: 1225596985
+   2.921 Prototype list checksum: 252881642
+   3.045 Info PlayerData.cpp:566: Cloud player-data.json unavailable
+   3.045 Info PlayerData.cpp:582: Local player-data.json unavailable
+   3.047 Info GlobalContext.cpp:1346: Resetting config.
+   3.048 Factorio initialised
+   3.049 Info Create.cpp:32: Creating new map C:/Users/Lily/AppData/Local/hermes/cache/scratch/ftest-combined/write/scene.zip
+   3.094 Blueprint storage "blueprint-storage-2.dat" was not found, trying to load previous version storage "blueprint-storage.dat"
+   5.687 Loading level.dat: 785941 bytes.
+   5.687 Info Scenario.cpp:152: Map version 2.1.23-2
+   5.719 Blueprint storage "blueprint-storage-2.dat" was not found, trying to load previous version storage "blueprint-storage.dat"
+   5.727 Checksum for script __level__/control.lua: 2385776952
+   5.732 Checksum for script __lilys-melta__/control.lua: 1658563399
+   5.737 Checksum for script __melta-combined__/control.lua: 2194887494
+   7.043 Script @__melta-combined__/control.lua:70: [comb] kill_all_units -> true
+   7.170 Script @__melta-combined__/control.lua:70: [comb] cleared q=17 p=44 b=9 a=24 r=114
+   7.171 Script @__melta-combined__/control.lua:70: [comb] quality row 1: requested=normal actual=normal range=16
+   7.171 Script @__melta-combined__/control.lua:70: [comb] quality row 2: requested=uncommon actual=uncommon range=16
+   7.171 Script @__melta-combined__/control.lua:70: [comb] quality row 3: requested=rare actual=rare range=16
+   7.172 Script @__melta-combined__/control.lua:70: [comb] quality row 4: requested=epic actual=epic range=16
+   7.172 Script @__melta-combined__/control.lua:70: [comb] quality row 5: requested=legendary actual=legendary range=16
+   7.173 Script @__melta-combined__/control.lua:70: [comb] pipes A: connections=4 fluid=205.70519560575
+   7.173 Script @__melta-combined__/control.lua:70: [comb] pipes B: connections=4 fluid=202.01574802399
+   7.173 Script @__melta-combined__/control.lua:70: [comb] beam 1: fuel=light-oil turret=true target=true hp=1000000.0
+   7.174 Script @__melta-combined__/control.lua:70: [comb] beam 2: fuel=light-oil turret=true target=true hp=1000000.0
+   7.174 Script @__melta-combined__/control.lua:70: [comb] beam 3: fuel=light-oil turret=true target=true hp=1000000.0
+   7.174 Script @__melta-combined__/control.lua:70: [comb] beam 4: fuel=melta-fuel turret=true target=true hp=1000000.0
+   7.174 Script @__melta-combined__/control.lua:70: [comb] beam 5: fuel=melta-fuel turret=true target=true hp=1000000.0
+   7.174 Script @__melta-combined__/control.lua:70: [comb] beam 6: fuel=melta-fuel turret=true target=true hp=1000000.0
+   7.175 Script @__melta-combined__/control.lua:70: [comb] rock 1: small-metallic-asteroid hp=100.0 turret=true
+   7.175 Script @__melta-combined__/control.lua:70: [comb] rock 2: medium-metallic-asteroid hp=400.0 turret=true
+   7.175 Script @__melta-combined__/control.lua:70: [comb] rock 3: big-metallic-asteroid hp=2000.0 turret=true
+   7.175 Script @__melta-combined__/control.lua:70: [comb] rock 4: huge-metallic-asteroid hp=5000.0 turret=true
+   7.175 Script @__melta-combined__/control.lua:70: [comb] reach normal_15: quality=normal dist=15 expect=true turret=true
+   7.176 Script @__melta-combined__/control.lua:70: [comb] reach normal_19: quality=normal dist=19 expect=false turret=true
+   7.176 Script @__melta-combined__/control.lua:70: [comb] reach legendary_23: quality=legendary dist=23 expect=true turret=true
+   7.176 Script @__melta-combined__/control.lua:70: [comb] reach legendary_27: quality=legendary dist=27 expect=false turret=true
+   7.176 Script @__melta-combined__/control.lua:70: [comb] rotation: turret=true dummy=true rotation_speed=nil
+   7.177 Script @__melta-combined__/control.lua:70: [comb] prototype: range=16 cooldown=8 rotation_speed=nil turn_range=1
+   7.177 Script @__melta-combined__/control.lua:70: [comb] quality normal: range_multiplier=1
+   7.177 Script @__melta-combined__/control.lua:70: [comb] quality uncommon: range_multiplier=1.1
+   7.177 Script @__melta-combined__/control.lua:70: [comb] quality rare: range_multiplier=1.2
+   7.177 Script @__melta-combined__/control.lua:70: [comb] quality epic: range_multiplier=1.3
+   7.177 Script @__melta-combined__/control.lua:70: [comb] quality legendary: range_multiplier=1.5
+   7.177 Script @__melta-combined__/control.lua:70: [comb] scene ready
+   7.177 Script @__melta-combined__/control.lua:70: [comb] build -> true
+   7.631 Goodbye

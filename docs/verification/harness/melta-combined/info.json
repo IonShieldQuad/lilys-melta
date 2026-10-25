@@ -1,0 +1,16 @@
+{
+  "name": "melta-combined",
+  "version": "0.1.0",
+  "title": "melta combined verification probe",
+  "author": "verification harness, never shipped",
+  "description": "One scene that exercises all five melta workstreams at once: pipe joints, quality row for the inspect panel, six firing meltas for beam/damage/perf, asteroids, and reach/rotation. Evidence tooling only.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.0",
+    "lilys-melta",
+    "? space-age",
+    "? quality",
+    "? recycler",
+    "? elevated-rails"
+  ]
+}

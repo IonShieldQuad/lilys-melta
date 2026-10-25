@@ -1,6 +1,13 @@
 # In-game verification of the 0.4.0 melta rework
 
-Everything in this folder was produced by one real Factorio launch plus three headless
+> **Later pass (0.5.0, tree `f5aa887`):** the five improvement cards were re-verified
+> together — pipes, range/quality/rotation, damage description, beam, asteroids — in one
+> scene with space-age and quality loaded at once. Report:
+> [`melta-improvements-verification.md`](melta-improvements-verification.md); evidence in
+> `in-game-combined/`, harness in `harness/melta-combined` + `harness/{setup_combined_run.sh,
+> run_combined.py,hover_combined.py}`.
+
+Everything below in this folder was produced by one real Factorio launch plus three headless
 runs on 2026-10-25 against the tree at `97a327b`. Nothing here is a mock-up: the
 screenshots are `game.take_screenshot` output from the running game, and the numbers in
 `melta-end-to-end-verification.md` are measured from those files or from the logs in
