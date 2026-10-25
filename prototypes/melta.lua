@@ -63,9 +63,14 @@ stream.particle_start_alpha = 0
 stream.particle_end_alpha = 0
 stream.particle_start_scale = 0.01
 stream.smoke_sources = nil
--- The engine's own contact hit is the same split the script applies, scaled down to
--- 1 damage: whichever path lands the hit, the damage type reads fire first and the
--- physical slice is still there (0.85 fire + 0.15 physical).
+-- The engine's own contact hit is deliberately EMPTY. It used to carry 1 damage
+-- (0.85 fire + 0.15 physical), which the inspect panel printed as "Damage: 0.09/s
+-- Fire" -- a number that has nothing to do with the beam, which is script damage.
+-- Measured on an unarmoured dummy before this change: a full-charge pulse took
+-- exactly 56.00 hp, i.e. the script's number and not a point more, so those effects
+-- never landed and only ever fed the panel a false readout. The delivery stays (a
+-- stream action needs one); the damage lives in control.lua and is described by
+-- prototypes/tooltip.lua.
 stream.action =
 {
   {
@@ -73,10 +78,14 @@ stream.action =
     action_delivery =
     {
       type = "instant",
+      -- A stream action rejects an empty target_effects list ("Key \"type\" not
+      -- found"), and the engine prints whatever damage is listed here in the
+      -- inspect panel's Damage line. Zero is the only honest number for effect
+      -- data that cannot land: the list has to exist, but the beam's damage is
+      -- script damage (control.lua) and is described by prototypes/tooltip.lua.
       target_effects =
       {
-        {type = "damage", damage = {amount = 1 * (1 - C.physical_share), type = C.damage_type}},
-        {type = "damage", damage = {amount = 1 * C.physical_share,       type = C.damage_type_hit}}
+        {type = "damage", damage = {amount = 0, type = C.damage_type}}
       }
     }
   }

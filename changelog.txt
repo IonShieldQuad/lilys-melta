@@ -32,6 +32,14 @@ Date: 2026-10-25
     - Beams no longer outlive their turret's death: mining or destroying a firing melta
       used to leave the render objects destroyed mid-fade, now the lance is retired and
       freed through a fenced path
+    - The inspect panel now prints the damage the turret actually deals. The beam is
+      script damage, not the engine's, so the panel had no damage line at all; the text
+      is generated from constants.lua (14 per pulse cold, 56 at full charge, 85 % fire +
+      15 % physical, 7.5 pulses/s, 82 % pierce falloff up to 12 bodies, every fuel
+      multiplier, the asteroid channel) and is translated in locale/en and locale/ru,
+      so the tooltip cannot drift from the numbers control.lua applies. Verified by
+      measuring a pulse against an unarmoured dummy: 56.00 hp at full charge on light
+      oil, and 89.63 = 56 x 1.60 on enriched melta fuel
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.0
 Date: 2026-10-25

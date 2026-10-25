@@ -1,4 +1,5 @@
 require("prototypes.beam")
 require("prototypes.melta")
 require("prototypes.entity")
+require("prototypes.tooltip")
 require("prototypes.technology")
