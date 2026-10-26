@@ -45,6 +45,7 @@ gun turret — and the turret only became worth its plumbing once white hot.
 | cold pulse damage | `constants.lua` `damage_cold` | 14 | **32** |
 | hot pulse damage | `constants.lua` `damage_hot` | 56 | 56 (unchanged: 420 dps = 1.75x cold) |
 | research scaling | `control.lua` research section, `data-updates.lua` | none — script damage was invisible to every technology | fire damage ladder (x^1.5) + turret firing speed |
+| researched pulse rate | `control.lua` pulse clock | interval rounded **up** to a whole tick, so up to 11 % of the firing-speed bonus was silently dropped | the fraction is carried forward; the average interval is exactly the researched one |
 | flat armour | `control.lua` `flat_armor()` | applied in full (a behemoth's 12 flat ate the whole cold pulse) | ignored; percentage resistance still applies |
 | tooltip | `prototypes/tooltip.lua`, `locale/*/locale.cfg` | cold/hot dps only | + two lines: flat armour, research |
 
@@ -103,9 +104,13 @@ at the end of the finite lines. 1.5 is the one number that keeps the cold barrel
 The second dip is the turret firing-speed line: `data-updates.lua` copies each
 `weapon-shooting-speed` level's bullet `gun-speed` modifier onto the melta's own ammo
 category (so it appears in the tech tooltip as melta firing speed), and `control.lua`
-divides the pulse interval by the same accumulated bonus. The pulse clock is scripted,
-so the script has to read it; the data stage reports `melta firing speed: 6 gun-speed
-effects copied from 6 technologies` at load.
+divides the pulse interval by the same accumulated bonus. The pulse clock is scripted, so
+the script has to read it — and it has to **deliver** it: a clock that adds the interval to
+the current tick rounds every interval up to a whole tick (4.44 → 5 ticks at +80 % rate,
+i.e. 12 pulses/s instead of 13.5). The clock now carries the fraction forward, so the
+average interval is the researched one while every pulse still lands on a whole tick.
+The data stage reports `melta firing speed: 6 gun-speed effects copied from 6 technologies`
+at load.
 
 ### 2b. Flat armour — ignoring the subtraction, keeping the percentage
 
@@ -141,29 +146,43 @@ the spin-up, so it is a little above the 32/56 statline; both columns ramp the s
 
 Same scene, one tier per step: research the next level of `refined-flammables`,
 `weapon-shooting-speed` and `physical-projectile-damage` (the gun turret's reference),
-fresh turret + dummy per tier. `first` and `last` are real health drops; the dps columns
-are `pulse x 60/cooldown` and are the comparable figures (the measured interval is
-quantised to whole ticks, which is why tier 1 reads 8 ticks where the maths says 7.27).
+fresh turret + dummy per tier. `first` and `hot` are real health drops; the dps columns
+are the pulse figure times the measured pulse rate, and the rate is the mean gap between
+drops — not the median, because the clock carries the fraction of a tick forward, so at
++80 % rate the gaps alternate 4,5,4,5 (mean 4.44) and the median would report 15 pulses/s
+for a 13.5/s clock.
 
-| tier | fire / rate | melta cold pulse | melta hot pulse | interval | melta cold dps | melta hot dps | gun turret dps |
-|---|---|---|---|---|---|---|---|
-| 0 | +0 % / +0 % | 32 | 56.000 | 8 | **240** | **420** | **240** |
-| 1 | +20 % / +10 % | 43.7 | 73.625 | 8 | 347 | 607 | 319 |
-| 2 | +40 % / +30 % | 55.7 | 92.813 | 7 | 517 | 905 | 449 |
-| 3 | +60 % / +50 % | 67.6 | 113.313 | 6 | 729 | 1275 | 706 |
-| 4 | +90 % / +80 % | 87.1 | 146.688 | 5 | 1132 | 1980 | 1106 |
-| 5 | +120 % / +110 % | 108.6 | 182.750 | 4 | **1645** | **2878** | **1633** |
+| tier | fire / rate | cold pulse (statline) | measured first pulse | melta hot pulse | mean gap | pulses/s | melta cold dps | melta hot dps | gun turret dps | cold ratio |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 0 | +0 % / +0 % | 32 | 34.063 | 56.000 | 7.833 | 7.66 | **245** | **429** | **240** | 1.02 |
+| 1 | +20 % / +10 % | 42.1 | 44.563 | 73.625 | 7.152 | 8.39 | **353** | **618** | **319** | 1.11 |
+| 2 | +40 % / +30 % | 53.0 | 55.688 | 92.813 | 6.128 | 9.79 | **519** | **909** | **449** | 1.16 |
+| 3 | +60 % / +50 % | 64.8 | 67.625 | 113.313 | 5.333 | 11.25 | **729** | **1275** | **706** | 1.03 |
+| 4 | +90 % / +80 % | 83.8 | 87.125 | 146.688 | 4.444 | 13.50 | **1131** | **1980** | **1106** | 1.02 |
+| 5 | +120 % / +110 % | 104.4 | 108.625 | 182.750 | 3.825 | 15.68 | **1637** | **2866** | **1632** | 1.00 |
 
-* Cold tracks the gun turret within 1-15 % at every tier (1.00x, 1.09x, 1.15x, 1.03x,
-  1.02x, 1.01x) — the "on par at cold barrel" half of the contract, held through the whole
-  research chain instead of only at tier 0.
-* Hot is 1.75x the melta's own cold dps everywhere, i.e. 1.76-2.02x the gun turret — the
-  "significantly outperform when fired up" half.
-* The unpulsed hot figures are exact against the statline (56 x 1.2^1.5 = 73.6,
-  56 x 2.2^1.5 = 182.7), so the exponent is applied exactly once and nowhere twice.
+* The **measured first pulse runs ~6 % above the statline** (34.1 at tier 0, 108.6 at tier
+  5) because the 150-tick spin-up has already started by the time it leaves the barrel; the
+  cold dps column therefore uses the statline so it is like-for-like with the gun turret,
+  whose first shot is exactly 24. The measured figure is in the table for scale.
+* Cold tracks the gun turret at **1.00x-1.16x** at every tier — the "on par at cold barrel"
+  half of the contract, held through the whole research chain instead of only at tier 0.
+* Hot is **1.75x** the melta's own cold dps everywhere, i.e. **1.76x-2.02x the gun
+  turret** — the "significantly outperform when fired up" half.
+* The measured hot figures are exact against the statline (56 x 1.2^1.5 = 73.6,
+  56 x 2.2^1.5 = 182.7), so the exponent is applied exactly once and nowhere twice, and the
+  gun turret's dps is its own measured per-shot damage (24, 29.06, 34.56, 47.06, 61.44,
+  77.75) times its own mean rate (10, 10.98, 13.0, 15.0, 18.0, 20.99).
 
 Before the change the same probe read `first=17.625 hot=56.000` at **every** tier: no
 scaling at all, i.e. the turret lost this race by 4x at the end of the finite lines.
+
+One measurement artefact is worth naming because it was a real loss: the pulse clock used
+to round every interval **up** to a whole tick (`pulse_at = tick + interval`), so at +80 %
+rate the interval became 5 ticks instead of 4.44 and the turret fired 12 pulses/s instead
+of 13.5 — 11 % of its researched dps, which put it at **0.85x** the gun turret at tier 4
+(measured before the fix: cold 1045 dps against 1106). The clock now carries the remainder,
+and the tier-4 row above is the same tree after that fix.
 
 ## 4. Fuel, for completeness
 

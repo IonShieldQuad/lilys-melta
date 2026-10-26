@@ -189,6 +189,17 @@ local function median_interval(case)
   return gaps[math.ceil(#gaps / 2)]
 end
 
+-- The MEAN gap is the honest rate: the pulse clock now carries the fraction of a tick
+-- forward, so the gaps alternate (e.g. 4,5,4,5 at +80 % rate) and the median reports
+-- only one of the two. n pulses over (tick[n] - tick[1]) is the rate the player actually
+-- gets, and it is what the dps columns below are computed from.
+local function mean_interval(case)
+  if #case.ticks < 2 then
+    return 0
+  end
+  return (case.ticks[#case.ticks] - case.ticks[1]) / (#case.ticks - 1)
+end
+
 local function report()
   local tier = storage.tier or 0
   for _, case in ipairs(storage.cases or {}) do
@@ -202,7 +213,8 @@ local function report()
     end
     local hot = hot_n > 0 and (hot_sum / hot_n) or 0
     local interval = median_interval(case)
-    local rate = interval > 0 and (60 / interval) or 0
+    local gap = mean_interval(case)
+    local rate = gap > 0 and (60 / gap) or 0
     -- window dps: everything the dummy lost over the whole firing window, which is
     -- the number that does not depend on where a pulse happened to land
     local first = case.ticks[1] or 0
@@ -213,8 +225,11 @@ local function report()
       total = total + drop
     end
     local window_dps = window > 0 and (total / (window / 60)) or 0
-    logf("tier %d %-16s n=%2d first=%7.3f last=%7.3f interval=%.2f rate=%5.2f window_dps=%8.2f",
-      tier, case.key, count, cold, hot, interval, rate, window_dps)
+    -- dps from the measured per-pulse figures at the measured rate. `first` is one
+    -- pulse into the spin-up (so it reads a few % above the cold statline), `last` is
+    -- steady state and exact.
+    logf("tier %d %-16s n=%2d first=%7.3f last=%7.3f interval=%.2f gap=%.3f rate=%5.2f dps_first=%7.1f dps_hot=%7.1f window_dps=%8.2f",
+      tier, case.key, count, cold, hot, interval, gap, rate, cold * rate, hot * rate, window_dps)
   end
 end
 

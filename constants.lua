@@ -109,17 +109,20 @@ C.hit_half_width  = 0.45  -- tiles: half-width of the line hit test around the b
 -- it belongs:
 --
 --   tier  fire dmg  rate   melta cold  melta hot   gun turret (uranium)
---    0      +0 %     +0 %     240        420       240
---    1     +20 %    +10 %     347        607       319
---    2     +40 %    +30 %     517        905       449
+--    0      +0 %     +0 %     245        429       240
+--    1     +20 %    +10 %     353        618       319
+--    2     +40 %    +30 %     519        909       449
 --    3     +60 %    +50 %     729       1275       706
---    4     +90 %    +80 %    1132       1980      1106
---    5    +120 %   +110 %    1645       2878      1633
+--    4     +90 %    +80 %    1131       1980      1106
+--    5    +120 %   +110 %    1637       2866      1632
 --
--- (melta cold = 32 x (1+fire)^1.5 x (1+rate) x 60/8; the gun turret column is
--- 24 x (1+bullet-dmg)^2 x (1+bullet-rate) x 60/6. Measured in game:
--- docs/verification/balance-verification.md. A 1.0 exponent is the plain
--- single dip, 2.0 is a literal double dip -- re-tune here, not in control.lua.)
+-- (melta cold = 32 x (1+fire)^1.5 x the pulse rate; the gun turret column is
+-- 24 x (1+bullet-dmg)^2 x its shot rate. Both columns are measured in game:
+-- docs/verification/balance-verification.md. The pulse rate has to *deliver*
+-- the researched bonus -- control.lua carries the fraction of a tick forward,
+-- because rounding each interval up to a whole tick cost 11 % at tier 4 and put
+-- the turret at 0.85x the gun there. A 1.0 exponent is the plain single dip, 2.0
+-- is a literal double dip -- re-tune here, not in control.lua.)
 C.research_damage_ammo    = {"flamethrower"}  -- ammo categories whose ammo-damage research scales the beam
 C.research_damage_scale   = 1.0   -- 0 turns the damage dip off; 1 = the researched bonus, as-is
 C.research_damage_exponent = 1.5  -- how hard the fire ladder compounds (see the table above)
@@ -133,10 +136,12 @@ C.research_rate_ammo      = {"melta"}  -- ammo categories whose gun-speed resear
 -- the only honest way to ignore the flat half is to hand the engine
 -- `damage + decrease` for that damage type: the subtraction cancels and the
 -- percentage is applied to the full figure. Two details matter:
---   * only a POSITIVE decrease is compensated. Asteroids carry negative flat
---     resistances (-2000 physical on big, -3000 on huge) which mean extra
---     damage; compensating those would *nerf* the melta against rocks and
---     silently break the explosion channel's balance.
+--   * only a POSITIVE decrease is compensated. A NEGATIVE decrease (some modded
+--     entities have one) means "takes extra damage", so adding it would subtract
+--     damage and quietly turn a bonus into a penalty; those are left alone.
+--   * note the vanilla big/huge asteroids carry POSITIVE physical flat armour
+--     (`decrease = {0,0,0,2000,3000}`, percent {0,0,10,10,10}) -- so this bypass
+--     cancels it and rocks DO take the physical slice, which they did not before.
 --   * a 100 % resistance still comes out at zero damage, which is correct:
 --     percentage resistance is respected, by design.
 -- This touches nothing outside the melta's own pulse: no engine behaviour, no
@@ -148,16 +153,20 @@ C.pierce_flat_armor = true   -- ignore resistances[type].decrease on both damage
 -- data/space-age/prototypes/entity/asteroid.lua gives every asteroid an explicit
 -- `percent = 100` entry for each damage type its type does not list, and fire is
 -- listed for none of them. So 85 % of the beam is literally nothing on a rock, and
--- the 15 % physical slice is all that lands -- until the rock's flat armour eats it:
+-- the 15 % physical slice is all that lands (before the flat-armour bypass, the rock's
+-- own flat armour swallowed it too):
 --
 --   asteroid   hp    physical resistance        physical that lands per pulse (hot)
 --   small      100   none                       8.4
 --   medium     400   10 %, no flat armour       7.6
---   big       2000   10 % and -2000 flat        0.0   <- the whole slice is absorbed
---   huge      5000   10 % and -3000 flat        0.0   <- same
+--   big       2000   10 % and +2000 flat        7.6   (flat ignored; was 0.0)
+--   huge      5000   10 % and +3000 flat        7.6   (same)
 --
--- Rocks therefore get their own channel: an extra hit sized as a multiple of the
--- pulse, in a damage type the vanilla asteroid ladder already balances. `explosion`
+-- Even with the flat armour gone that slice is 0.4 % of a big rock's health and
+-- 0.15 % of a huge one -- a rounding error next to the rock's own damage output,
+-- which is why rocks still need a channel of their own: an extra hit sized as a
+-- multiple of the pulse, in a damage type the vanilla asteroid ladder already balances.
+-- `explosion`
 -- is that ladder (small 50 %, medium 30 %, big 10 %, huge 99 % resistance), so the
 -- melta becomes a small/medium/big rock killer and leaves huge asteroids to the
 -- railgun -- the progression space-age already ships.

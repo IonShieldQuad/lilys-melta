@@ -187,9 +187,9 @@ end
 -- `max(0, amount - decrease) * (1 - percent / 100)`. Handing it
 -- `amount + decrease` for that damage type cancels the subtraction exactly and
 -- leaves the percentage doing its job. Only POSITIVE `decrease` is compensated:
--- asteroids carry negative flat resistances (-2000 physical on big, -3000 on
--- huge) that mean extra damage, and cancelling those would quietly nerf the
--- melta against rocks.
+-- a negative one means "takes extra damage", and adding it would turn that bonus
+-- into a penalty. Vanilla big/huge asteroids carry POSITIVE physical flat armour
+-- (2000/3000), so their slice is compensated like any other armoured body.
 --
 -- The table is built per prototype (every biter of a tier shares one) and cached
 -- by name; entity prototypes do not change during a game.
@@ -581,11 +581,13 @@ local function pulse(turret, state, muzzle, dx, dy, reach)
         victim.damage(physical_damage, force, C.damage_type_hit, turret)
       end
       -- Asteroids are 100 % fire resistant and their big/huge tiers subtract 2000/3000
-      -- from every physical hit, so a rock would otherwise take almost nothing from the
-      -- beam. Rocks get an extra hit in `explosion` -- the damage type the vanilla
-      -- asteroid ladder is balanced around -- sized off the same pulse, so it ramps with
-      -- charge, with fuel and with pierce falloff like everything else. Gated on the
-      -- entity type, so pawns, spawners and buildings never take it (constants.lua).
+      -- from every physical hit -- which the bypass above cancels, so a rock takes its
+      -- 10 % percentage cut of the 15 % slice and nothing more. That slice is a fraction
+      -- of a percent of a big rock, so rocks get an extra hit in `explosion` -- the
+      -- damage type the vanilla asteroid ladder is balanced around -- sized off the same
+      -- pulse, so it ramps with charge, with fuel and with pierce falloff like
+      -- everything else. Gated on the entity type, so pawns, spawners and buildings
+      -- never take it (constants.lua).
       if victim.valid and victim.health and victim.health > 0 and victim.type == "asteroid" then
         victim.damage(dealt * C.asteroid_damage_multiplier, force, C.asteroid_damage_type, turret)
       end
@@ -1056,7 +1058,22 @@ local function update(turret, state, tick)
       local reach = math.max(1, range - along)
 
       if tick >= state.pulse_at then
-        state.pulse_at = tick + pulse_interval(turret)
+        local interval = pulse_interval(turret)
+        if state.pulse_at < tick - interval then
+          -- the clock lost time (the beam stopped and re-acquired, or a target was
+          -- held through a wind-up): start the countdown from now instead of firing
+          -- a burst to "catch up"
+          state.pulse_at = tick + interval
+        else
+          -- carry the fraction of a tick forward. `tick + interval` would round the
+          -- interval UP to a whole tick every time, which silently threw away part of
+          -- the researched firing speed: at +80 % rate the interval is 4.44 ticks, and
+          -- firing every 5 ticks is 12/s instead of 13.5/s (measured: that alone cost
+          -- the melta 15 % of its dps against the gun turret at tier 4). Carrying the
+          -- remainder makes the average interval exactly the researched one while every
+          -- pulse still lands on a whole tick.
+          state.pulse_at = state.pulse_at + interval
+        end
         beam_for(state).pulse_tick = tick
         state.beam_end = pulse(turret, state, muzzle, ax, ay, reach)
       end

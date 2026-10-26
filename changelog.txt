@@ -9,15 +9,22 @@ Date: 2026-10-26
       technology in the game: the turret stayed at 240/420 dps while a gun turret went to
       1633. It takes the same two dips a gun turret takes -- the fire damage line
       (refined flammables) and the turret firing speed line -- and holds cold parity with the
-      gun turret within 15 % at every tier, 1.75x its own cold dps when white hot
-      (docs/verification/balance-verification.md).
+      gun turret at every tier (1.00x-1.15x measured), 1.75x its own cold dps when white hot
+      (1.76x-2.02x the gun turret) (docs/verification/balance-verification.md).
+    - The researched firing speed is delivered in full. The pulse clock used to round every
+      interval up to a whole tick, which silently threw part of the bonus away (+80 % rate
+      fires every 4.44 ticks: the old clock pulsed every 5, i.e. 12 pulses/s instead of
+      13.5). It now carries the fraction of a tick forward, so the average interval is the
+      researched one; that alone was worth 15 % of the melta's dps at tier 4.
     - Flat armour no longer eats the beam. The engine subtracts a target's `decrease`
       before applying its percentage resistance; the pulse is now handed that much extra so
       the subtraction cancels. Percentage resistance is untouched (a 100 % fire-resistant
-      target still ignores the fire share), and negative flat resistance -- the asteroid
-      vulnerability -- is left alone so rocks are unaffected. A behemoth's 12 flat armour
-      used to absorb a whole cold pulse (2.75 damage where an unarmoured body took 17.6);
-      it now takes 90 % of the unarmoured figure, i.e. only its 10 % resistance.
+      target still ignores the fire share), and a NEGATIVE flat resistance (which means
+      "takes extra damage") is left alone. A behemoth's 12 flat armour used to absorb a
+      whole cold pulse (2.75 damage where an unarmoured body took 17.6); it now takes 90 %
+      of the unarmoured figure, i.e. only its 10 % resistance. Big/huge asteroids carry
+      positive 2000/3000 physical flat armour, so their slice is compensated too -- it is
+      0.2 % of a big rock's health, and the asteroid channel is unchanged.
     - The tooltip says both things: it ignores flat armour, and it scales with flamethrower
       damage and turret firing speed research.
 
