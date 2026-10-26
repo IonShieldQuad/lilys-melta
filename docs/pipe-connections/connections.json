@@ -1,0 +1,67 @@
+{
+  "pipe_reach": 1.12,
+  "tile_px": 64,
+  "pipe_tiles": 2.0,
+  "sides": {
+    "north": {
+      "port_width": 1.078,
+      "pipe_width": 1.109,
+      "vanilla_width": 0.797,
+      "mouth": 2.104,
+      "inboard": 0.37,
+      "pipe_near": 1.516,
+      "overlap": 0.589,
+      "seam": 0.0,
+      "marker_px": [
+        96,
+        96
+      ],
+      "marker_on_art": true
+    },
+    "east": {
+      "port_width": 1.031,
+      "pipe_width": 1.0,
+      "vanilla_width": 0.797,
+      "mouth": 1.808,
+      "inboard": 0.354,
+      "pipe_near": 1.5,
+      "overlap": 0.308,
+      "seam": 0.0,
+      "marker_px": [
+        96,
+        96
+      ],
+      "marker_on_art": true
+    },
+    "south": {
+      "port_width": 1.047,
+      "pipe_width": 1.109,
+      "vanilla_width": 0.797,
+      "mouth": 1.847,
+      "inboard": 0.519,
+      "pipe_near": 1.188,
+      "overlap": 0.659,
+      "seam": 0.0,
+      "marker_px": [
+        96,
+        93
+      ],
+      "marker_on_art": true
+    },
+    "west": {
+      "port_width": 1.031,
+      "pipe_width": 1.0,
+      "vanilla_width": 0.797,
+      "mouth": 1.965,
+      "inboard": 0.512,
+      "pipe_near": 1.516,
+      "overlap": 0.449,
+      "seam": 0.0,
+      "marker_px": [
+        100,
+        96
+      ],
+      "marker_on_art": true
+    }
+  }
+}

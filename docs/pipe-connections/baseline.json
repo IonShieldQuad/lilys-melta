@@ -1,0 +1,62 @@
+{
+  "pipe_reach": 1.12,
+  "note": "art as shipped before the connector rework",
+  "sides": {
+    "north": {
+      "port_width": 0.641,
+      "pipe_width": 1.109,
+      "mouth": 1.948,
+      "inboard": 0.964,
+      "pipe_near": 1.516,
+      "overlap": 0.433,
+      "seam": 0.0,
+      "marker_px": [
+        64,
+        64
+      ],
+      "marker_on_art": true
+    },
+    "east": {
+      "port_width": 0.703,
+      "pipe_width": 1.0,
+      "mouth": 1.792,
+      "inboard": 0.933,
+      "pipe_near": 1.5,
+      "overlap": 0.292,
+      "seam": 0.0,
+      "marker_px": [
+        64,
+        64
+      ],
+      "marker_on_art": true
+    },
+    "south": {
+      "port_width": 0.641,
+      "pipe_width": 1.109,
+      "mouth": 1.691,
+      "inboard": 0.909,
+      "pipe_near": 1.188,
+      "overlap": 0.503,
+      "seam": 0.0,
+      "marker_px": [
+        64,
+        61
+      ],
+      "marker_on_art": true
+    },
+    "west": {
+      "port_width": 0.594,
+      "pipe_width": 1.0,
+      "mouth": 1.949,
+      "inboard": 1.09,
+      "pipe_near": 1.516,
+      "overlap": 0.434,
+      "seam": 0.0,
+      "marker_px": [
+        68,
+        64
+      ],
+      "marker_on_art": true
+    }
+  }
+}

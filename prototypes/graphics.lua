@@ -86,8 +86,8 @@ local function port_side(kind, side)
     {
       {
         filename = "__lilys-melta__/graphics/entity/melta-turret/melta-pipe-" .. kind .. "-" .. side .. ".png",
-        width = 128,
-        height = 128,
+        width = 192,
+        height = 192,
         scale = 0.5,
         shift = C.pipe_shift[side],
         mipmap_count = 4,

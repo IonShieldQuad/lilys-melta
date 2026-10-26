@@ -7,6 +7,14 @@
 > `in-game-combined/`, harness in `harness/melta-combined` + `harness/{setup_combined_run.sh,
 > run_combined.py,hover_combined.py}`.
 
+> **Connector rework (post-0.5.0):** the pipe ports were re-sized and moved inboard. That
+> pass is measured rather than described — `tools/check_pipe_connections.py` reads the
+> prototype's `pipe_connections`, measures the sprites against vanilla's own pipe cover and
+> writes an annotated debug PNG per rotation; the numbers, the engine connectivity probe and
+> the in-game shots are in [`../pipe-connections/README.md`](../pipe-connections/README.md)
+> and `in-game-connectors/`. Harness: `harness/melta-connprobe` +
+> `harness/{run_connprobe.sh,run_conngui.py}`.
+
 Everything below in this folder was produced by one real Factorio launch plus three headless
 runs on 2026-10-25 against the tree at `97a327b`. Nothing here is a mock-up: the
 screenshots are `game.take_screenshot` output from the running game, and the numbers in

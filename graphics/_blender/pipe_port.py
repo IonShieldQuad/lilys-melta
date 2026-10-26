@@ -46,6 +46,7 @@ import os
 import sys
 
 import bpy
+from mathutils import Vector
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 if HERE not in sys.path:
@@ -54,10 +55,26 @@ if HERE not in sys.path:
 import melta_render as M            # noqa: E402  (materials, primitives, lights)
 
 # --------------------------------------------------------------- framing ----
-FRAME = 128                        # art px per frame edge -> 64 screen px at 0.5
-TILES_IN_FRAME = FRAME / 64.0      # 2.0 tiles across the frame
-RES = 512                          # 4x supersample
+FRAME = 192                        # art px per frame edge -> 96 screen px at 0.5
+TILES_IN_FRAME = FRAME / 64.0      # 3.0 tiles across the frame
+RES = 768                          # 4x supersample
 DIRECTIONS = 4
+
+# --------------------------------------------------------------- port size ---
+# The pipe the turret joins is ~1.0-1.1 tiles across (measured off vanilla's own
+# pipe sheets, see tools/check_pipe_connections.py); this fitting was only 0.59-0.70,
+# so it read as a nub beside the pipe instead of a receiver the pipe plugs into.
+#
+# SCALE grows the whole fitting 1.5x in every axis -- *about the mouth*, not about
+# the frame centre. That matters: the mouth has to stay on the pipe (the pipe's near
+# edge is fixed by the turret's 1.2 collision box), so scaling about the frame centre
+# would drag the mouth inboard and open a gap. Anchored on the mouth, the geometry
+# instead grows back toward the turret: the inboard end travels 0.39 tiles closer to
+# the pivot (0.94 -> 0.55 tiles from the centre), which is the "moved inwards,
+# mounted on the hull" half of the same complaint. The mouth's own reach is
+# untouched, so the join measured by pipe_join.py / check_pipe_connections.py stays
+# exactly where it was.
+SCALE = 1.75
 
 # Port geometry, in frame space (connection point = frame centre). One owner for
 # these numbers: the assembler prints them and the checker measures against them.
@@ -209,6 +226,21 @@ def build_port(capped=False, lip_ext=0.0):
     return parts
 
 
+def scale_about_mouth(parts, s):
+    """Grow the fitting by `s` about its mouth, keeping the mouth where it is.
+
+    Every part is placed by `location` with its geometry centred on the local
+    origin (melta_render.box/cyl/torus/bolt_ring all do), so a uniform scale about
+    a pivot is `loc = pivot + (loc - pivot) * s` plus the object's own scale.
+    """
+    pivot = Vector((0.0, PORT["outboard"], PORT["axis_z"]))
+    for ob in parts:
+        ob.location = pivot + (ob.location - pivot) * s
+        ob.scale = (ob.scale[0] * s, ob.scale[1] * s, ob.scale[2] * s)
+        M.apply_scale(ob)
+    return parts
+
+
 # ------------------------------------------------------------------ main ----
 def main():
     M.purge()
@@ -234,6 +266,8 @@ def main():
             flat = []
             for item in parts:
                 flat.extend(item if isinstance(item, list) else [item])
+            if SCALE != 1.0:
+                scale_about_mouth(flat, SCALE)
             for ob in flat:
                 ob.parent = root
             scene.render.filepath = os.path.join(OUT_DIR, "port",

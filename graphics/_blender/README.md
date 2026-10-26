@@ -18,12 +18,20 @@ damage level by changing numbers instead of pixels.
                       and draws the docs/pipe-sockets views
     pipe_port.py      builds and renders the PIPE PORT (one model, four orientations)
                       plus a blanked-off variant: fluid_box.pipe_picture / pipe_covers.
-                      Frame centre = the connection point, 128 px at scale 0.5
+                      Frame centre = the connection point, 192 px at scale 0.5; the
+                      fitting is SCALE 1.75x about its MOUTH, so it stays on the pipe
+                      while its body grows back toward the hull
     assemble_port.py  tone curve + baked shadow for those eight sprites, reusing
                       assemble.py's helpers
     pipe_join.py      the post-fix gate: composites hull + port + the real vanilla pipe
                       sprite at 64 px/tile and fails if the port does not reach the pipe
                       or if bare ground shows between them (docs/pipe-join/)
+    ../../tools/check_pipe_connections.py
+                      the measuring gate rather than the pass/fail one: reads the actual
+                      pipe_connections + sprite geometry out of the prototypes, measures
+                      connector width against vanilla's own pipe cover, how far the body
+                      sits from the turret centre, and writes an annotated debug PNG per
+                      rotation (docs/pipe-connections/)
     preview.py        (scratch tool) lays renders on a ground tile for review
 
 ## Requirements

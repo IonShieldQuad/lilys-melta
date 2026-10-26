@@ -23,7 +23,7 @@ sys.path.insert(0, HERE)
 import assemble                      # tone curve, shadow bake, helpers
 from PIL import Image                # noqa: E402
 
-FRAME = 128                          # 64 art px/tile at scale 0.5, like the rest
+FRAME = 192                          # 64 art px/tile at scale 0.5, like the rest
 SIDES = ("north", "east", "south", "west")
 KINDS = (("open", "port"), ("cap", "cap"))
 
