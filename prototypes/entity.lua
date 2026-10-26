@@ -229,8 +229,17 @@ data:extend(
     name = C.turret,
     icon = ICON,
     icon_size = ICON_SIZE,
-    subgroup = "defensive-structure",
-    order = "e[melta-turret]",
+    -- Where it sorts in the crafting menu and every item list. 2.1 splits the old
+    -- "combat" group into `turret` (subgroup order "i") and `defensive-structure`
+    -- (order "h", which holds walls, gates, the radar and land mines) -- the melta
+    -- sat in the latter, one slot past the radar, because it kept an order string
+    -- written against the old flat group. The order key below is the vanilla turret
+    -- ladder's own prefix, so the turret lands directly after the flamethrower turret
+    -- it is the bigger cousin of: base uses b[turret]-a[gun-turret], -b[laser-turret],
+    -- -c[flamethrower-turret], -d[artillery-turret], and space age adds
+    -- -e[rocket-turret], -f[tesla-turret], -g[railgun-turret].
+    subgroup = "turret",
+    order = "b[turret]-c[flamethrower-turret]-a[melta-turret]",
     place_result = C.turret,
     stack_size = 20
   },
