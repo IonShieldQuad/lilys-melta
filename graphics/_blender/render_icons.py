@@ -59,11 +59,46 @@ DIRS = [int(x) for x in argval("--dirs", "40").split(",")]
 # -- measured on this model: 51 deg leaves 63x44 of content in the 64 px box, 34 deg
 # gives 63x53, i.e. the same icon with no dead band.
 TILT = float(argval("--tilt", "34"))
+# ICON-ONLY shape budget. The hull is ~3.1 tiles across and the cannon reaches 1.51
+# tiles from the pivot, so in the fitted 64 px cell the weapon is a minority of the
+# silhouette and at 32 px the icon collapses into one oval (measured: 15.5 % of the
+# mask beyond 1.3x the median radius against 20-24 % for vanilla's turret icons).
+# This knob multiplies the GUN ROOT about the pivot in the icon render only -- the
+# sprite sheets call melta_render.build_gun() directly and never see it, so in-world
+# art, the beam anchors and the collision box are untouched. The scale is uniform and
+# the root is dropped by exactly the amount that keeps the barrel axis at
+# GUN_Z * GUN_SCALE, so the gun grows about its bore instead of floating off the
+# bearing. Default 1.0 = the machine the sheets show.
+GUN_F = float(argval("--icon-gun-scale", "1.0"))
+# Icon-only emissive boost, "<material>=<multiplier>,...". At 32 px the muzzle has to
+# be the one element the eye lands on -- vanilla's flamethrower icon is a hull blob, a
+# plate and a white-hot nozzle -- and the shared materials are deliberately tuned "hot
+# pixels, not a lamp" for the sprite sheets. Multiplying the emission here (never in
+# melta_render's defaults) keeps the sheets byte-identical while giving the icon a
+# white-hot muzzle lip and bore.
+EMIT_BOOST = [s for s in argval("--icon-emit", "").split(",") if s]
 
 
 def main():
     M.purge()
     M.build_materials()
+    for spec in EMIT_BOOST:
+        head, mul = spec.split("=")
+        name, _, white = head.partition(":")
+        white = float(white or 0.0)
+        mat = bpy.data.materials.get(name)
+        if mat is None or not mat.use_nodes:
+            raise SystemExit("icon emit: no material " + name)
+        hit = 0
+        for node in mat.node_tree.nodes:
+            if node.type == 'EMISSION':
+                node.inputs["Strength"].default_value *= float(mul)
+                if white > 0.0:
+                    c = list(node.inputs["Color"].default_value)
+                    node.inputs["Color"].default_value = tuple(
+                        c[i] + (1.0 - c[i]) * white for i in range(3)) + (1,)
+                hit += 1
+        print("icon emit %s x%s -> %d emission node(s), white %.2f" % (name, mul, hit, white))
     M.setup_render()
     cam = M.setup_camera()
     cam.data.ortho_scale = ORTHO
@@ -105,7 +140,19 @@ def main():
     M.build_gun(root)
     # scale AFTER parenting, exactly like melta_render.main(): build_gun stores the
     # parent inverse matrix, so a scale set before parenting is cancelled out
-    root.scale = (M.GUN_SCALE, M.GUN_SCALE, M.GUN_SCALE)
+    s = M.GUN_SCALE * GUN_F
+    root.scale = (s, s, s)
+    # keep the bore at its sheet height: growing about the pivot would otherwise lift
+    # the collar off the bearing and leave daylight between gun and hull
+    root.location = Vector((0.0, 0.0, -(GUN_F - 1.0) * M.GUN_Z * M.GUN_SCALE))
+    if GUN_F != 1.0:
+        # a bigger gun reaches past the sheet frame; widen the frame so nothing clips
+        # (assemble_icons fits the silhouette anyway, so this costs no framing)
+        reach = 1.80 * s + 0.30
+        if reach * 2.0 > cam.data.ortho_scale:
+            cam.data.ortho_scale = reach * 2.0
+        print("icon gun scale %.2f -> root scale %.3f, z drop %.3f, ortho %.2f"
+              % (GUN_F, s, -root.location.z, cam.data.ortho_scale))
 
     os.makedirs(OUT_DIR, exist_ok=True)
     for d in DIRS:

@@ -236,15 +236,97 @@ def pack_mips(base, levels):
     return sheet, chain
 
 
+# ------------------------------------------------- icon-only shape budget ---
+# The icon is judged at 32 px, where only two or three big masses survive. Vanilla's
+# turret icons keep their detail budget by having almost none: the flamethrower icon is
+# a hull blob, a plate, and a white-hot nozzle. Our render carries plate seams, rivets
+# and vent slats that at 32 px are sub-pixel and turn the whole icon into one warm oval
+# (measured: 15.5 % of the mask beyond 1.3x the median radius, against 20-24 % for the
+# vanilla turret icons, and the projecting barrel reads only 7 luma brighter than the
+# body, against 45-140 for vanilla).
+#
+# Two passes, both applied at the FINAL icon size, after the tone fit, so they cannot
+# disturb the palette band:
+#   * suppress detail whose local contrast is below DETAIL_MIN luma: it is texture, not
+#     shape. Big edges (silhouette, mantlet, muzzle ring) survive untouched. Measured
+#     sweep (icon_read.py at 32 px): 6 is a marginal win, 10 is the largest win that
+#     still reads as a sharp machine, 14+ smears the muzzle and banding.
+#   * optionally drive the hottest FOCAL_PCT of the mask to a near-white warm highlight.
+#     OFF by default (0): a tone-level highlight desaturates the muzzle, while the same
+#     job done in the render -- render_icons.py --icon-emit, which lifts the actual
+#     emissive material -- keeps the hot metal's hue and its 3D form. Kept as a knob
+#     because it is the cheap way to fake the focal element on an older render.
+DETAIL_MIN = 10.0         # luma units below which local variation is flattened
+DETAIL_SIGMA = 1.0        # px at 64 for the low-pass the detail is measured against
+FOCAL_PCT = 0.0           # % of the mask pushed into the white-hot shoulder
+FOCAL_LUMA = 246.0        # the value that cluster lands on
+FOCAL_WARM = (1.00, 0.965, 0.905)
+
+# The icon's shape budget, as a knob on the render (render_icons.py --icon-gun-scale).
+# Measured sweep on this model: 1.0 leaves the barrel at 16 % protrusion / 1.61 reach
+# (vanilla 20-24 % / 1.7-2.5), 1.5 reaches 1.89 / 18.9 %, 1.75 reaches 2.04 / 23.5 % --
+# inside the vanilla band -- and 2.0 starts to stretch the machine. This constant is the
+# value render_icons.py was run with; assemble_icons.py records it in icons.json so a
+# mismatch between render and metadata is visible instead of silent.
+ICON_GUN_SCALE = 1.75
+
+# Parameters of the two shape passes, read at CALL time (assemble_icons' study driver
+# varies them; the defaults are what ships).
+SHAPE_CFG = {"detail": DETAIL_MIN, "sigma": DETAIL_SIGMA,
+             "focal": FOCAL_PCT, "target": FOCAL_LUMA, "warm": FOCAL_WARM}
+
+
+def suppress_detail(rgb, alpha, threshold=None, sigma=None):
+    """Flatten texture below `threshold` luma, keep every real edge.
+
+    Splits luma into a low-pass and a detail layer and soft-thresholds the detail, so
+    plate seams and rivet highlights (2-3 luma units at 64 px) merge into their plate
+    while the mantlet edge, the muzzle ring and the silhouette stay crisp.
+    """
+    threshold = SHAPE_CFG["detail"] if threshold is None else threshold
+    sigma = SHAPE_CFG["sigma"] if sigma is None else sigma
+    L = luma(rgb) * 255.0
+    base = np.asarray(Image.fromarray(np.clip(L, 0, 255).astype(np.uint8), "L")
+                      .filter(ImageFilter.GaussianBlur(sigma)), dtype=np.float32)
+    d = L - base
+    mag = np.maximum(np.abs(d) - threshold, 0.0)
+    d2 = np.sign(d) * mag
+    L2 = np.clip(base + d2, 1.0, 255.0)
+    scale = L2 / np.maximum(L, 1e-3)
+    return np.clip(rgb * scale[:, :, None], 0.0, 1.0)
+
+
+def hot_focal(rgb, alpha, pct=None, target=None, warm=None):
+    """Push the brightest `pct` % of the silhouette toward a white-hot highlight."""
+    pct = SHAPE_CFG["focal"] if pct is None else pct
+    target = SHAPE_CFG["target"] if target is None else target
+    warm = SHAPE_CFG["warm"] if warm is None else warm
+    mask = alpha > 0.15
+    if mask.sum() < 32 or pct <= 0.0:
+        return rgb
+    L = luma(rgb) * 255.0
+    cut = float(np.percentile(L[mask], 100.0 - pct))
+    # soft shoulder: 0 at the cut, 1 at the top of the render's range
+    top = float(L[mask].max()) if L[mask].max() > cut + 1e-3 else cut + 1.0
+    w = np.clip((L - cut) / max(top - cut, 1e-3), 0.0, 1.0) ** 0.7
+    w = np.where(mask, w, 0.0)
+    tint = np.array(warm, dtype=np.float32)[None, None, :] * (target / 255.0)
+    out = rgb * (1.0 - w[:, :, None]) + tint * w[:, :, None]
+    return np.clip(out, 0.0, 1.0)
+
+
 # --------------------------------------------------------------- the parts ---
-def compose(src, box, ss=1, shadow_offset=(5.0, 3.0), shadow_blur=2.2):
-    """Fit -> tone -> filter down -> exact tone pass -> shadow, at `box` size.
+def compose(src, box, ss=1, shadow_offset=(5.0, 3.0), shadow_blur=2.2, shape=False):
+    """Fit -> tone -> filter down -> exact tone pass -> shape pass -> shadow, at `box`.
 
     The tone is applied twice on purpose. The first pass happens on the big render,
     where it has room to work; the second pass is measured on the finished `box`
     image, which is the only place the quantiles that matter exist (sRGB averaging
     during the downscale pulls the top end in, so a single hi-res pass lands ~60
     levels short of the target p90).
+
+    `shape` is the icon-only simplification (see suppress_detail / hot_focal): it runs
+    at `box`, after the fit, so the tone band is already fixed when it starts.
     """
     ss_box = box * ss
     (rgb_hi, alpha_hi), info = fit_cell(
@@ -255,13 +337,17 @@ def compose(src, box, ss=1, shadow_offset=(5.0, 3.0), shadow_blur=2.2):
     base = resize_pm(premult(rgb_hi, alpha_hi), (box, box), steps=2)
     rgb, alpha = unpremultiply(base)
     rgb = icon_tone(rgb, alpha)
+    if shape:
+        rgb = suppress_detail(rgb, alpha)
+        rgb = hot_focal(rgb, alpha)
     rgb, alpha = shadow_over(rgb, alpha, box, ss, shadow_offset, shadow_blur)
     return to_img(rgb, alpha), info
 
 
-def build_icon(src, out_path, box=ICON_BOX, ss=ICON_SS, levels=3):
+def build_icon(src, out_path, box=ICON_BOX, ss=ICON_SS, levels=3, shape=False):
     """Item/entity icon: fitted, toned, shadowed, mips packed -> one PNG."""
-    base, info = compose(src, box, ss=ss, shadow_offset=(1.5, 1.0), shadow_blur=0.75)
+    base, info = compose(src, box, ss=ss, shadow_offset=(1.5, 1.0), shadow_blur=0.75,
+                         shape=shape)
     sheet, chain = pack_mips(base, levels)
     sheet.save(out_path, optimize=True)
     return sheet, base, info
@@ -353,30 +439,47 @@ def main():
     out_root = "H:/Factorio Mods/lilys-melta"
     if "--out" in sys.argv:
         out_root = sys.argv[sys.argv.index("--out") + 1]
+    # the icon-only simplification and the icon shape budget are DEFAULTS, so the bare
+    # documented command  `python assemble_icons.py graphics/_blender/iconraw 40 --out X`
+    # still reproduces the shipped files byte for byte. Override for studies only.
+    shape = "--no-shape" not in sys.argv
+    gun_scale = ICON_GUN_SCALE
+    if "--gun-scale" in sys.argv:
+        gun_scale = float(sys.argv[sys.argv.index("--gun-scale") + 1])
 
     src_path = os.path.join(raw, "icon-{:03d}.png".format(direction))
     print("render:", src_path)
     src = load_pm(src_path)
+    # The 64 px item icon is drawn with the icon shape budget (a bigger gun). The
+    # technology icon and the portal thumbnail are NOT: at 256/512 px the barrel reads
+    # perfectly well, and those two are the mod's honest portrait of the machine, so
+    # they keep the shipping proportions from the same render rig (the `-ship` file).
+    ship_path = os.path.join(raw, "icon-{:03d}-ship.png".format(direction))
+    if not os.path.exists(ship_path):
+        ship_path = src_path
+    print("ship render:", ship_path)
+    ship = load_pm(ship_path)
 
     icons_dir = os.path.join(out_root, "graphics", "icons")
     os.makedirs(icons_dir, exist_ok=True)
 
     if candidate:
-        sheet, base, info = build_icon(src, candidate)
-        print("candidate ->", candidate)
+        sheet, base, info = build_icon(src, candidate, shape=shape)
+        print("candidate ->", candidate, "shape" if shape else "raw",
+              "gun_scale", gun_scale)
         stats(base, "candidate %d" % direction)
         return
 
     icon_path = os.path.join(icons_dir, "melta-turret.png")
-    sheet, base, info = build_icon(src, icon_path)
-    print("wrote", icon_path)
+    sheet, base, info = build_icon(src, icon_path, shape=shape)
+    print("wrote", icon_path, "(shape pass %s)" % ("on" if shape else "off"))
 
     tech_path = os.path.join(icons_dir, "melta-turret-technology.png")
-    tech_sheet, tech_base, tech_info = build_tech(src, tech_path)
+    tech_sheet, tech_base, tech_info = build_tech(ship, tech_path)
     print("wrote", tech_path)
 
     thumb_path = os.path.join(out_root, "thumbnail.png")
-    build_thumbnail(src, thumb_path)
+    build_thumbnail(ship, thumb_path)
     print("wrote", thumb_path)
 
     print("\nframing (render px -> icon px):")
@@ -401,6 +504,15 @@ def main():
         "tech_file_px": list(tech_sheet.size),
         "thumbnail_px": THUMB_BOX,
         "fit_px": FIT,
+        "icon_gun_scale": gun_scale,
+        "icon_source": "icon-%03d.png (render_icons.py --icon-gun-scale %.2f%s)"
+                       % (direction, gun_scale, " --icon-emit"),
+        "tech_thumbnail_source": "icon-%03d-ship.png (shipping proportions, same rig)"
+                                 % direction,
+        "shape_pass": {"detail_min_luma": SHAPE_CFG["detail"],
+                       "detail_sigma_px": SHAPE_CFG["sigma"],
+                       "focal_pct": SHAPE_CFG["focal"],
+                       "applies_to": "item icon only"},
         "icon_tone": {"reference": "vanilla flamethrower-turret.png icon",
                       "target_p10_90": list(ICON_TARGET_LUMA),
                       "chroma": ICON_CHROMA},

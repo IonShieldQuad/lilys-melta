@@ -12,6 +12,15 @@
   ],
   "thumbnail_px": 512,
   "fit_px": 61,
+  "icon_gun_scale": 1.75,
+  "icon_source": "icon-040.png (render_icons.py --icon-gun-scale 1.75 --icon-emit)",
+  "tech_thumbnail_source": "icon-040-ship.png (shipping proportions, same rig)",
+  "shape_pass": {
+    "detail_min_luma": 10.0,
+    "detail_sigma_px": 1.0,
+    "focal_pct": 0.0,
+    "applies_to": "item icon only"
+  },
   "icon_tone": {
     "reference": "vanilla flamethrower-turret.png icon",
     "target_p10_90": [

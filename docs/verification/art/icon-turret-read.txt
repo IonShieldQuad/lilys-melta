@@ -1,0 +1,16 @@
+== 64 px ==
+gun        cov 63.3%  bbox 64x59  elong 1.21  reach 1.76  protr 21.7%  neck 0.55  masses 3  luma 102  white  7.3%  darklimb  -53.8
+flamer     cov 68.9%  bbox 60x64  elong 1.27  reach 1.83  protr 22.2%  neck 0.48  masses 4  luma 108  white 11.2%  darklimb -126.9
+laser      cov 59.9%  bbox 62x63  elong 1.28  reach 1.73  protr 22.2%  neck 0.97  masses 5  luma 124  white 16.3%  darklimb -100.8
+artillery  cov 42.5%  bbox 62x56  elong 1.53  reach 2.62  protr 24.5%  neck 0.31  masses 5  luma 113  white 16.5%  darklimb  -59.7
+rocket     cov 69.8%  bbox 58x64  elong 1.23  reach 1.72  protr 21.0%  neck 0.69  masses 4  luma  98  white  6.3%  darklimb  -45.6
+melta      cov 50.7%  bbox 61x58  elong 1.52  reach 2.03  protr 23.1%  neck 0.46  masses 4  luma  96  white  7.7%  darklimb  -50.4
+
+== 32 px ==
+gun        cov 65.6%  bbox 32x30  elong 1.20  reach 1.75  protr 21.4%  neck 0.56  masses 3  luma 113  white  9.8%  darklimb  -94.0
+flamer     cov 71.5%  bbox 31x32  elong 1.26  reach 1.81  protr 22.3%  neck 0.52  masses 4  luma 117  white 13.7%  darklimb -139.4
+laser      cov 64.2%  bbox 31x31  elong 1.24  reach 1.71  protr 22.2%  neck 0.94  masses 5  luma 140  white 19.9%  darklimb -110.3
+artillery  cov 45.4%  bbox 31x29  elong 1.48  reach 2.53  protr 24.3%  neck 0.33  masses 4  luma 127  white 19.1%  darklimb  -83.7
+rocket     cov 72.0%  bbox 29x32  elong 1.22  reach 1.69  protr 20.4%  neck 0.72  masses 3  luma 103  white  6.9%  darklimb  -54.7
+melta      cov 51.6%  bbox 31x29  elong 1.52  reach 2.01  protr 24.1%  neck 0.47  masses 5  luma  94  white  4.7%  darklimb  -44.0
+
