@@ -129,11 +129,12 @@ Wiring (`prototypes/entity.lua`): `begin_sound` is a `variations` list of
 `end_sound` is `melta-stop.ogg`; all three carry `aggregation` and an
 `audible_distance_modifier` of 1.3–1.4.
 
-- **Data stage** (`--create` on the staged copy): exit 0, no errors, no warnings, and the
-  resolved prototype dumped from `data.raw` carries three variations with the expected
-  volumes and aggregation. Every filename in it exists on disk, and a sweep of the staged
-  `sound/` directory finds **no unreferenced `.ogg`** — `melta-start.ogg` is gone and
-  nothing points at it.
+- **Data stage** (`--create`): exit 0, no errors, no warnings, both on the staged copy of
+  the working tree and on `git archive HEAD` — i.e. the commit alone loads, not just a tree
+  that happens to have a sibling card's uncommitted edits. The resolved prototype dumped
+  from `data.raw` carries three variations with the expected volumes and aggregation.
+  Every filename in it exists on disk, and a sweep of the staged `sound/` directory finds
+  **no unreferenced `.ogg`** — `melta-start.ogg` is gone and nothing points at it.
 - **GUI run** (plain `--load-game`, so a real audio device): `[Audio] Driver:wasapi,
   Device:Default device, Depth:32, Channels:2, Frequency:44100`, then `Loading sounds...`
   — the engine's own sound loader read the mod's OGGs and reported nothing — then the probe

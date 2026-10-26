@@ -353,44 +353,62 @@ two numbers to turn down if it feels like a pipe into the void.
 ## Sound
 
 `sound/_generator/melta_sounds.py` synthesises the whole set from noise spectra (random phase ->
-circular filters -> inverse FFT, so the loop is seamless):
+circular filters -> inverse FFT, so the loop is seamless). Every cue is built from three layers,
+and each layer is placed in a different part of the spectrum so that "is it there?" is a
+measurement:
 
-- `melta-burn.ogg` -- 2 s loop: low rumble, a band-passed roaring body with a 7 Hz flutter, and a
-  thin sizzle with crackle ticks on top. Measured 63 % of its energy sits in 0.5-3 kHz, ~2.4 kHz
-  centroid: air being pushed, not white hiss.
-- `melta-start.ogg` -- 0.45 s pressure build-up (rising jet + falling thump).
-- `melta-stop.ogg` -- 0.6 s decay, sizzle lingering.
+| layer | synthesis | band |
+|---|---|---|
+| pressure release | 2600/6800 Hz burst on sample 0, 1.5 ms attack, 40 ms decay, plus a falling 150 -> 62 Hz thump for mass | first 5 ms, 2-6 kHz |
+| sizzle / roar | 420/1150/2800 Hz noise body with 7 Hz flutter, a 5.2/9 kHz hiss, 7-12 molten spatter ticks | 120 Hz - 16 kHz |
+| turbopump | harmonic stack (1, 2, 3, 4, 6 x) climbing 45 -> 92 Hz over 0.20 s, 11x/17x blade whine, 9 Hz wobble | 20-120 Hz |
 
-They are wired as the turret's `cyclic_sound` (begin / middle loop / end), so the jet runs for as
-long as the trigger is held and stops with the beam. The engine cannot pitch a sound per entity,
-so the spin-up is carried by the visuals, not the audio.
+- `melta-fire-1/2/3.ogg` -- 0.62 / 0.70 / 0.66 s shots, three variations (pump pitch, sizzle level
+  and spatter count differ; cross-correlation between them is 0.17-0.27, and they are level-matched
+  within 0.15 dB). Onset is 0.2-0.45 ms from sample 0, so there is no perceptible firing delay.
+- `melta-burn.ogg` -- 2 s loop at the same three layers with the pump at running speed, so the
+  ignition hands over to the sustain with no step. Seam continuous: |last - first| is 0.016 against
+  a mean sample step of 0.046.
+- `melta-stop.ogg` -- 0.6 s shut-down with the rotor winding down 88 -> 42 Hz.
 
-**Loudness (measured, not guessed).** The generator normalises by *peak*, and this noise bed has a
-25 dB crest factor, so the loop shipped 12.7 dB quieter than a vanilla flamer loop even though its
-`volume` was close to vanilla's:
+They are wired as the turret's `cyclic_sound`: the three variations are `begin_sound.variations`,
+`melta-burn.ogg` is `middle_sound`, `melta-stop.ogg` is `end_sound`. Not `attack_parameters.sound`:
+that retriggers on every 8-tick pulse, i.e. 7.5/s, so a 0.65 s cue would stack five deep and smear.
+`begin/middle/end` is the model vanilla uses for a held stream (the flamethrower turret), and
+`allow_random_repeat` defaults to false, so consecutive ignitions pick different files. The engine
+still cannot pitch a sound per entity, so the pump spin-up lives in the cue itself rather than in
+the audio engine.
 
-| | file RMS | volume | in the mix | file peak |
+**Loudness (measured, not guessed).** The generator normalises by *RMS*, not peak: a noise bed like
+this has a ~13 dB crest factor, and peak-normalising it was how an earlier build shipped 12.7 dB
+quieter than a vanilla flamer loop with a `volume` that looked right. Numbers come from decoding the
+shipped OGGs (`docs/verification/harness/sound_measure.py`):
+
+| cue | file RMS | volume | in the mix | file peak |
 |---|---|---|---|---|
-| before | −26.4 dBFS | 0.45 | −33.3 dBFS | −1.4 dBFS |
-| now | −15.2 dBFS | 0.70 | −18.3 dBFS | −1.6 dBFS |
-| reference: flamethrower-turret-mid | −13.2 dBFS | 0.5 | −19.2 dBFS | −2.3 dBFS |
-| reference: gun-turret gunshot | −17.6 dBFS | 0.4 | — | −0.5 dBFS |
+| melta-fire-1/2/3 | −15.4 dBFS | 0.70 | −18.5 dBFS | −3.3 dBFS |
+| melta-burn (loop) | −15.3 dBFS | 0.70 | −18.4 dBFS | −4.4 dBFS |
+| melta-stop | −19.6 dBFS | 0.70 | −22.7 dBFS | −5.7 dBFS |
+| reference: flamethrower-turret-start | −13.2 dBFS | 0.5 | −19.2 dBFS | −1.2 dBFS |
+| reference: flamethrower-turret-mid | −13.7 dBFS | 0.5 | −19.7 dBFS | −2.4 dBFS |
+| reference: gun-turret gunshot | −17.9 dBFS | 0.4 | −25.9 dBFS | −0.8 dBFS |
+| reference: laser turret shot | −20.2 dBFS | 0.5 | −26.2 dBFS | −3.6 dBFS |
 
-That is +15 dB in the mix: level with a vanilla flamer loop, still below gun-turret spam, and with
-−4.7 dBFS of headroom per voice so two loops cannot sum past full scale. `aggregation.max_count =
-2` on all three sounds is the anti-clipping clamp, and `audible_distance_modifier` 1.3–1.4 widens
-the falloff so it carries further than it did.
+So the melta is ~0.8 dB above the flamethrower turret's igniter and ~7 dB above the gun and laser
+turrets: the heaviest weapon in the comparison, which is what a pressure weapon should be.
 
-The shipped `melta-burn.ogg` is the generator's output run through a limiter that raises the RMS
-without touching the loop point (causal, no tail), same 22050 Hz mono Vorbis:
+**Clipping budget.** Peak is the number that decides clipping, and the encoder is where it moves:
+libvorbis overshoots a sharp transient by 1.5-3 dB, so the generator now re-encodes until every cue
+*decodes* at or under −3 dBFS (that loop caught files that were safe before encoding and decoded at
+−1.4 dBFS). Two voices of any variations 0-40 ms apart peak at −1.4 dBFS, and `aggregation.max_count
+= 2` on all three slots is what keeps it at two; `progress_threshold = 0.35` on the ignition hands
+its slot back once the cue is a third through, so a second turret's ignition is never dropped by the
+first one's tail.
 
-```bash
-ffmpeg -i melta-burn.ogg -af "volume=20dB,alimiter=limit=0.80:attack=3:release=60:level=disabled" \
-       -ac 1 -ar 22050 -c:a libvorbis -q:a 6 out.ogg
-```
-
-Re-running `melta_sounds.py` restores the quiet version — re-apply that command, or add the gain to
-the generator, before shipping a rebuild.
+There is no manual mastering step any more -- no ffmpeg limiter command to re-apply after a rebuild.
+`melta_sounds.py` is the whole pipeline: synthesise, RMS-match, soft-limit, encode, then gate the
+decoded file on peak, loudness, per-layer band balance, sample 0 near zero, tail to silence and loop
+seam continuity, and fail loudly if any of it regresses.
 
 ## Research and recipes
 
