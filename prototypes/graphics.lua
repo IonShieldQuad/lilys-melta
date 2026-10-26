@@ -53,66 +53,42 @@ local base =
   priority = "high"
 }
 
--- Pipe sockets ---------------------------------------------------------------
--- A pipe is a 1-tile entity and the turret's collision box is 1.2, so the nearest
--- tile a pipe can occupy is 2.0 tiles out and its art stops at 1.5 -- past the
--- hull's silhouette on X (1.62) but short of it in Y (1.02-1.09, the camera is
--- pitched). With no port art the pipe just runs up to the emplacement and reads as
--- floating, which is the reported bug.
+-- Pipe stubs -----------------------------------------------------------------
+-- Copied from lilys-cubeine's combustion center (prototypes/fuel/
+-- cubeine-combustion-center.lua), which is the one place this look is already
+-- right: space-age's electromagnetic-plant pipe pictures, in their own colours,
+-- drawn only on a side that actually has a pipe.
 --
--- 2.1 has two different fields here and they are NOT interchangeable:
---   `pipe_picture` = the port hardware, drawn on a side that HAS a pipe connected
---   `pipe_covers`  = what to draw on a side with NOTHING connected
--- and `always_draw_covers` defaults to true when `pipe_picture` is absent, i.e. the
--- old build drew vanilla's *cap* (whose art sits 0.5 tiles inboard of the connection
--- point, on top of the deck at 0.88-1.04 tiles) on every side, pipe or no pipe. That
--- is exactly "a collar lying on the hull, half a tile short of the pipe".
+-- Three engine fields do the work, and they are the reason this replaced the
+-- mod's own renders:
+--   `pipe_picture`             = the stub drawn where a pipe arrives
+--   `draw_only_when_connected` = draw it *only* then, so an unused side stays bare
+--                                hull. The old build rendered a "cap" plate for
+--                                unused sides and put it at the connection point;
+--                                the hull never reaches that point, so every unused
+--                                side showed a plate floating off the deck.
+--   `secondary_draw_order`     = -1 draws the stub behind the hull, so its inboard
+--                                half is hidden and only the part that pokes past
+--                                the rim reads -- a pipe running into the housing.
+-- Same models as cubeine, no tint: the hardware is the same grey metal as every
+-- other pipe the player builds.
 --
--- So the mod now renders its own port (graphics/_blender/pipe_port.py) and uses it
--- for both: the open socket where a pipe arrives, the blanked-off plate where none
--- does. Frame centre = the connection point, `shift = {0, 0}`, so where the art
--- lands is decided by `C.pipe_reach`. graphics/_blender/pipe_join.py measures the
--- result (port reach vs the pipe's own near edge, bare ground in between) and fails
--- if the two do not meet on any side.
--- Where the port art sits relative to the connection point: C.pipe_shift (screen
--- tiles, per side). Kept in constants.lua because graphics/_blender/pipe_join.py
--- measures the join and has to use the same numbers the prototype draws with.
-local C = require("constants")
-
-local function port_side(kind, side)
-  return
-  {
-    layers =
-    {
-      {
-        filename = "__lilys-melta__/graphics/entity/melta-turret/melta-pipe-" .. kind .. "-" .. side .. ".png",
-        width = 192,
-        height = 192,
-        scale = 0.5,
-        shift = C.pipe_shift[side],
-        mipmap_count = 4,
-        priority = "extra-high"
-      }
-    }
-  }
-end
-
-local function port_set(kind)
-  return
-  {
-    north = port_side(kind, "north"),
-    east = port_side(kind, "east"),
-    south = port_side(kind, "south"),
-    west = port_side(kind, "west")
-  }
+-- The art lives in space-age; a base-only install keeps vanilla's own pipe covers
+-- (what the vanilla flamethrower turret uses) instead.
+local pipe_pictures
+local pipe_covers
+if mods["space-age"] then
+  pipe_pictures = require("__space-age__.prototypes.entity.electromagnetic-plant-pictures").pipe_pictures
+else
+  pipe_covers = pipecoverspictures()
 end
 
 return
 {
   head = head,
   base = base,
-  pipe_picture = port_set("port"),
-  pipe_covers = port_set("cap"),
+  pipe_picture = pipe_pictures,
+  pipe_covers = pipe_covers,
 
   attacking_animation = head_layers(),
   prepared_animation = head_layers(),

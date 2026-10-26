@@ -1,3 +1,17 @@
+Version: 0.5.2
+Date: 2026-10-27
+  Graphics:
+    - Pipe connections are the same hardware the Cubeine combustion center uses: the
+      space-age electromagnetic-plant pipe stubs, in their normal grey, drawn only on a
+      side that actually has a pipe connected (draw_only_when_connected), and drawn
+      behind the hull so what shows is the pipe running into the housing
+    - An unused side is now bare hull. The old build put a cap on all four sides, and
+      that cap sat at the connection point while the hull starts further out, so every
+      unused port showed a plate floating half a tile off the deck
+    - The mod's own rendered port and cap sprites are no longer used; on a base-only
+      install (no Space Age) the turret falls back to vanilla's pipe covers, the same
+      thing the flamethrower turret uses
+
 Version: 0.5.1
 Date: 2026-10-26
   Graphics:

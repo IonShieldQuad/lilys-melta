@@ -286,93 +286,75 @@ So the ports are `+-1.12` tiles on the four axes and `flow_direction` is left at
 engine default (`"input-output"`, verified at runtime by reading
 `get_fluid_box_pipe_connections`) like the vanilla flamethrower turret.
 
-### Why the pipes still looked disconnected, and what actually fixes it
+### The fix: the pipe hardware cubeine's combustion center already ships
 
 `pipe_covers` is **not** the connected-port picture. 2.1 splits the two cases:
 
 | field | drawn when |
 |---|---|
-| `pipe_picture` | a pipe *is* connected on that side — this is the machine's own stub (vanilla's `assembling-machine-2-pipe-N/E/S/W`) |
+| `pipe_picture` | a pipe *is* connected on that side — the machine's own stub |
 | `pipe_covers` | nothing is connected on that side — a blanking cap |
 | `always_draw_covers` | defaults to **true when `pipe_picture` is absent**, i.e. covers are then drawn on every side |
 
-The 0.4.0 build set only `pipe_covers`, so the engine drew vanilla's *cap* — whose art
-sits 0.28-0.5 tiles inboard of the anchor, i.e. at 0.88-1.04 tiles from the centre —
-on all four sides whether a pipe was there or not: a collar lying on the deck, half a
-tile short of the pipe, and no port art at all where the pipe arrived.
+0.4.0 set only `pipe_covers`, so vanilla's *cap* — whose art sits 0.28-0.5 tiles inboard
+of the anchor — was drawn on all four sides whether a pipe was there or not. 0.5.x
+replaced that with the mod's own rendered port plus a blanked-off variant of it, and hit
+the same wall one generation further on: a cap has to be drawn at the connection point
+(1.12), while the hull's silhouette starts at 1.28 north / 1.53 west / 1.64 east, so
+**every unused side showed a plate floating half a tile off the deck** — visible in
+`docs/verification/in-game-pipes/05-capped-ports.jpg` from 0.5.1.
 
-The fix is the native one and it is where the "render extra pipe models" instinct was
-right: the mod now renders its own port (`graphics/_blender/pipe_port.py`, one model:
-mount pad, neck with ribbed strain relief, bolted clamp collar, socket mouth with a
-bolt ring) in four orientations, and supplies it as **`pipe_picture`** for connected
-sides and as a blanked-off variant of the same port for **`pipe_covers`**.
-`always_draw_covers = false` makes the distinction explicit.
+The configuration that works is not a render at all: it is what `lilys-cubeine`'s
+combustion center already ships, copied almost verbatim.
 
-- Frame centre = the connection point, `scale = 0.5` on a 128 px sprite (64 art px/tile,
-  the same density as the rest of the mod's art), so `C.pipe_reach` decides where the
-  socket sits and nothing guesses a `shift`.
-- One model, four renders through the same 51° camera: the projection lands it at a
-  different screen distance per side (the pipe's own art is asymmetric too — its near
-  edge is 1.52 tiles north but 1.19 south). `C.pipe_shift` carries the per-side
-  correction, screen tiles: south `+0.18` and west `-0.22`, because on those sides the
-  clamp collar otherwise hid behind the hull's deeper rim (south 1.28) or the west
-  vent block, and only the mouth showed — which read as a cap sitting on the pipe.
+```lua
+pipe_picture             = <space-age electromagnetic-plant pipe pictures>
+draw_only_when_connected = true
+secondary_draw_orders    = {north = -1, west = -1, east = -1}
+pipe_covers              = nil          -- whenever space-age is present
+```
 
-Measured with `python graphics/_blender/pipe_join.py --check`, which composites the
-hull, the port and the real vanilla pipe sprite at 64 px/tile (Factorio zoom 2.0) and
-fails if the port does not reach the pipe or if any bare ground shows in between:
+- `draw_only_when_connected` is literally "only if the connector is actually used": a
+  side with no pipe draws nothing, so an unused port is bare hull with no cap to float.
+- `secondary_draw_order = -1` draws the stub behind the hull, so its inboard half is
+  hidden and what reads is the part that pokes past the rim — a pipe running into the
+  housing rather than a collar lying on the deck.
+- The art is space-age's `electromagnetic-plant-pipe-{N,E,S,W}`, **untinted**: the same
+  grey metal as every pipe the player builds. (cubeine's own combustion center uses
+  exactly these pictures, also untinted.)
+- `pipe_connections` stay at `C.pipe_reach = 1.12` on all four sides. Positions are the
+  one part of that config that does *not* carry over: cubeine's connections sit at ±2 on
+  a 5x5 reactor, and a connection cannot move out to meet the pipe anyway (1.199 is the
+  hard ceiling).
 
-| side | port reaches | pipe's near edge | overlap | bare ground between |
-|---|---|---|---|---|
-| north | 1.98 | 1.52 | +0.46 | 0 |
-| east | 1.89 | 1.50 | +0.39 | 0 |
-| south | 1.77 | 1.19 | +0.58 | 0 |
-| west | 2.01 | 1.52 | +0.50 | 0 |
+A base-only install gets vanilla `pipecoverspictures()` covers instead — the same thing
+the vanilla flamethrower turret uses — because the electromagnetic-plant art does not
+exist without the expansion. The mod detects `mods["space-age"]` at the data stage and
+picks the branch itself.
 
-The capped sprite is checked the same way (`cap px`: pixels the blanking plate adds over
-the open port, 72-160 per side) so "no pipe connected" cannot silently revert to looking
-like an open socket.
+### Evidence
 
-In game (Steam build, 15 screenshots in `docs/verification/in-game-pipes/`): all four
-pipes meet the turret with no bare floor and a visible socket, the three unconnected
-sides of a one-sided turret show blanked plates, and the straight / L / T / cross
-junctions plus a dead end all render clean — the dead end capped, not hollow.
+Real frames from one GUI run (Steam build 87750, 2.1.23), `docs/verification/in-game-pipes/`,
+taken by the `melta-pipes` harness:
 
+| shot | what it shows |
+|---|---|
+| `00-vanilla-ref` | vanilla `assembling-machine-2` with a pipe on four sides — the yardstick for what a vanilla `pipe_picture` join looks like (it leaves a hairline seam too) |
+| `02-melta-four-way`, `03/04/12/13-join-*` | all four joins on a fully plumbed turret: pipe, stub, hull, no bare floor |
+| `05-capped-ports`, `14-capped-port-north` | a turret plumbed on one side: the other three sides are **bare hull**, no hardware at all |
+| `01-overview`, `15-overview-close` | the whole pad, so the joins can be judged at normal zoom |
 
-Measured join — distance from the turret centre to the hull's own silhouette vs to the
-pipe's near edge, at 64 px/tile, measured in a +-0.5 tile band around each pipe axis
-(that band is the only part of the hull a pipe can meet):
+Before/after on the same scene: the 0.5.1 frames (in the same folder) draw a ringed cap
+on every side, connected or not; these draw the stub only where a pipe arrives. The
+in-game pass also re-confirms the plumbing still works headlessly — pipes on all four
+sides are connection targets, and a filled pipe hands fluid over on the next tick (see
+`docs/pipe-connections/`, unchanged by this: no prototype moved except the pipe art
+fields).
 
-| side | hull silhouette | pipe's near edge | ground gap |
-|---|---|---|---|
-| north | 1.38 | 1.50 | **+0.12** |
-| east | 1.64 | 1.50 | −0.14 (pipe overlaps the hull) |
-| south | 1.28 | 1.19 | −0.09 (overlap: the pipe's raised rim projects over the skirt) |
-| west | 1.53 | 1.50 | −0.03 |
-
-The south and east pipe ends are drawn *closer* than 1.5 tiles because the vertical
-pipe sprite's raised rim, and the baked cast shadow, project inboard on screen — that is
-the art, not a port placement.
-
-North used to be +0.42 and was the one side that read as unattached. It was not a
-plumbing problem: a `pipe_connection` cannot sit outside the 1.199 collision box and the
-cover art draws inboard of the anchor, so no socket sprite can reach into that gap. The
-cause was the **art**: `melta-turret-base.png` is rendered through a 51° pitched
-orthographic camera, so the round hull's footprint is drawn squashed in Y — 3.05 tiles
-wide but only ~2.1 tall where vanilla turret hulls run about 1.2 wide-to-tall. So
-`assemble.py` now de-squashes the base layer vertically (`BASE_DESQUASH_Y = 1.26`,
-applied about the frame centre, so `shift = {0, 0}` and the head stays concentric). Only
-the base layer: the 64 head frames are not resampled, so the pivot is untouched.
-
-For reference, vanilla `assembling-machine-2` (same ±1.2 collision box, so pipes also sit
-2.0 tiles out) leaves **+0.24** on its north side — measured the same way, in
-`docs/pipe-sockets/reference-vanilla.png`. Ours is now tighter than vanilla's.
-
-`docs/pipe-sockets/` holds the comparison that picked 1.12 (sink / flush / float /
-no-covers), the four side views, the north before/after panel, the vanilla reference and
-`gaps.json` (the measured table), with a README that says exactly how they were made and
-the one command that re-measures them:
-`python graphics/_blender/pipe_sockets.py --check`.
+The measured hull/pipe geometry above is unchanged and still the reason the stub cannot
+simply be moved outward: `docs/pipe-sockets/` (superseded as art evidence — its
+composites still draw vanilla covers — but `gaps.json` is the measurement) and
+`python graphics/_blender/pipe_sockets.py --check` remain valid as numbers.
 
 ## Engine facts this leans on (and the ones that bit)
 

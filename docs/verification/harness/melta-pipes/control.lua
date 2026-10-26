@@ -5,7 +5,9 @@
 --   A. the melta with a pipe on all four sides, each running on to a storage tank
 --      (a real network, not four loose pipes)
 --   B. a second melta plumbed on ONE side only, so the other three ports are bare
---      -- that is the "dead end shows a cap, not an open hole" case
+--      -- that is the "an unused port must draw nothing at all" case
+--   REF. a vanilla assembling-machine-2 with a pipe on each side: the yardstick for
+--      what a vanilla pipe_picture join looks like (it leaves a hairline seam too)
 --   C. the four junction shapes on their own, so a straight run, an L corner, a T
 --      junction, a 4-way cross and a dead-ended pipe can each be looked at
 --
@@ -18,6 +20,11 @@ local TURRET = "melta-turret"
 local A = {x = 0, y = 200}          -- melta, four pipes
 local B = {x = 16, y = 200}         -- melta, east pipe only
 local SHAPES = {x = 0, y = 214}     -- the junction shapes
+-- REF: a vanilla assembling-machine-2 (3x3, collision 1.2, north/south pipe
+-- connections at 1.0) with a pipe on each side. Its pipe_picture art is the
+-- reference for where the engine anchors one of these sprites, so every melta
+-- join can be compared against a join nobody argues about.
+local REF = {x = -16, y = 200}
 
 local function S()
   storage.pipes = storage.pipes or {}
@@ -68,6 +75,7 @@ end
 ----------------------------------------------------------------- setup -------
 local function build()
   local surface = game.surfaces[1]
+  game.speed = 2
   surface.always_day = true
 
   surface.request_to_generate_chunks({SHAPES.x, SHAPES.y}, 4)
@@ -105,6 +113,21 @@ local function build()
     tank(surface, B.x + 5.5, B.y + 1.5)
   else
     logf("FATAL: could not create the second melta")
+  end
+
+  -- REF: vanilla assembling-machine-2 with a pipe on all four sides
+  local ref = surface.create_entity{name = "assembling-machine-2",
+                                    position = {REF.x, REF.y},
+                                    force = game.forces.player, raise_built = true}
+  if ref then
+    REF.x, REF.y = ref.position.x, ref.position.y
+    for _, d2 in ipairs({{0, -1}, {1, 0}, {0, 1}, {-1, 0}}) do
+      for step = 2, 3 do
+        pipe(surface, REF.x + d2[1] * step, REF.y + d2[2] * step)
+      end
+    end
+  else
+    logf("FATAL: could not create the reference assembler")
   end
 
   -- C: the junction shapes
@@ -154,6 +177,8 @@ end
 ---------------------------------------------------------------- shots -------
 -- tick, path, position, zoom
 local SHOTS = {
+  {60,  "00-vanilla-ref",       {-16, 200}, 2.6},
+  {90,  "00-vanilla-ref-north", {-16, 198.6}, 4.0},
   {120, "01-overview",        {8, 207},   0.9},
   {165, "02-melta-four-way",  {0, 200.5}, 2.6},
   {210, "03-join-north",      {0, 198.6}, 4.0},

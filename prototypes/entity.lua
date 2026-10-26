@@ -128,15 +128,16 @@ local turret =
       {direction = defines.direction.south, position = {0, C.pipe_reach}},
       {direction = defines.direction.west, position = {-C.pipe_reach, 0}}
     },
-    -- the port hardware: the open socket where a pipe arrives (pipe_picture) and the
-    -- blanked-off plate where none does (pipe_covers). Both are the mod's own renders
-    -- of one port model, per direction; see prototypes/graphics.lua for why 2.1 makes
-    -- these two different fields.
+    -- The stub hardware and the two fields that decide when it shows. Copied from
+    -- lilys-cubeine's combustion center (see prototypes/graphics.lua for the art):
+    -- `draw_only_when_connected` keeps an unused side bare hull -- no cap plate --
+    -- and the negative secondary draw order puts the stub behind the hull so only
+    -- the part that pokes past the rim reads. `pipe_covers` is nil whenever the
+    -- space-age art is available; a base-only install gets vanilla's covers instead.
     pipe_picture = head.pipe_picture,
     pipe_covers = head.pipe_covers,
-    -- without pipe_picture the engine draws pipe_covers on *every* side, pipe or no
-    -- pipe (that was the bug: a cap lying on the deck next to each pipe end)
-    always_draw_covers = false
+    draw_only_when_connected = true,
+    secondary_draw_orders = {north = -1, west = -1, east = -1}
   },
   fluid_buffer_size = C.fluid_buffer,
   fluid_buffer_input_flow = 1.6,   -- units/tick: enough to feed ~50/s at full beam
