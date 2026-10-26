@@ -1,0 +1,8 @@
+[
+  {"action": "wait", "s": 1.0},
+  {"action": "key", "vk": 69},
+  {"action": "wait", "s": 3.0},
+  {"action": "move", "x": 40, "y": 1000},
+  {"action": "wait", "s": 0.5},
+  {"action": "grab", "name": "01-character-screen"}
+]

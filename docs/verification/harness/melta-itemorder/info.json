@@ -1,0 +1,9 @@
+{
+  "name": "melta-itemorder",
+  "version": "0.0.1",
+  "title": "melta item-order probe",
+  "author": "hermes",
+  "description": "Harness only: gives the launched GUI run a character and unlocks the melta recipe so the crafting menu can be photographed.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1", "lilys-melta"]
+}

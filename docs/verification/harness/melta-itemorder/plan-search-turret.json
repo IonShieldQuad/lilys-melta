@@ -1,0 +1,11 @@
+[{"action": "wait", "s": 2.0},
+ {"action": "key", "vk": 69},
+ {"action": "wait", "s": 3.5},
+ {"action": "click", "x": 1564, "y": 140},
+ {"action": "wait", "s": 1.0},
+ {"action": "grab", "name": "40-search-open"},
+ {"action": "type", "text": "turret"},
+ {"action": "wait", "s": 2.0},
+ {"action": "move", "x": 40, "y": 1000},
+ {"action": "wait", "s": 0.8},
+ {"action": "grab", "name": "41-search-turret"}]
