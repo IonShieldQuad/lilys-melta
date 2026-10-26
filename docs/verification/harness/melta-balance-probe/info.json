@@ -1,0 +1,8 @@
+{
+  "name": "melta-balance-probe",
+  "version": "0.0.1",
+  "title": "melta balance probe (harness, never shipped)",
+  "author": "harness",
+  "factorio_version": "2.1",
+  "dependencies": ["lilys-melta"]
+}

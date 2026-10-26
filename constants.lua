@@ -43,13 +43,105 @@ C.range_scan_ticks   = 6    -- a turret handed a target it cannot reach (a neigh
                             -- one this often (ticks)
 
 C.cooldown        = 8     -- ticks between pulses (7.5/s, reads as one continuous beam)
-C.damage_cold     = 14    -- damage per pulse, cold barrel (85 % fire + 15 % physical)
-C.damage_hot      = 56    -- damage per pulse, fully spun up (same split)
+C.cooldown_min    = 2     -- floor for the researched pulse interval: a modded
+                          -- +400 % firing-speed bonus must not turn the beam into
+                          -- a per-tick damage hose
+
+-- DAMAGE ---------------------------------------------------------------
+-- The melta is compared with two turrets, and both of them are ahead on
+-- something else: the gun turret outranges it (18 tiles, the tesla 30, the
+-- melta 16) and the tesla turret hits a whole chain of bodies (up to 10 jumps
+-- at 120 electric each, i.e. 60 dps single-target but up to ~600 across a
+-- chain). What the melta has is *dps on the one body in front of it*, so that
+-- is what this number has to buy:
+--
+--   turret (no research, unarmoured)   single-target dps
+--   gun turret, firearm magazine        50   (10 shots/s x 5)
+--   gun turret, piercing rounds         80   (10 shots/s x 8)
+--   gun turret, uranium rounds         240   (10 shots/s x 24)
+--   tesla turret                        60   (0.5 shots/s x 120, plus chain)
+--   melta, cold barrel                 240   <- 32 x 7.5
+--   melta, fully spun up               420   <- 56 x 7.5 = 1.75x cold
+--
+-- 32 cold puts the cold barrel level with the strongest gun turret (uranium
+-- rounds) even though it only reaches 16 tiles and drinks fluid instead of
+-- ammo; the spin-up then leaves every other turret well behind, which is what
+-- pays for the short reach and the fuel bill. Before this the cold barrel was
+-- 14 (105 dps) -- below a *piercing* gun turret -- and the turret only became
+-- worth its plumbing once it was white hot.
+C.damage_cold     = 32    -- damage per pulse, cold barrel (85 % fire + 15 % physical)
+C.damage_hot      = 56    -- damage per pulse, fully spun up (same split) = 1.75x cold
 C.spin_up_ticks   = 150   -- 2.5 s of unbroken fire from cold to white-hot
 C.spin_down_ticks = 60    -- 1 s to fall back to cold once the target is gone
 C.pierce_falloff  = 0.82  -- each further body in the line takes this fraction of the last hit
 C.pierce_max      = 12    -- hard cap on bodies a single pulse can cut through
 C.hit_half_width  = 0.45  -- tiles: half-width of the line hit test around the beam axis
+
+-- research scaling ------------------------------------------------------------
+-- The beam damage is the script's, so the engine's own ammo upgrades never see
+-- it: before this, EVERY turret in the game scaled with research and the melta
+-- stayed at 240/420 forever, i.e. it lost the arms race it was balanced for.
+-- The melta now takes the same two dips a gun turret takes:
+--
+--   1. damage -- the fire line (`refined-flammables`): its `ammo-damage`
+--      effects for the ammo categories below, applied once per pulse. The
+--      engine's carrier stream is zeroed, so this is the only place the number
+--      can come from; nothing else scales it.
+--   2. rate   -- the turret firing-speed line (`weapon-shooting-speed`).
+--      data-updates.lua copies each level's `gun-speed` modifier onto the
+--      melta's own ammo category, and control.lua shortens the pulse interval
+--      by the same amount (the pulse clock is scripted, so the script has to
+--      read it).
+--
+-- Why "double dip" needed a coefficient rather than a second modifier: every
+-- turret technology ships its bonus TWICE -- `ammo-damage` for an ammo category
+-- and `turret-attack` for a turret id -- and the engine multiplies the two
+-- together. That is why a gun turret's damage is the square of its accumulated
+-- bonus (measured: uranium rounds, 24 -> 29.06 at +10 % = 24 x 1.1^2, ->
+-- 61.44 at +60 % = 24 x 1.6^2) while its firing speed is a single application.
+-- The melta is not the `turret_id` any technology names (the fire line points
+-- at `flamethrower-turret`), so only the `ammo-damage` half is readable -- the
+-- turret-attack half simply does not exist for this turret id. A single flat
+-- application of the (steeper) fire ladder leaves it 32 % behind a gun turret
+-- at the end of the finite lines, so the readable half is compounded by
+-- `research_damage_exponent = 1.5`, the one number that puts the cold barrel
+-- level with a uranium gun turret at EVERY tier while keeping the hot end where
+-- it belongs:
+--
+--   tier  fire dmg  rate   melta cold  melta hot   gun turret (uranium)
+--    0      +0 %     +0 %     240        420       240
+--    1     +20 %    +10 %     347        607       319
+--    2     +40 %    +30 %     517        905       449
+--    3     +60 %    +50 %     729       1275       706
+--    4     +90 %    +80 %    1132       1980      1106
+--    5    +120 %   +110 %    1645       2878      1633
+--
+-- (melta cold = 32 x (1+fire)^1.5 x (1+rate) x 60/8; the gun turret column is
+-- 24 x (1+bullet-dmg)^2 x (1+bullet-rate) x 60/6. Measured in game:
+-- docs/verification/balance-verification.md. A 1.0 exponent is the plain
+-- single dip, 2.0 is a literal double dip -- re-tune here, not in control.lua.)
+C.research_damage_ammo    = {"flamethrower"}  -- ammo categories whose ammo-damage research scales the beam
+C.research_damage_scale   = 1.0   -- 0 turns the damage dip off; 1 = the researched bonus, as-is
+C.research_damage_exponent = 1.5  -- how hard the fire ladder compounds (see the table above)
+C.research_rate           = true  -- false pins the pulse rate at C.cooldown (no firing-speed dip)
+C.research_rate_ammo      = {"melta"}  -- ammo categories whose gun-speed research speeds the pulse clock
+
+-- flat armour bypass ----------------------------------------------------------
+-- The brief: the melta should ignore the *flat* part of an enemy's armour
+-- (resistances[type].decrease) and still be subject to the *percentage* part.
+-- The engine always does `max(0, damage - decrease) * (1 - percent/100)`, so
+-- the only honest way to ignore the flat half is to hand the engine
+-- `damage + decrease` for that damage type: the subtraction cancels and the
+-- percentage is applied to the full figure. Two details matter:
+--   * only a POSITIVE decrease is compensated. Asteroids carry negative flat
+--     resistances (-2000 physical on big, -3000 on huge) which mean extra
+--     damage; compensating those would *nerf* the melta against rocks and
+--     silently break the explosion channel's balance.
+--   * a 100 % resistance still comes out at zero damage, which is correct:
+--     percentage resistance is respected, by design.
+-- This touches nothing outside the melta's own pulse: no engine behaviour, no
+-- other turret, no fraction of it.
+C.pierce_flat_armor = true   -- ignore resistances[type].decrease on both damage components
 
 -- asteroids / rocks ------------------------------------------------------------
 -- A melta pulse is 85 % fire, and EVERY space-age asteroid is 100 % fire resistant:

@@ -72,6 +72,161 @@ local turrets
 -- until they have faded out (see retire_beam / fade_beam)
 local fades
 
+--------------------------------------------------------------- research -----
+
+-- What research gives the melta, and why the script has to read it itself.
+--
+-- A turret's damage normally scales because the ENGINE multiplies its ammo's
+-- damage, and its rate because the engine multiplies its cooldown. Neither can
+-- happen here: the melta's damage is dealt by this file (`victim.damage`) and
+-- its pulse clock is this file's `state.pulse_at`, so both are invisible to the
+-- engine's modifiers. Left alone, the turret is the only one in the game that
+-- stops growing the moment it is built -- it sat at 240/420 dps while a gun
+-- turret went 240 -> 1320.
+--
+-- So the two dips a gun turret gets are read here and applied in the same
+-- places the engine would have applied them:
+--
+--   * damage -- summed `ammo-damage` modifiers for C.research_damage_ammo
+--     (the flamethrower's `refined-flammables` line), applied ONCE per pulse
+--     and then compounded by C.research_damage_exponent. Each researched
+--     technology contributes its modifier exactly once: the `level` field on
+--     `refined-flammables-2` is the tier number (2), not a stacking count, and
+--     multiplying by it triple-counts the ladder (measured -- it is what made
+--     the first pass of this change reach +240 % instead of +120 %).
+--   * rate -- summed `gun-speed` modifiers for C.research_rate_ammo. The melta
+--     owns its ammo category, and data-updates.lua copies each
+--     `weapon-shooting-speed` level's bullet modifier onto that category, so
+--     the same research the gun turret line uses also shows up in the tech
+--     tooltip as "melta firing speed". The pulse interval is divided by the
+--     bonus, i.e. the turret really fires faster (and drinks fluid faster).
+--     Measured on 2.1.23, a gun turret's rate is exactly this: cooldown 6 at
+--     +0 %, 5 at +10 %, 4 at +50 %, 3 at +80 % -- one application, no more.
+--
+-- Both are cached per force and thrown away when research finishes: a scan of
+-- ~200 technologies per pulse per turret would be the single most expensive
+-- thing in the mod.
+
+local function category_set(list)
+  local set = {}
+  for _, name in ipairs(list or {}) do
+    set[name] = true
+  end
+  return set
+end
+
+local DAMAGE_CATEGORIES = category_set(C.research_damage_ammo)
+local RATE_CATEGORIES = category_set(C.research_rate_ammo)
+
+local function research_bonus(force)
+  storage.bonus_cache = storage.bonus_cache or {}
+  local cached = storage.bonus_cache[force.index]
+  if cached then
+    return cached
+  end
+
+  local damage, rate = 0, 0
+  for _, technology in pairs(force.technologies) do
+    if technology.researched then
+      -- `prototype.effects` is where the modifier list lives; guarded because a
+      -- technology with no effects is normal and a missing field must not kill
+      -- every turret on the map
+      local effects = technology.prototype and technology.prototype.effects
+      if effects then
+        for _, effect in pairs(effects) do
+          local kind = effect.type
+          if kind == "ammo-damage" and DAMAGE_CATEGORIES[effect.ammo_category] then
+            damage = damage + (effect.modifier or 0)
+          elseif kind == "gun-speed" and RATE_CATEGORIES[effect.ammo_category] then
+            rate = rate + (effect.modifier or 0)
+          end
+        end
+      end
+    end
+  end
+
+  cached =
+  {
+    damage = damage * (C.research_damage_scale or 0),
+    rate = (C.research_rate and rate) or 0
+  }
+  storage.bonus_cache[force.index] = cached
+  return cached
+end
+
+local function damage_multiplier(turret)
+  local bonus = research_bonus(turret.force).damage
+  if bonus < 0 then
+    bonus = 0
+  end
+  local exponent = C.research_damage_exponent or 1
+  if exponent ~= 1 then
+    return (1 + bonus) ^ exponent
+  end
+  return 1 + bonus
+end
+
+-- ticks between pulses after the firing-speed line, floored at C.cooldown_min
+local function pulse_interval(turret)
+  local rate = research_bonus(turret.force).rate
+  if rate < 0 then
+    rate = 0
+  end
+  local interval = C.cooldown / (1 + rate)
+  local floor = C.cooldown_min or 1
+  if interval < floor then
+    interval = floor
+  end
+  return interval
+end
+
+----------------------------------------------------------- flat armour -----
+
+-- "Ignore flat armour, respect percentage resistance", done where the damage is
+-- dealt because the engine offers no such flag: it always resolves a hit as
+-- `max(0, amount - decrease) * (1 - percent / 100)`. Handing it
+-- `amount + decrease` for that damage type cancels the subtraction exactly and
+-- leaves the percentage doing its job. Only POSITIVE `decrease` is compensated:
+-- asteroids carry negative flat resistances (-2000 physical on big, -3000 on
+-- huge) that mean extra damage, and cancelling those would quietly nerf the
+-- melta against rocks.
+--
+-- The table is built per prototype (every biter of a tier shares one) and cached
+-- by name; entity prototypes do not change during a game.
+local flat_armor_cache
+
+local function flat_armor(victim, damage_type)
+  local prototype = victim.prototype
+  if not prototype then
+    return 0
+  end
+  flat_armor_cache = flat_armor_cache or {}
+  local by_type = flat_armor_cache[prototype.name]
+  if not by_type then
+    by_type = {}
+    local resistances = prototype.resistances
+    if resistances then
+      for key, resistance in pairs(resistances) do
+        if type(resistance) == "table" then
+          -- dictionary form is keyed by damage type; the array form carries
+          -- `type` on each entry. Accept both rather than depend on which one
+          -- this engine build hands back.
+          local name = resistance.type
+          if type(name) ~= "string" then
+            name = type(key) == "string" and key or nil
+          end
+          if name then
+            local decrease = resistance.decrease or 0
+            by_type[name] = decrease > 0 and decrease or 0
+          end
+        end
+      end
+    end
+    flat_armor_cache[prototype.name] = by_type
+  end
+  return by_type[damage_type] or 0
+end
+
 ---------------------------------------------------------------- helpers ------
 
 local function normalize(dx, dy)
@@ -352,7 +507,8 @@ end
 local function pulse(turret, state, muzzle, dx, dy, reach)
   local force = turret.force
   local profile = fuel_profile(turret)
-  local damage = (C.damage_cold + (C.damage_hot - C.damage_cold) * state.charge) * profile.damage_modifier
+  local damage = (C.damage_cold + (C.damage_hot - C.damage_cold) * state.charge)
+                 * profile.damage_modifier * damage_multiplier(turret)
   local far_x = muzzle.x + dx * reach
   local far_y = muzzle.y + dy * reach
 
@@ -407,10 +563,22 @@ local function pulse(turret, state, muzzle, dx, dy, reach)
       -- amount, force, type, cause). The total is unchanged -- the split is taken out
       -- of `dealt`, so balance is identical and only the resistance maths differs:
       -- a 100 % fire-resistant target still eats C.physical_share of the pulse.
-      victim.damage(dealt * (1 - C.physical_share), force, C.damage_type, turret)
+      --
+      -- Flat armour is compensated out of both halves (C.pierce_flat_armor): the
+      -- engine subtracts `resistances[type].decrease` before the percentage, which
+      -- is what eats a short-range burst weapon alive against armoured targets, so
+      -- the pulse is handed exactly that much extra. Percentage resistance is NOT
+      -- touched -- a resistant target still takes its cut.
+      local fire_damage = dealt * (1 - C.physical_share)
+      local physical_damage = dealt * C.physical_share
+      if C.pierce_flat_armor then
+        fire_damage = fire_damage + flat_armor(victim, C.damage_type)
+        physical_damage = physical_damage + flat_armor(victim, C.damage_type_hit)
+      end
+      victim.damage(fire_damage, force, C.damage_type, turret)
       -- the fire hit may have killed it; a dead entity has nothing left to damage
       if victim.valid and victim.health and victim.health > 0 then
-        victim.damage(dealt * C.physical_share, force, C.damage_type_hit, turret)
+        victim.damage(physical_damage, force, C.damage_type_hit, turret)
       end
       -- Asteroids are 100 % fire resistant and their big/huge tiers subtract 2000/3000
       -- from every physical hit, so a rock would otherwise take almost nothing from the
@@ -445,8 +613,9 @@ local function pulse(turret, state, muzzle, dx, dy, reach)
   end
 
   if C.debug then
-    log(string.format("melta pulse unit=%s charge=%.2f damage=%.1f reach=%.1f candidates=%d hits=%d fuel=%d",
-      tostring(turret.unit_number), state.charge, damage, reach, #candidates, #hits, turret.get_fluid_count()))
+    log(string.format("melta pulse unit=%s charge=%.2f damage=%.1f reach=%.1f candidates=%d hits=%d fuel=%d research=%.2f interval=%.2f",
+      tostring(turret.unit_number), state.charge, damage, reach, #candidates, #hits,
+      turret.get_fluid_count(), damage_multiplier(turret), pulse_interval(turret)))
   end
 
   burn_surcharge(turret, state)
@@ -887,7 +1056,7 @@ local function update(turret, state, tick)
       local reach = math.max(1, range - along)
 
       if tick >= state.pulse_at then
-        state.pulse_at = tick + C.cooldown
+        state.pulse_at = tick + pulse_interval(turret)
         beam_for(state).pulse_tick = tick
         state.beam_end = pulse(turret, state, muzzle, ax, ay, reach)
       end
@@ -981,13 +1150,27 @@ end
 script.on_init(function()
   storage.turrets = {}
   storage.fades = {}
+  storage.bonus_cache = {}
   turrets = storage.turrets
   fades = storage.fades
 end)
 
+-- Research is the only thing that changes the bonus tables, so those two events
+-- are the whole invalidation story. Cheap: the next pulse of any melta refills
+-- the entry for its force.
+local function forget_research()
+  storage.bonus_cache = {}
+end
+
+script.on_event(defines.events.on_research_finished, forget_research)
+script.on_event(defines.events.on_technology_effects_reset, forget_research)
+
 script.on_configuration_changed(function()
   storage.turrets = storage.turrets or {}
   storage.fades = storage.fades or {}
+  -- a changed prototype set can change resistances and technology effects
+  storage.bonus_cache = {}
+  flat_armor_cache = nil
   turrets = storage.turrets
   fades = storage.fades
   reconcile()

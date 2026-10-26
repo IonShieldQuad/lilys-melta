@@ -1,3 +1,26 @@
+Version: 0.5.1
+Date: 2026-10-26
+  Balance:
+    - The cold barrel now lands where it has to: 32 damage per pulse (240 dps) instead of
+      14 (105 dps), i.e. level with a gun turret on uranium rounds, even though the melta
+      only reaches 16 tiles and drinks fluid. Fully spun up it is 56 per pulse (420 dps,
+      1.75x cold) -- measured against an unarmoured dummy in game.
+    - The beam damage now scales with research. Before this it was invisible to every
+      technology in the game: the turret stayed at 240/420 dps while a gun turret went to
+      1633. It takes the same two dips a gun turret takes -- the fire damage line
+      (refined flammables) and the turret firing speed line -- and holds cold parity with the
+      gun turret within 15 % at every tier, 1.75x its own cold dps when white hot
+      (docs/verification/balance-verification.md).
+    - Flat armour no longer eats the beam. The engine subtracts a target's `decrease`
+      before applying its percentage resistance; the pulse is now handed that much extra so
+      the subtraction cancels. Percentage resistance is untouched (a 100 % fire-resistant
+      target still ignores the fire share), and negative flat resistance -- the asteroid
+      vulnerability -- is left alone so rocks are unaffected. A behemoth's 12 flat armour
+      used to absorb a whole cold pulse (2.75 damage where an unarmoured body took 17.6);
+      it now takes 90 % of the unarmoured figure, i.e. only its 10 % resistance.
+    - The tooltip says both things: it ignores flat armour, and it scales with flamethrower
+      damage and turret firing speed research.
+
 ---------------------------------------------------------------------------------------------------
 Version: 0.5.0
 Date: 2026-10-25

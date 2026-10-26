@@ -83,8 +83,24 @@ else
 end
 
 -- The description the player reads: the flavour text that already exists in locale/,
--- then the generated damage block. Same block on the item and on the entity, so the
--- inventory tooltip and the inspect panel cannot disagree.
+-- then the generated damage block, then the two mechanics the damage block cannot
+-- express as a number -- the flat-armour bypass and research scaling. Both are
+-- switches in constants.lua, so turning either off removes its sentence instead of
+-- leaving the tooltip promising something the code no longer does. Same block on the
+-- item and on the entity, so the inventory tooltip and the inspect panel cannot
+-- disagree.
+local extra = {}
+if C.pierce_flat_armor then
+  extra[#extra + 1] = {"melta-tooltip.armor"}
+end
+if (C.research_damage_scale or 0) > 0 or C.research_rate then
+  extra[#extra + 1] = {"melta-tooltip.research"}
+end
+for _, line in ipairs(extra) do
+  block[#block + 1] = "\n"
+  block[#block + 1] = line
+end
+
 local function with_damage(flavour_key)
   return {"", {flavour_key}, "\n\n", block}
 end
