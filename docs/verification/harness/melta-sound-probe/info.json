@@ -1,0 +1,9 @@
+{
+  "name": "melta-sound-probe",
+  "version": "0.0.1",
+  "title": "melta sound probe",
+  "author": "hermes",
+  "description": "Never ships. Fires a melta turret in a GUI run so the engine has to open its OGG files.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1", "lilys-melta"]
+}

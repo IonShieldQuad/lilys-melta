@@ -179,27 +179,56 @@ local turret =
         }
       }
     },
-    -- synthesised jet exhaust + sizzle (sound/_generator/melta_sounds.py): a
-    -- high-pressure stream, not a flame loop borrowed from the flamethrower.
-    -- Loudness, measured (ffmpeg astats, effective = file dBFS + 20log10(volume)):
-    --   before  loop -26.4 dBFS RMS x 0.45 = -33.3 dBFS in the mix  (why it was quiet:
-    --           the generator normalises by PEAK, and this noise bed has a 25 dB crest)
-    --   after   loop -15.2 dBFS RMS x 0.70 = -18.3 dBFS in the mix
-    -- Reference points: vanilla flamethrower-turret-mid is -13.2 dBFS RMS x 0.5 =
-    -- -19.2 dBFS, gun-turret gunshot -17.6 x 0.4. So the melta now sits level with a
-    -- vanilla flamer loop and still under gun-turret spam, and its file peak (-1.6 dBFS)
-    -- leaves -4.7 dBFS per voice, i.e. two loops cannot sum over full scale.
-    -- `aggregation` is the anti-clipping clamp: at most 2 loops / 2 cues at once, so a
-    -- 5-turret wall raises the level instead of stacking. `audible_distance_modifier`
-    -- widens the falloff so it also *carries* further.
+    -- SOUND. Every cue is synthesised by sound/_generator/melta_sounds.py -- that
+    -- script is the source of truth, so re-run it rather than hand-editing the
+    -- OGGs (it re-checks loudness, clipping and layer balance after encoding).
+    -- Each cue is built from three layers: a pressure-release burst on sample 0,
+    -- a sizzling roar body as the stream burns, and a turbopump hum underneath
+    -- that spins up and gives the shot its weight.
+    --
+    -- Why CyclicSound and not `attack_parameters.sound`: `sound` retriggers on
+    -- every shot, and this turret pulses at 7.5/s (C.cooldown = 8), so a 0.6 s cue
+    -- would stack five deep and smear -- exactly what the brief says to avoid.
+    -- begin/middle/end is the model the vanilla flamethrower turret uses and it
+    -- matches what the melta does: one ignition, a held stream, one shut-down.
+    -- The three variations sit on the ignition (allow_random_repeat defaults to
+    -- false, so consecutive engagements never pick the same one).
+    --
+    -- Loudness, measured on the shipped files (ffmpeg astats; effective = file
+    -- RMS dBFS + 20log10(volume)):
+    --   cue                      file RMS   file peak   volume   effective
+    --   melta-fire-1/2/3           -15.4      -3.3       0.70      -18.5
+    --   melta-burn   (loop)        -15.3      -4.4       0.70      -18.4
+    --   melta-stop                 -19.6      -5.7       0.70      -22.7
+    --   vanilla flamer igniter     -13.2      -1.2       0.50      -19.2
+    --   vanilla flamer loop        -13.7      -2.4       0.50      -19.7
+    --   vanilla gun turret shot    -17.9      -0.8       0.40      -25.9
+    --   vanilla laser turret shot  -20.2      -3.6       0.50      -26.2
+    -- So the melta sits just above a vanilla flamer and far above the gun and
+    -- laser turrets: heavier than both, as a fluid weapon firing continuous
+    -- pressure should be.
+    --
+    -- Peaks are what clip, not RMS: the generator gates every file to decode under
+    -- -3 dBFS, so one voice at 0.70 peaks at -6.1 dBFS and the worst measured
+    -- two-voice sum (any two variations, 0-40 ms apart) is -1.4 dBFS.
+    -- `aggregation.max_count` is what limits it to two voices -- a 5-turret wall
+    -- raises the level instead of stacking. `progress_threshold` hands the
+    -- ignition's slot back once the cue is a third through, so a second turret's
+    -- ignition is never dropped because the first one's tail is still ringing.
+    -- `audible_distance_modifier` widens the falloff so the cue carries instead of
+    -- being pushed louder.
     cyclic_sound =
     {
       begin_sound =
       {
-        filename = "__lilys-melta__/sound/melta-start.ogg",
-        volume = 0.7,
+        variations =
+        {
+          {filename = "__lilys-melta__/sound/melta-fire-1.ogg", volume = 0.7},
+          {filename = "__lilys-melta__/sound/melta-fire-2.ogg", volume = 0.7},
+          {filename = "__lilys-melta__/sound/melta-fire-3.ogg", volume = 0.7}
+        },
         audible_distance_modifier = 1.3,
-        aggregation = {max_count = 2, remove = true, count_already_playing = true}
+        aggregation = {max_count = 2, remove = true, count_already_playing = true, progress_threshold = 0.35}
       },
       middle_sound =
       {

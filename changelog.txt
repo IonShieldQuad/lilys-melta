@@ -77,6 +77,26 @@ Date: 2026-10-25
       so the tooltip cannot drift from the numbers control.lua applies. Verified by
       measuring a pulse against an unarmoured dummy: 56.00 hp at full charge on light
       oil, and 89.63 = 56 x 1.60 on enriched melta fuel
+  Sound:
+    - The firing cue is a layered sound now instead of one flat noise bed: a sharp
+      pressurised release on the first sample, a sizzling roar as the stream burns, and
+      a turbopump hum spinning up underneath that gives the shot its weight. Three
+      variations of the ignition, so a turret that stops and starts firing does not
+      sound identical every time
+    - It is heavier than the gun and laser turrets on purpose, and longer than a
+      gunshot: the melta holds a beam, so the cue is the engine's begin/middle/end
+      cycle (the same model the vanilla flamethrower turret uses). Measured effective
+      loudness -18.5 dBFS for the shot and -18.4 for the sustained loop, against -19.2
+      and -19.7 for the flamethrower turret, -25.9 for the gun turret and -26.2 for
+      the laser turret
+    - Every cue is synthesised by sound/_generator/melta_sounds.py and checked after
+      encoding: 44.1 kHz mono Ogg Vorbis, RMS-normalised (peak-normalising is why the
+      old loop measured -26 dBFS RMS and sounded quiet), a transient on sample 0 with
+      no leading silence, and no cue decoding above -3 dBFS so two overlapping shots
+      cannot clip
+    - melta-start.ogg is replaced by melta-fire-1/2/3.ogg, listed as `variations` on
+      begin_sound; nothing references the old file and no unreferenced sound is left
+      in the mod
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.0
 Date: 2026-10-25
