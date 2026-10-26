@@ -62,6 +62,30 @@ Date: 2026-10-26
       0.2 % of a big rock's health, and the asteroid channel is unchanged.
     - The tooltip says both things: it ignores flat armour, and it scales with flamethrower
       damage and turret firing speed research.
+  Changes:
+    - The turret is listed with the other turrets instead of at the end of the combat
+      tab. Its item moved out of the defensive-structure subgroup, where the walls, gate
+      and radar live, into the turret subgroup, on an order key taken from the
+      flamethrower turret's own and extended by one segment: in the 2.1.23 crafting menu,
+      searching "turret" reads gun, laser, flamethrower, melta, artillery, rocket, tesla,
+      railgun
+    - Every string the player reads is in the base game's register now instead of the
+      mod's own: item, entity, technology, fluid and mod descriptions in sentence case
+      with US spelling, using the "needs a fluid supply instead of ammunition" phrasing
+      the flamethrower turret uses. The fuel list names the fluids it takes instead of
+      drawing three unnamed drops, and the two lines about armour and research render at
+      all -- a parameterised localised string drops everything appended after its last
+      parameter, so they belong to the tooltip's own description
+  Fixed:
+    - The pipe ports are sized and placed like a pipe fitting rather than like a collar:
+      1.03 to 1.08 tiles across, against a pipe's 1.00 to 1.11 and vanilla's own 0.80
+      pipe cover, where they were 0.59 to 0.70; and the inboard end sits 0.35 to 0.52
+      tiles from the centre where it was 0.91 to 1.09. The port is scaled about its
+      mouth, so the far end stays on the pipe on all four sides and no floor shows
+      between the two (seam 0.00 on every side). Moving the connection point itself a
+      tile inwards cannot work: at pipe_reach 0.75 all four sides still link, at 0.50
+      two of them stop linking and no fluid arrives, so the art carries the move and the
+      reach stays 1.12
 
 ---------------------------------------------------------------------------------------------------
 Version: 0.5.0

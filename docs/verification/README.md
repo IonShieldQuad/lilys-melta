@@ -1,5 +1,12 @@
 # In-game verification of the 0.4.0 melta rework
 
+> **0.5.1 finalisation:** the five 0.5.1 passes (item order, text, cannon art, pipe ports,
+> sound) were checked together on the merged commit — headless load + 300-tick run on the
+> exact tree, the palette/port/icon gates re-run from the committed files, the changelog
+> completed, and the icon camera question settled (five cameras rendered; the shipped one
+> is the best of them, and the icon's weakness is proportional, not photographic). Report:
+> [`finalisation-0.5.1.md`](finalisation-0.5.1.md); evidence in `art/icon-*.png`.
+
 > **Art rework (0.5.1, pre-release):** the cannon model, muzzle and palette were
 > rebuilt toward vanilla. Report:
 > [`art-rework-verification.md`](art-rework-verification.md); evidence in `art/`,
