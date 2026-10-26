@@ -19,6 +19,10 @@ damage level by changing numbers instead of pixels.
                       the packed mip chain, plus the mod thumbnail
     check_icons.py    offline stand-in for the atlas: sizes, packed mips, framing,
                       and that the prototypes point at these files
+    icon_read.py      measures how an icon READS at 64 px and at the authored 32 px mip
+                      (coverage, elongation, reach, protrusion, neck, big-mass count,
+                      white-hot share, limb contrast) against vanilla's turret icons --
+                      the acceptance measurement for the 0.5.1 icon shape-budget pass
     pipe_sockets.py   measures the hull/pipe join on all four sides from the sprites,
                       and draws the docs/pipe-sockets views
     pipe_port.py      builds and renders the PIPE PORT (one model, four orientations)
@@ -118,8 +122,44 @@ python check_icons.py "H:/Factorio Mods/lilys-melta"
 
 `render_icons.py` imports `melta_render` rather than copying it, so `GUN_SCALE`, the
 materials and every part stay in one place: change the turret and the icon changes
-with it. `iconraw/icon-040.png` is the render the shipped icons came from, kept so
-the icons can be re-derived without Blender.
+with it. `iconraw/icon-040.png` is the render the shipped item icon came from and
+`iconraw/icon-040-ship.png` the shipping-proportions render the technology icon and
+thumbnail came from, kept so the icons can be re-derived without Blender.
+
+### The icon's shape budget (do not undo without re-measuring)
+
+The item icon is judged at 32 px, where the weapon has to be a real part of the
+silhouette. The hull is 3.1 tiles across and the cannon reaches 1.5, so at shipping
+proportions the icon measured 15.5 % protrusion / 1.60 reach against 20-24 % / 1.7-2.5
+for vanilla's turret icons, and it collapsed into a warm oval in the crafting menu. Two
+knobs fix that, and both are ICON-ONLY — the sheets never see them:
+
+```bash
+blender -b --factory-startup -P render_icons.py -- \
+    --out graphics/_blender/iconraw --dirs 40 --res 1024 --samples 56 --tilt 34 \
+    --icon-gun-scale 1.75 --icon-emit "hotmetal:0.6=3,lamp:0.3=2"
+blender -b --factory-startup -P render_icons.py -- \
+    --out C:/tmp/melta/shipraw --dirs 40 --res 1024 --samples 56 --tilt 34
+# then copy shipraw/icon-040.png over graphics/_blender/iconraw/icon-040-ship.png
+python assemble_icons.py graphics/_blender/iconraw 40 --out "H:/Factorio Mods/lilys-melta"
+python check_icons.py "H:/Factorio Mods/lilys-melta"
+python icon_read.py ../../graphics/icons/melta-turret.png    # the numbers below
+```
+
+* `--icon-gun-scale F` multiplies the gun root about the pivot (and drops it in Z so the
+  bore stays at sheet height). 1.75 puts reach/protrusion/neck/elongation inside the
+  vanilla band; 1.5 leaves the weapon at the floor of it, 2.0 overshoots.
+* `--icon-emit "mat[:white]=mult,..."` lifts an emissive material in the icon render
+  only, so the muzzle lip and bore are white-hot with their own hue and form. Boosting
+  the same thing in the tone curve instead (the retired `hot_focal` path) desaturates the
+  muzzle and reads as a glow blob.
+* `assemble_icons.py` applies the icon-only detail pass at the final 64 px: texture below
+  10 luma is flattened, real edges survive (6 is a marginal win, 14+ smears the muzzle).
+
+`python icon_read.py --vanilla --ours graphics/icons/melta-turret.png` is the acceptance
+measurement: coverage, elongation, reach, protrusion share, neck ratio, big-mass count,
+white-hot share and limb-vs-body contrast, at 64 px and at the authored 32 px mip.
+`docs/verification/icon-read-0.5.1.md` records the sweep and why each number was chosen.
 
 Three things are deliberately different from the sheets:
 
@@ -127,6 +167,7 @@ Three things are deliberately different from the sheets:
 |---|---|---|
 | camera pitch | 51 deg | **34 deg** -- at 51 the 2x2 emplacement only fills 63x44 of the 64 px box (a dead band); at 34 it fills 63x53 and the muzzle still reads |
 | tone | fitted to the vanilla base *sprites* (mean ~50, half near black) | fitted to the vanilla *icons* (mean 85-97, ~10% near black) -- the sprite curve on an icon reads as a murky disc at 32 px |
+| shape budget | the machine as it stands | **icon-only**: gun root x1.75 about the pivot and a white-hot muzzle (`--icon-gun-scale`, `--icon-emit`), so the weapon is a real share of a 32 px silhouette; the technology icon and thumbnail stay on shipping proportions (`icon-040-ship.png`) |
 | file shape | 256x2048 sheets | vanilla icon shape: 120x64 = 64 px icon + 32/16/8 mips packed right; 480x256 for the technology |
 
 The packed mip layout is measured, not assumed: vanilla's own `gun-turret.png` (120x64)

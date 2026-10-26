@@ -1,5 +1,14 @@
 # In-game verification of the 0.4.0 melta rework
 
+> **0.5.1 icon shape budget:** the 64/32 px item icon read as a rounded pod because the
+> 3.1-tile hull left the 1.5-tile cannon a minority of the silhouette. The icon pass now
+> scales the gun root in the icon render only and gives it a white-hot muzzle; every shape
+> metric lands inside the vanilla turret family (protrusion 15.5 → 23.1 %, reach 1.60 → 2.03,
+> neck 0.69 → 0.46) and the crafting-menu row was re-photographed. Report:
+> [`icon-read-0.5.1.md`](icon-read-0.5.1.md); evidence in `art/icon-*.png`, measurement in
+> `graphics/_blender/icon_read.py`, sheet builder
+> `harness/build_icon_read_sheet.py`.
+
 > **0.5.1 finalisation:** the five 0.5.1 passes (item order, text, cannon art, pipe ports,
 > sound) were checked together on the merged commit — headless load + 300-tick run on the
 > exact tree, the palette/port/icon gates re-run from the committed files, the changelog

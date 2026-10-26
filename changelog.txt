@@ -35,6 +35,14 @@ Date: 2026-10-26
       bearing against 64 bins, which this model can never pass -- the receiver is
       heavier than the barrel, so the bearing trails the muzzle and flips at the poles
       (60-63 distinct bins on both the old and the new sheets)
+    - The crafting-menu icon reads as a turret now instead of a rounded pod. It was a
+      shape-budget problem, not a camera one: the 3.1-tile emplacement left the 1.5-tile
+      cannon 15 % of the silhouette, so at the 32 px size the menu draws it collapsed into
+      a warm oval. The icon render now scales the gun about its own bore (sheets untouched)
+      and lights the muzzle white-hot: protrusion 15.5 % -> 23.1 %, reach 1.60 -> 2.03,
+      barrel-versus-body contrast 21 -> 50 luma, against vanilla turret icons at 20-24 %
+      and 1.7-2.5. The technology icon and the portal thumbnail keep the machine's real
+      proportions (docs/verification/icon-read-0.5.1.md)
   Balance:
     - The cold barrel now lands where it has to: 32 damage per pulse (240 dps) instead of
       14 (105 dps), i.e. level with a gun turret on uranium rounds, even though the melta
