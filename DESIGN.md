@@ -8,9 +8,9 @@ render-object leaks).
 ## The three things it has to feel like
 
 1. **A lance, not a squirt gun.** One beam that starts at the muzzle and runs its whole
-   12 tiles, cutting every body on the line instead of stopping at the first one.
+   16 tiles, cutting every body on the line instead of stopping at the first one.
 2. **It has to warm up.** Tapping fire is a thin orange line; holding it on a target for
-   ~2.5 s turns it into a boiling white-hot column and roughly quadruples the damage.
+   ~2.5 s turns it into a boiling white-hot column at 1.75x the damage.
 3. **It costs something.** Liquid fuel, not electricity — a turret you plumb in, and a hot
    beam burns about twice the fuel of a cold one.
 
@@ -24,7 +24,7 @@ render-object leaks).
 | range | 16 tiles, scaling with quality through the engine's `range_multiplier` (17.6 / 19.2 / 20.8 / 24 at uncommon / rare / epic / legendary) | laser 24, rocket 36: the melta is still the close-in emitter, and quality is what buys the extra tiles. The engine does the scaling; the script mirrors it for the beam and clamps at 24 — see **Quality range** below |
 | head rotation | 0.03 turns/tick (10.8 deg/tick) | was 0.006 (2.16 deg/tick, inherited from the rocket turret): a half turn took 83 ticks (1.4 s) and the head could not track a behemoth biter (0.3 tiles/tick) crossing at 4 tiles, which needs 0.012 turns/tick. 0.03 = half a turn in 17 ticks (0.28 s), twice the vanilla gun turret's 0.015 |
 | pulse rate | 8 ticks (7.5/s) | fast enough that discrete pulses read as one beam |
-| damage / pulse | 14 cold → 56 hot | 105 → 420 dps single target, before pierce |
+| damage / pulse | 32 cold → 56 hot (1.75x) | 240 → 420 dps single target, before pierce; cold is level with a gun turret on uranium rounds (240), hot is 1.76-2.02x it across the research tiers. Scales with the fire damage and turret firing-speed research — see the balance note below |
 | spin-up | 150 ticks (2.5 s) | one biter wave is not enough time to peak |
 | spin-down | 60 ticks (1 s) | it cools fast, so holding a line is the skill |
 | pierce | 12 bodies, 0.82 falloff each | front rank eats it, back ranks eat 82 % of the one in front |
@@ -35,33 +35,69 @@ render-object leaks).
 Derived — per pulse at full intensity, base damage 56 (47.6 fire + 8.4 physical), and what
 survives each biter's resistances (none of them resist fire; only physical is resisted):
 
-| target | physical resistance | lands per pulse | vs the old single-type 56 |
+| target | physical resistance | lands per pulse | note |
 |---|---|---|---|
 | small biter | none | 56.0 (47.6 + 8.4) | unchanged |
-| medium biter | decrease 4, 10 % | 51.6 (47.6 + 3.96) | −7.9 % |
-| big biter | decrease 8, 10 % | 48.0 (47.6 + 0.36) | −14.2 % |
-| behemoth biter | decrease 12, 10 % | 47.6 (fire only) | −15.0 % |
-| any 100 % fire-resistant target | — | 8.4 (physical only) | was 0 — the reason for the split |
+| medium biter | decrease 4, 10 % | 55.2 (47.6 + 7.56) | flat ignored — only the 10 % percentage is left |
+| big biter | decrease 8, 10 % | 55.2 | same |
+| behemoth biter | decrease 12, 10 % | 55.2 | was 47.6 before the flat-armour bypass |
+| any 100 % fire-resistant target | — | 8.4 (physical only) | was 0 before the split |
 
-So the split is free against unarmoured bodies and costs up to 15 % against the armoured
-end of the biter line, because flat armour eats a small physical slice whole. Turn
-`C.physical_share` down if that trade is not worth it, or raise `damage_hot` by ~15 % if
-behemoth dps matters more than parity with everything else.
+So the split now costs almost nothing: the only thing the physical slice loses is the
+target's *percentage* resistance, i.e. 1.4 % of the pulse against the whole biter line,
+where flat armour used to eat up to 15 % of it. Flat armour is bypassed by handing the
+engine `damage + decrease` (it always resolves `max(0, amount - decrease) * (1 -
+percent/100)`); percentage resistance is deliberately respected. Turn
+`C.pierce_flat_armor` off to get the old behaviour back, and `C.physical_share` down if the
+physical slice ever stops earning its two `damage()` calls per body.
 
-Measured headlessly (harness mod, one target at a time, melta-fuel = 1.6x, full charge):
-89.59 / 13.44 / 77.44 per pulse on the plain / fire-resistant / behemoth-armour targets —
-i.e. exactly 56 x 1.6, 15 % of it, and 86.4 % of it.
+Measured headlessly at 7.5 pulses/s, light oil, four dummies that differ only in
+resistance (full charge): 56.00 unarmoured, 50.38 on a `decrease 12, percent 10` target
+(90.0 %, exactly its percentage), 28.00 on a 50 % target (50 % exactly), 8.38 on a
+fire-immune one (the physical slice alone) — `docs/verification/balance-verification.md`.
 
-Derived: a behemoth biter (3000 hp) dies in ~8 s of full-intensity fire (was ~7 s): its
-flat 12 physical resistance swallows the physical slice whole (0.15 x 56 = 8.4).
+Derived: a behemoth biter (3000 hp) dies in ~8 s of full-intensity light-oil fire (377.8
+dps after its 10 % resistance), and in ~5 s on melta-fuel (1.6x).
+
+## Research scaling and the comparison turrets
+
+The beam's damage is dealt by `control.lua`, so no technology reached it: before this
+change the turret sat at 240/420 dps while a gun turret went 240 → 1632 and both other
+turrets pulled ahead for free. It now reads the same research a gun turret does — the fire
+damage ladder (`refined-flammables` → `ammo-damage[flamethrower]`, compounded by
+`C.research_damage_exponent = 1.5` because the fire ladder is steeper than the bullet one)
+and the turret firing-speed line, whose bullet `gun-speed` modifiers `data-updates.lua`
+copies onto the melta's own ammo category. The scripted pulse clock carries the fraction of
+a tick forward, so the researched rate is delivered in full rather than rounded up.
+
+| tier | fire / rate | melta cold dps | melta hot dps | gun turret (uranium) |
+|---|---|---|---|---|
+| 0 | +0 % / +0 % | 245 | 429 | 240 |
+| 1 | +20 % / +10 % | 353 | 618 | 319 |
+| 2 | +40 % / +30 % | 519 | 909 | 449 |
+| 3 | +60 % / +50 % | 729 | 1275 | 706 |
+| 4 | +90 % / +80 % | 1131 | 1980 | 1106 |
+| 5 | +120 % / +110 % | 1637 | 2866 | 1632 |
+
+Cold holds parity with the gun turret at every tier (1.00x-1.16x) despite 16 tiles of reach
+and a fluid bill; hot is 1.76x-2.02x the gun turret, which is what pays for the short range.
+The tesla turret is the other comparison: 60 dps on one body, up to ~600 across its chain,
+against the melta's 12-body piercing line (32 + 0.82 falloff ≈ 1290 dps cold across a full
+line). Method, probe and the before/after measurement:
+`docs/verification/balance-verification.md`.
 
 ## Asteroids (space age)
 
 Rocks are the one target class the fire beam cannot touch: every asteroid prototype gets
 `percent = 100` on every damage type it does not list, and `fire` is listed for none of
-them — so 85 % of a pulse was zero, and the 15 % physical slice was eaten whole by the
--2000 / -3000 flat armour of big and huge asteroids. Measured before the fix: small rock
-11 pulses, medium 31, big and huge never (236 pulses for 0.14 hp).
+them — so 85 % of a pulse is zero, and only the 15 % physical slice is in play. Big and
+huge asteroids also carry a POSITIVE 2000 / 3000 physical `decrease`
+(`data/space-age/prototypes/entity/asteroid.lua`), which swallowed that slice whole:
+measured before either fix, a small rock took 11 pulses, a medium 31, and big and huge
+never killed (236 pulses for 0.14 hp). The flat-armour bypass now cancels that
+`decrease`, so the slice does land (7.56 per hot pulse on every rock tier, 0.4 % of a big
+rock's health) — still nothing next to the rock's own damage output, which is why rocks
+still need a channel of their own.
 
 The melta now delivers one extra hit per pulse to `entity.type == "asteroid"` — an
 `explosion` hit sized `C.asteroid_damage_multiplier` (1.6) x the pulse. Explosion is the
