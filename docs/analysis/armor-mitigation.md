@@ -90,7 +90,7 @@ Read back from `data.raw` of a 2.1.23 dump (base + space-age + quality). `P` = p
 | 0-3 | spitters (all four) | 10-1500 | E only (0 / 10-30 %) — **no fire or physical resistance at all** |
 | — | biter / spitter / gleba spawner | 350-500 | P 2 / 15 %, E 5 flat, **F 3 / 60 %** |
 | — | small / medium / big / behemoth worm turret | 200-3000 | P 0-10 flat, **F 2-3 / 50-70 %**, E 5-10, laser 0 / 20-80 % |
-| — | wriggler + stomper/strafer pentapods | 100-15000 | P 2 flat (stomper 50 %), laser/impact % only |
+| — | wriggler / stomper / strafer pentapods | 100-15000 | wrigglers laser 0 / 50 % only; strafers P 2 / 10 %, laser 0 / 50 %; stompers P 2 / 50 %, laser 0 / 80 %, impact 0 / 80 % |
 | — | small / medium / big / huge asteroid | 100-5000 | P 0 / 0 / **2000** / **3000** flat at 10 %, F **100 %**, E 50 / 30 / 10 / 99 %, electric 100 % |
 
 So the flat armour the melta meets is: `physical` 2-12 on the biter line, `fire` 2-3 on
@@ -323,8 +323,9 @@ spec records why a code mechanism was preferred; not a substitute for A.
    * *the asteroid decision* — the current comment's justification is factually wrong (their
      `decrease` is positive 2000/3000), so choose explicitly: compensate (= +9.4 % on big
      rocks, huge 0.90 → 8.46/pulse) or exclude `entity.type == "asteroid"`;
-   * no change to any other turret, damage type or prototype — an assertion that can be
-     checked by diffing a `--dump-data` before/after.
+   * no change to any other turret, damage type or prototype — script-side this is free
+     (nothing in `data.raw` is touched at all), and a `--dump-data` diff before/after is the
+     check that it stayed that way.
 3. **Acceptance test** (already in the tree as `melta-balance-probe`, built for this card's
    sibling — plus the engine probe added here): one melta, four dummies — plain, `fire`+
    `physical` `12 / 10 %`, `percent 50` only, `fire percent 100` — expecting nominal,
