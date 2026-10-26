@@ -31,13 +31,36 @@ end
 local per_second = 60 / C.cooldown
 
 -- only the fuels this install actually has, exactly like the prototype does -- a fuel
--- belonging to an absent mod must not appear in the tooltip either
+-- belonging to an absent mod must not appear in the tooltip either.
+--
+-- Each entry is a LocalisedString, not text, because of a measured rendering fact:
+-- `[fluid=light-oil]` shows the fluid ICON ONLY once it is inside a tooltip (the
+-- first in-game capture of this block printed "Fuel bonus: <drop> x1.00,
+-- <drop> x0.85, <drop> x1.60" -- three unlabelled drops). So the fluid's own
+-- [fluid-name.*] key is spelled out beside its icon, or the player cannot tell which
+-- fuel pays which multiplier.
 local fuels = {}
 for _, fuel in ipairs(C.fuels) do
   if data.raw["fluid"] and data.raw["fluid"][fuel.name] then
-    -- two decimals always: "x1.00" next to "x0.85" reads as one column, "x1" does not
-    fuels[#fuels + 1] = string.format("[fluid=%s] x%.2f", fuel.name, fuel.damage_modifier or 1)
+    fuels[#fuels + 1] =
+    {
+      "",
+      "[fluid=" .. fuel.name .. "]",
+      " ",
+      {"fluid-name." .. fuel.name},
+      -- two decimals always: "x1.00" next to "x0.85" reads as one column, "x1" does not
+      string.format(" x%.2f", fuel.damage_modifier or 1)
+    }
   end
+end
+
+-- the list as one LocalisedString: ", " between entries, nothing after the last
+local fuel_list = {""}
+for index, entry in ipairs(fuels) do
+  if index > 1 then
+    fuel_list[#fuel_list + 1] = ", "
+  end
+  fuel_list[#fuel_list + 1] = entry
 end
 
 -- __1__ cold per pulse, __2__ white-hot, __3__ fire share, __4__ physical share,
@@ -62,7 +85,7 @@ if asteroid_percent > 0 then
     num(C.damage_hot * per_second),
     percent(C.pierce_falloff),
     tostring(C.pierce_max),
-    table.concat(fuels, ", "),
+    fuel_list,
     percent(asteroid_percent)
   }
 else
@@ -78,7 +101,7 @@ else
     num(C.damage_hot * per_second),
     percent(C.pierce_falloff),
     tostring(C.pierce_max),
-    table.concat(fuels, ", ")
+    fuel_list
   }
 end
 
@@ -96,13 +119,19 @@ end
 if (C.research_damage_scale or 0) > 0 or C.research_rate then
   extra[#extra + 1] = {"melta-tooltip.research"}
 end
-for _, line in ipairs(extra) do
-  block[#block + 1] = "\n"
-  block[#block + 1] = line
-end
 
+-- The extra lines go on the OUTER description, never on `block`. `block` is a
+-- parameterised string ({"melta-tooltip.block", __1__ ... __11__}), and every element
+-- after its first is a *parameter*: anything appended past __11__ is silently dropped
+-- by the engine. Measured: with the lines appended to `block` the tooltips ended at
+-- the rock sentence, while the same strings rendered fine on a plain label.
 local function with_damage(flavour_key)
-  return {"", {flavour_key}, "\n\n", block}
+  local description = {"", {flavour_key}, "\n\n", block}
+  for _, line in ipairs(extra) do
+    description[#description + 1] = "\n"
+    description[#description + 1] = line
+  end
+  return description
 end
 
 local entity = data.raw["fluid-turret"] and data.raw["fluid-turret"][C.turret]

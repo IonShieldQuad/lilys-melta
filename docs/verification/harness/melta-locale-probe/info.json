@@ -1,0 +1,9 @@
+{
+  "name": "melta-locale-probe",
+  "version": "0.0.1",
+  "title": "melta locale probe",
+  "author": "hermes",
+  "description": "Harness only: builds one melta turret on flat ground and paints every melta locale key into the screen GUI so the tooltips can be photographed.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1", "lilys-melta"]
+}

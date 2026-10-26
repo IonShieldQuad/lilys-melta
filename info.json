@@ -1,9 +1,9 @@
 {
 	"name": "lilys-melta",
 	"version": "0.5.0",
-	"title": "Lily's Thermal Beam turret",
+	"title": "Melta turret",
 	"author": "MsBinaryLily",
-	"description": "A melta turret. Burns fuel to hold a short, white-hot thermal beam that cuts straight through a whole line of biters - and the longer it fires, the hotter it gets.",
+	"description": "Adds a short-ranged turret that burns liquid fuel into a pressurized stream of heat. It needs no ammunition.",
 	"factorio_version": "2.1",
 	"dependencies": [
 		"base >= 2.1",
