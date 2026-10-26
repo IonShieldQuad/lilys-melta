@@ -1,0 +1,9 @@
+{
+  "name": "melta-look",
+  "version": "0.1.0",
+  "title": "melta look probe",
+  "author": "hermes",
+  "description": "Builds a row of melta turrets next to vanilla gun/laser/flamethrower turrets and screenshots them at normal zoom.",
+  "factorio_version": "2.1",
+  "dependencies": ["base", "lilys-melta"]
+}

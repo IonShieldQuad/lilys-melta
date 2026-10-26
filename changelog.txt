@@ -1,5 +1,40 @@
 Version: 0.5.1
 Date: 2026-10-26
+  Graphics:
+    - The turret is re-rendered toward the vanilla palette. The body is mid-value warm
+      gunmetal instead of dark grey, the fluid hardware (compressor block, turbine
+      housing, pressurised fuel tank, copper feed lines running into the receiver) is
+      brass and copper, and the only saturated thing left is the orange heat in the
+      vents and the gauge lights
+    - The muzzle is a WH40K-style melta projector now: a fat cylinder with a ring of six
+      radial vents and a hollow, warm bore, so the pressurised stream has somewhere
+      visible to come out of. The flat pale plate that used to cap the barrel front is
+      gone -- the muzzle face is a dark bore with a hot-metal lip, and the vents carry
+      the glow
+    - The tone curve is refit for the new model (quantile-matched to vanilla
+      gun-turret-shooting-1.png). The assembled head measures mean 79 against vanilla
+      gun turret's 75, p50 63 vs 60, p75 116 vs 105, p90 177 vs 160, 14 % of pixels
+      under luma 16 (vanilla 11 %), warm +27 against +27 and no pure-white pixel at
+      all; the base layer measures mean 61 beside the vanilla flamethrower's 56-60 and
+      the laser's 63. The old curve was fitted to the dark model and sent the new
+      render to p90 234, which is what read as a white plate at the muzzle
+    - The warm accent is its own material, so it survives the downsample without
+      washing the barrel: the vent bores, the muzzle lip, the two pressure gauges and
+      the sight lens are lit by a small lamp material, while the glow collar between
+      the heat rings stays dim. One vent dot is about 2 art pixels at sheet scale,
+      which is why the first pass (an emissive of 0.9) disappeared entirely in game
+    - The icon and thumbnail are re-rendered from the same model through a fixed rig. A
+      lighting softbox used to be photographed as a flat white triangle in the icon's
+      top-left (the icon camera sees 4.2 tiles where the sheets see 4.0), which also
+      shrank the turret to 54 % of the icon cell; the plates are hidden from camera rays
+      now, the icon fills 65 % of the cell (vanilla gun turret 64 %) and its values sit
+      at p10/p50/p90 11/72/190 against vanilla's 19/80/175
+    - check_sheets.py checks the thing a misordered or duplicated direction actually
+      breaks: the head centroid has to walk a closed loop with no jump over 4 px (this
+      art: 2.08 px worst step, 1.53 px closure). The old test compared the centroid's
+      bearing against 64 bins, which this model can never pass -- the receiver is
+      heavier than the barrel, so the bearing trails the muzzle and flips at the poles
+      (60-63 distinct bins on both the old and the new sheets)
   Balance:
     - The cold barrel now lands where it has to: 32 damage per pulse (240 dps) instead of
       14 (105 dps), i.e. level with a gun turret on uranium rounds, even though the melta

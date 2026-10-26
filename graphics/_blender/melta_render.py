@@ -66,6 +66,20 @@ DIR_ARG = argval("--dirs", "all")
 SUN_SCALE = float(argval("--sunscale", "1.0"))   # debug: 0 proves which lights matter
 WORLD_SCALE = float(argval("--worldscale", "1.0"))
 EMIT_SCALE = float(argval("--emitscale", "1.0"))
+# ---- lighting: emissive geometry only -------------------------------------
+# Cycles in this Blender build ignores LAMP energy completely. Measured:
+# `--sunscale 0` and `--sunscale 1` render pixel-identical, and replacing the suns
+# with AREA lamps at 300 / 800 / 1500 W also renders pixel-identical (probe_rig.py
+# prints the luma table). The one source that provably works is EMISSIVE GEOMETRY --
+# the glow parts visibly light their neighbours -- so the rig is three emissive
+# softboxes (warm key upper-left, cool fill right, cool rim behind). Strengths are
+# irradiance-like numbers, not watts: a 5-tile plane ~8 tiles away needs ~0.3 to lift
+# the hull to vanilla's luma band, and 2.2 blows the frame to pure white.
+RIG = {"key": 5.0, "fill": 1.5, "rim": 2.5}
+for _k in ("key", "fill", "rim"):
+    RIG[_k] = float(argval("--rig" + _k, str(RIG[_k])))
+KEYPOWER = float(argval("--keypower", "1.0"))     # master scale, 0 = no rig at all
+AOMIX = float(argval("--aomix", "0.35"))
 FLATMAT = argval("--flatmat", "0") == "1"
 ONLY = argval("--only", "")
 
@@ -211,11 +225,11 @@ def weathered_material(name, paint=(0.115, 0.120, 0.128), metal=(0.200, 0.205, 0
     patch_ramp = _ramp(links, nodes, patch_noise.outputs["Fac"],
                        [(0.58, 0.0), (0.68, 1.0)])
     m_patch = nodes.new("ShaderNodeMixRGB")
-    m_patch.inputs["Fac"].default_value = 0.55
+    m_patch.inputs["Fac"].default_value = 0.34
     links.new(m_wear.outputs["Color"], m_patch.inputs["Color1"])
     links.new(patch_ramp.outputs["Color"], m_patch.inputs["Fac"])
-    m_patch.inputs["Color2"].default_value = (half[0] * 1.15, half[1] * 1.15,
-                                             half[2] * 1.15, 1)
+    m_patch.inputs["Color2"].default_value = (half[0] * 1.02, half[1] * 1.02,
+                                             half[2] * 1.02, 1)
 
     # ---- oil / soot streaks running down the same way as the rust ---------
     oil_noise = nodes.new("ShaderNodeTexNoise")
@@ -239,27 +253,28 @@ def weathered_material(name, paint=(0.115, 0.120, 0.128), metal=(0.200, 0.205, 0
     links.new(m_oil.outputs["Color"], m_grain.inputs["Color1"])
     links.new(grain.outputs["Color"], m_grain.inputs["Color2"])
 
-    # ---- ambient occlusion as a shader, not a light ----------------------
-    # Cycles 2.79's sun lamps in this build do not respond to `energy`, so the
-    # directional key light cannot be trusted to carve the model. Shader-level AO
-    # gives the recesses their darkness deterministically, which is also what
-    # vanilla turret art looks like (half its pixels sit near black).
-    ao = nodes.new("ShaderNodeAmbientOcclusion")
-    # socket layout differs between 2.79 builds: AO distance is the non-colour input
-    for sock in ao.inputs:
-        if sock.name != "Color":
-            sock.default_value = 0.30
-    if hasattr(ao, "samples"):
-        ao.samples = 8
-    ao_out = ao.outputs["AO"] if "AO" in ao.outputs else ao.outputs[-1]
-    ao_ramp = _ramp(links, nodes, ao_out,
-                    [(0.15, 0.0), (0.85, 1.0)])
-    m_ao = nodes.new("ShaderNodeMixRGB")
-    m_ao.blend_type = 'MULTIPLY'
-    m_ao.inputs["Fac"].default_value = 0.80
-    links.new(m_grain.outputs["Color"], m_ao.inputs["Color1"])
-    links.new(ao_ramp.outputs["Color"], m_ao.inputs["Color2"])
-    links.new(m_ao.outputs["Color"], bsdf.inputs["Base Color"])
+    # ---- ambient occlusion: a shader closure, mixed under the BSDF ---------
+    # Cycles 2.79's AmbientOcclusion node is a *shader* (one Color input, one AO
+    # closure output), not a texture node: wiring that closure into a ColorRamp
+    # raises "can only connect closure to closure (AmbientOcclusion.AO to
+    # ColorRamp.Fac)" and the whole AO stage silently does nothing -- which is what
+    # the shipped 0.5.0 art was doing. Since this build also ignores lamp.energy for
+    # Cycles (--sunscale 0 and 1 render pixel-identical, measured), the AO closure is
+    # the only geometric shading term available, so it is mixed in as a shader, which
+    # is the one shape that works. AO_MIX is the weight; 0 disables it.
+    links.new(m_grain.outputs["Color"], bsdf.inputs["Base Color"])
+    shader_src = bsdf.outputs["BSDF"]
+    if AOMIX > 0:
+        ao = nodes.new("ShaderNodeAmbientOcclusion")
+        # the closure's Color input is the colour of the ambient term it shades with
+        for sock in ao.inputs:
+            if sock.name == "Color":
+                sock.default_value = (0.78, 0.75, 0.70, 1.0)
+        mix_ao = nodes.new("ShaderNodeMixShader")
+        mix_ao.inputs[0].default_value = AOMIX
+        links.new(shader_src, mix_ao.inputs[1])
+        links.new(ao.outputs["AO"], mix_ao.inputs[2])
+        shader_src = mix_ao.outputs["Shader"]
 
     # ---- roughness: paint satin, rust rough, worn edges polished --------
     rough_rust = nodes.new("ShaderNodeMixRGB")
@@ -293,7 +308,7 @@ def weathered_material(name, paint=(0.115, 0.120, 0.128), metal=(0.200, 0.205, 0
         # as hot pixels, not as a lamp, so it stays small and weak.
         emit.inputs["Strength"].default_value = emissive_strength * EMIT_SCALE
         mix = nodes.new("ShaderNodeAddShader")
-        links.new(bsdf.outputs["BSDF"], mix.inputs[0])
+        links.new(shader_src, mix.inputs[0])
         links.new(emit.outputs["Emission"], mix.inputs[1])
         links.new(mix.outputs["Shader"], out.inputs["Surface"])
 
@@ -304,33 +319,66 @@ MATS = {}
 
 
 def build_materials():
-    """Palette sits next to vanilla gun/laser turret sprites: desaturated dark
-    steel, muted warning yellow, rust brown, a little copper plumbing."""
-    MATS["steel"] = weathered_material("steel", paint=(0.155, 0.162, 0.172),
-                                       metal=(0.330, 0.336, 0.348), rough=0.56,
-                                       chip=0.50, rust_amt=0.50)
-    MATS["steel_dark"] = weathered_material("steel_dark", paint=(0.092, 0.096, 0.104),
-                                            metal=(0.180, 0.188, 0.198), rough=0.66,
-                                            chip=0.38, rust_amt=0.45)
-    MATS["cast"] = weathered_material("cast", paint=(0.205, 0.210, 0.216),
-                                      metal=(0.420, 0.424, 0.430), rough=0.74,
-                                      chip=0.66, rust_amt=0.62, noise_scale=17.0,
-                                      metallic=0.35)
-    MATS["yellow"] = weathered_material("yellow", paint=(0.520, 0.350, 0.060),
-                                        metal=(0.300, 0.200, 0.055),
-                                        rust=(0.190, 0.080, 0.030), rough=0.62,
-                                        chip=0.85, rust_amt=0.80, noise_scale=15.0,
-                                        metallic=0.35)
-    MATS["red"] = weathered_material("red", paint=(0.340, 0.062, 0.038),
-                                     metal=(0.210, 0.070, 0.040), rust=(0.180, 0.075, 0.030),
-                                     rough=0.64, chip=0.80, rust_amt=0.70,
+    """Palette sits next to vanilla gun/laser/flamethrower turret sprites.
+
+    Measured off vanilla (stats.py --vanilla): the gun turret head is mean luma 75
+    with a strong warm bias (r-b = +27), the flamethrower hull mean 56-60 and warm as
+    well. The previous palette here was a cool blue-grey (r-b = +12) and every body
+    value sat one step darker, which is why the turret read as a dark grey object next
+    to vanilla turrets. So: mid-value warm gunmetal for the body, near-black for the
+    recesses, brass/copper for everything that carries fluid, and the orange emissive
+    kept to the vents and gauge lights.
+    """
+    MATS["steel"] = weathered_material("steel", paint=(0.300, 0.278, 0.246),
+                                       metal=(0.520, 0.495, 0.455),
+                                       half=(0.355, 0.335, 0.302),
+                                       rough=0.52, chip=0.42, rust_amt=0.40)
+    MATS["steel_dark"] = weathered_material("steel_dark", paint=(0.135, 0.126, 0.114),
+                                            metal=(0.250, 0.238, 0.220),
+                                            half=(0.300, 0.282, 0.256),
+                                            rough=0.60, chip=0.30, rust_amt=0.35)
+    MATS["cast"] = weathered_material("cast", paint=(0.310, 0.292, 0.258),
+                                      metal=(0.520, 0.492, 0.446),
+                                      half=(0.345, 0.326, 0.292),
+                                      rough=0.68, chip=0.55, rust_amt=0.48,
+                                      noise_scale=17.0, metallic=0.32)
+    MATS["yellow"] = weathered_material("yellow", paint=(0.620, 0.420, 0.080),
+                                        metal=(0.360, 0.240, 0.065),
+                                        rust=(0.200, 0.085, 0.032),
+                                        half=(0.620, 0.500, 0.240),
+                                        rough=0.58, chip=0.80, rust_amt=0.72,
+                                        noise_scale=15.0, metallic=0.35)
+    MATS["red"] = weathered_material("red", paint=(0.420, 0.080, 0.045),
+                                     metal=(0.270, 0.090, 0.048),
+                                     rust=(0.180, 0.075, 0.030),
+                                     half=(0.470, 0.250, 0.200),
+                                     rough=0.62, chip=0.75, rust_amt=0.62,
                                      noise_scale=13.0, metallic=0.40)
-    MATS["copper"] = weathered_material("copper", paint=(0.260, 0.120, 0.052),
-                                        metal=(0.380, 0.200, 0.090), rough=0.70,
-                                        chip=0.18, rust_amt=0.42, noise_scale=22.0,
-                                        metallic=0.55)
-    MATS["rubber"] = weathered_material("rubber", paint=(0.022, 0.022, 0.024),
-                                        metal=(0.034, 0.034, 0.036), rough=0.86,
+    # brass-into-copper: the fluid hardware (tank, compressor, turbine, feed lines,
+    # vent rims) is the only saturated thing on the model, so it has to be a real
+    # brass value rather than a dark brown, or it reads as rust instead of plumbing
+    MATS["brass"] = weathered_material("brass", paint=(0.470, 0.330, 0.115),
+                                       metal=(0.640, 0.450, 0.160),
+                                       rust=(0.230, 0.130, 0.045),
+                                       half=(0.600, 0.472, 0.236),
+                                       rough=0.46, chip=0.22, rust_amt=0.26,
+                                       noise_scale=20.0, metallic=0.78)
+    MATS["copper"] = weathered_material("copper", paint=(0.400, 0.200, 0.090),
+                                        metal=(0.560, 0.300, 0.130),
+                                        half=(0.520, 0.330, 0.186),
+                                        rough=0.54, chip=0.16, rust_amt=0.32,
+                                        noise_scale=22.0, metallic=0.70)
+    # hot-metal rim: dark iron that is *hot*, not a lamp. Emission stays low enough
+    # that it reads as glowing metal inside the vents instead of a white hole.
+    MATS["hotmetal"] = weathered_material("hotmetal", paint=(0.150, 0.072, 0.042),
+                                          metal=(0.220, 0.120, 0.070),
+                                          half=(0.260, 0.150, 0.085),
+                                          rough=0.55, chip=0.10, rust_amt=0.20,
+                                          metallic=0.55,
+                                          emissive=(1.0, 0.17, 0.025),
+                                          emissive_strength=1.60)
+    MATS["rubber"] = weathered_material("rubber", paint=(0.030, 0.029, 0.028),
+                                        metal=(0.042, 0.041, 0.040), rough=0.86,
                                         chip=0.0, rust_amt=0.0, metallic=0.0, bump=0.40)
     MATS["grime"] = weathered_material("grime", paint=(0.014, 0.013, 0.012),
                                        metal=(0.020, 0.018, 0.016), rough=0.95,
@@ -338,11 +386,41 @@ def build_materials():
     MATS["glow"] = weathered_material("glow", paint=(0.40, 0.14, 0.03),
                                       metal=(0.40, 0.14, 0.03), rough=0.5, chip=0.0,
                                       rust_amt=0.0, metallic=0.0,
-                                      emissive=(1.0, 0.34, 0.070), emissive_strength=6.0)
+                                      emissive=(1.0, 0.30, 0.060), emissive_strength=2.2)
     MATS["glow_dim"] = weathered_material("glow_dim", paint=(0.30, 0.09, 0.02),
                                           metal=(0.30, 0.09, 0.02), rough=0.6, chip=0.0,
                                           rust_amt=0.0, metallic=0.0,
-                                          emissive=(1.0, 0.26, 0.040), emissive_strength=1.9)
+                                          emissive=(1.0, 0.24, 0.045), emissive_strength=0.9)
+    # Small warm lights: vent bores, gauge faces, the sight lens. Deliberately a
+    # separate material from glow_dim, because glow_dim also paints the big heat
+    # collar between the barrel rings -- lifting that one washes the barrel and
+    # pushes the turret back toward "energy weapon". One vent dot is ~2 art px at
+    # sprite scale, so it needs a much hotter source to survive the downsample; at
+    # 0.9 the vents vanished entirely in the in-game pass.
+    MATS["lamp"] = weathered_material("lamp", paint=(0.45, 0.16, 0.03),
+                                      metal=(0.45, 0.16, 0.03), rough=0.5, chip=0.0,
+                                      rust_amt=0.0, metallic=0.0,
+                                      emissive=(1.0, 0.26, 0.040), emissive_strength=2.4)
+    # ---- hull variants: the emplacement keeps the older, darker values ----------
+    # Measured against vanilla (stats.py --vanilla): turret BASES sit at mean 42-60
+    # while turret HEADS sit at 75-105. The gun's palette above is tuned to the head
+    # band; if the same values are used for the 2x2 emplacement the whole turret reads
+    # as pale cream next to a vanilla gun turret. build_hull_in_place() swaps these in
+    # for the duration of the hull build, so one render still produces both layers.
+    MATS["hull_steel"] = weathered_material("hull_steel", paint=(0.150, 0.143, 0.132),
+                                            metal=(0.300, 0.287, 0.265),
+                                            half=(0.212, 0.201, 0.183),
+                                            rough=0.58, chip=0.46, rust_amt=0.46)
+    MATS["hull_steel_dark"] = weathered_material("hull_steel_dark",
+                                                 paint=(0.082, 0.078, 0.073),
+                                                 metal=(0.160, 0.154, 0.145),
+                                                 half=(0.196, 0.187, 0.174),
+                                                 rough=0.64, chip=0.34, rust_amt=0.42)
+    MATS["hull_cast"] = weathered_material("hull_cast", paint=(0.192, 0.183, 0.168),
+                                           metal=(0.360, 0.345, 0.320),
+                                           half=(0.248, 0.238, 0.219),
+                                           rough=0.72, chip=0.58, rust_amt=0.54,
+                                           noise_scale=17.0, metallic=0.32)
 
 
 # -------------------------------------------------------------- geometry ----
@@ -395,13 +473,15 @@ def box(name, sx, sy, sz, loc, rot=(0, 0, 0), mat="steel", bev=0.012, dents=0.0)
 
 
 def cyl(name, r, depth, loc, rot=(0, 0, 0), mat="steel", verts=18, smooth=True,
-        bev=0.008, taper=None, dents=0.0):
+        bev=0.008, taper=None, dents=0.0, hollow=False):
     if taper is None:
         bpy.ops.mesh.primitive_cylinder_add(vertices=verts, radius=r, depth=depth,
-                                            location=loc, rotation=rot)
+                                            location=loc, rotation=rot,
+                                            end_fill_type='NOTHING' if hollow else 'NGON')
     else:
         bpy.ops.mesh.primitive_cone_add(vertices=verts, radius1=r, radius2=taper,
-                                        depth=depth, location=loc, rotation=rot)
+                                        depth=depth, location=loc, rotation=rot,
+                                        end_fill_type='NOTHING' if hollow else 'NGON')
     ob = bpy.context.active_object
     ob.name = name
     if bev:
@@ -470,7 +550,62 @@ def bolt_ring(prefix, center, radius, count, plane, mat="steel_dark", size=0.045
     return out
 
 
+def orient(ob, direction):
+    """Point an object's local +Z along `direction` (used for radial/forward ports)."""
+    ob.rotation_mode = 'QUATERNION'
+    ob.rotation_quaternion = Vector((0.0, 0.0, 1.0)).rotation_difference(
+        Vector(direction).normalized())
+    return ob
+
+
+def vent_ports(parts, prefix, count, y, radius, port_r, phase=0.0, axis="radial",
+               rim_mat="brass", glow_mat="lamp"):
+    """A ring of vents: a dark rim standing proud of the body with a warm dot inside.
+
+    This is the readable form of "a cylinder with radial holes at the front" at sprite
+    scale (the muzzle body is ~24 art px across, so each port is ~3 px and has to be a
+    dark ring around a bright dot to survive the downsample). `axis="radial"` puts the
+    ring around the barrel at height y; `axis="forward"` puts it on the muzzle face.
+    """
+    for i in range(count):
+        a = 2 * math.pi * i / count + phase
+        if axis == "radial":
+            d = (math.cos(a), 0.0, math.sin(a))
+            pos = (radius * d[0], y, GUN_Z + radius * d[2])
+        else:
+            d = (0.0, 1.0, 0.0)
+            pos = (radius * math.cos(a), y, GUN_Z + radius * math.sin(a))
+        rim = torus("{}_rim{}".format(prefix, i), port_r, port_r * 0.26, pos,
+                    rot=(0, 0, 0), mat=rim_mat, maj_seg=14, min_seg=5)
+        orient(rim, d)
+        parts.append(rim)
+        glow = cyl("{}_glow{}".format(prefix, i), port_r * 0.86, port_r * 0.34,
+                   (pos[0] + d[0] * port_r * 0.10, pos[1] + d[1] * port_r * 0.10,
+                    pos[2] + d[2] * port_r * 0.10), mat=glow_mat, verts=12, bev=0.0)
+        orient(glow, d)
+        parts.append(glow)
+
+
 # ------------------------------------------------------------ the machine ---
+def build_hull_in_place():
+    """build_hull() with the hull's own darker body materials swapped in.
+
+    The gun and the emplacement share one material set, but they sit at different luma
+    bands next to vanilla art (head 75, base 42-60), so the three body materials are
+    rebound for the duration of the hull build. Objects capture the material at
+    creation, so restoring the bindings afterwards leaves the gun untouched.
+    """
+    names = ("steel", "steel_dark", "cast")
+    saved = {k: MATS[k] for k in names}
+    for k in names:
+        MATS[k] = MATS["hull_" + k]
+    try:
+        return build_hull()
+    finally:
+        for k, v in saved.items():
+            MATS[k] = v
+
+
 def build_hull():
     """Static emplacement, origin at the turret pivot, ground at z = 0:
     octagonal cast pedestal, layered armour wedges, deck machinery, heavy
@@ -619,9 +754,12 @@ def build_hull():
 
 
 def build_gun(root):
-    """The cannon. Short, wide-bore heat projector: chunky breech, armoured
-    mantlet, ribbed copper heat coils, vented shroud, slotted muzzle brake with a
-    white-hot bore. Points +Y at rest; every part parents to `root`."""
+    """The cannon. Short, wide-bore melta projector: chunky breech, armoured mantlet,
+    ribbed copper heat coils, vented shroud, and a WH40K-style cylindrical muzzle with
+    a ring of radial vents over a hot core. The fluid hardware hangs off the receiver:
+    a brass compressor drum on the right, a turbine drum on the roof, a banded
+    pressure tank on the left, and copper lines carrying fuel from the tank into the
+    breech. Points +Y at rest; every part parents to `root`."""
     parts = []
     Z = GUN_Z
 
@@ -640,20 +778,69 @@ def build_gun(root):
                      mat="steel", bev=0.016, dents=0.014))
     parts.append(box("gun_breech_rear", 0.70, 0.18, 0.50, (0, -0.64, Z - 0.04),
                      rot=(0.08, 0, 0), mat="steel_dark", bev=0.016, dents=0.016))
-    # heat-exchanger fin stack, both sides of the breech (melta heat sink)
-    for sign in (-1, 1):
-        for i in range(5):
-            parts.append(box("gun_fin{}x{}".format(sign, i), 0.07, 0.52, 0.05,
-                             (sign * 0.47, -0.30, 0.56 + i * 0.075),
-                             rot=(0, 0, 0), mat="steel_dark", bev=0.005))
-        parts.append(box("gun_fin_plate{}".format(sign), 0.05, 0.60, 0.44,
-                         (sign * 0.45, -0.30, 0.70), mat="cast", bev=0.01,
-                         dents=0.008))
-    # feed block + cap on the rear face
-    parts.append(cyl("gun_feed", 0.22, 0.36, (0.0, -0.80, Z + 0.04),
-                     rot=(math.pi / 2, 0, 0), mat="steel", verts=14))
-    parts.append(cyl("gun_feed_cap", 0.25, 0.06, (0.0, -0.99, Z + 0.04),
-                     rot=(math.pi / 2, 0, 0), mat="copper", verts=14))
+    # ---- compressor block, turbine housing and pressure tank ---------------
+    # The three big masses that say "this thing pressurises a fluid". Sizes are chosen
+    # against the sprite scale, not against realism: 1 tile is 32 art px (16 screen px
+    # at scale 0.5), so a 0.42-tile-diameter drum is ~13 art px and survives the
+    # downsample, while the old 0.33-tile fin wall turned into noise. Each subsystem
+    # gets its own silhouette and its own material: brass drum, cast turbine, banded
+    # steel tank.
+    parts.append(cyl("gun_comp_body", 0.210, 0.44, (0.56, -0.10, Z + 0.14),
+                     rot=(math.pi / 2, 0, 0), mat="brass", verts=16))
+    for i in range(4):
+        parts.append(cyl("gun_comp_fin{}".format(i), 0.262, 0.034,
+                         (0.56, -0.28 + i * 0.12, Z + 0.14),
+                         rot=(math.pi / 2, 0, 0), mat="steel_dark", verts=16,
+                         bev=0.004))
+    parts.append(cyl("gun_comp_intake", 0.145, 0.07, (0.56, -0.35, Z + 0.14),
+                     rot=(math.pi / 2, 0, 0), mat="grime", verts=14, bev=0.0))
+    parts.append(box("gun_comp_mount", 0.22, 0.32, 0.18, (0.44, -0.10, Z + 0.00),
+                     mat="cast", bev=0.008, dents=0.008))
+    parts.append(cyl("gun_comp_gauge", 0.060, 0.04, (0.775, -0.10, Z + 0.14),
+                     rot=(0, math.pi / 2, 0), mat="lamp", verts=12, bev=0.0))
+
+    parts.append(cyl("gun_turbine", 0.245, 0.50, (0.0, -0.34, Z + 0.46),
+                     rot=(0, math.pi / 2, 0), mat="cast", verts=18))
+    for i in range(3):
+        parts.append(cyl("gun_turbine_rib{}".format(i), 0.278, 0.038,
+                         (-0.155 + i * 0.155, -0.34, Z + 0.46),
+                         rot=(0, math.pi / 2, 0), mat="steel_dark", verts=16,
+                         bev=0.004))
+    parts.append(cyl("gun_turbine_hub", 0.090, 0.54, (0.0, -0.34, Z + 0.46),
+                     rot=(0, math.pi / 2, 0), mat="brass", verts=12, bev=0.0))
+    # exhaust stack, tipped back so it breaks the roof line
+    parts.append(cyl("gun_turbine_stack", 0.070, 0.34, (0.24, -0.54, Z + 0.64),
+                     rot=(0.62, 0, 0.28), mat="steel_dark", verts=12))
+    parts.append(cyl("gun_turbine_stack_cap", 0.088, 0.06, (0.30, -0.66, Z + 0.78),
+                     rot=(0.62, 0, 0.28), mat="copper", verts=12))
+
+    parts.append(cyl("gun_tank", 0.215, 0.42, (-0.60, -0.22, Z + 0.20),
+                     rot=(math.pi / 2, 0, 0), mat="brass", verts=16))
+    for i, y in enumerate((-0.36, -0.22, -0.08)):
+        parts.append(torus("gun_tank_band{}".format(i), 0.223, 0.026,
+                           (-0.60, y, Z + 0.20), rot=(math.pi / 2, 0, 0),
+                           mat="steel_dark", maj_seg=16, min_seg=5))
+    for i, y in enumerate((-0.415, -0.025)):
+        parts.append(cyl("gun_tank_cap{}".format(i), 0.160, 0.07,
+                         (-0.60, y, Z + 0.20), rot=(math.pi / 2, 0, 0),
+                         mat="steel_dark", verts=14))
+    parts.append(cyl("gun_tank_gauge", 0.062, 0.04, (-0.805, -0.22, Z + 0.20),
+                     rot=(0, math.pi / 2, 0), mat="lamp", verts=12, bev=0.0))
+    # a low heat-sink stack on the left rear keeps the melta "heat" read, now that
+    # the tall fin wall is gone
+    for i in range(3):
+        parts.append(box("gun_fin{}".format(i), 0.06, 0.40, 0.045,
+                         (-0.46, -0.34, 0.50 + i * 0.07),
+                         mat="steel_dark", bev=0.005))
+    # feed block on the rear face: a squared block, not a disc, so the back of the gun
+    # cannot be mistaken for a second muzzle
+    parts.append(box("gun_feed_block", 0.46, 0.24, 0.36, (0.0, -0.84, Z + 0.02),
+                     mat="steel", bev=0.012, dents=0.01))
+    parts.append(cyl("gun_feed_port", 0.110, 0.10, (0.0, -0.99, Z + 0.02),
+                     rot=(math.pi / 2, 0, 0), mat="copper", verts=12,
+                     bev=0.006))
+    parts.append(box("gun_feed_lug", 0.12, 0.10, 0.10, (-0.22, -0.98, Z + 0.14),
+                     mat="cast", bev=0.006))
     parts.extend(bolt_ring("gun_breech_bolt", (0, -0.18), 0.36, 8, Z + 0.20,
                            size=0.044, depth=0.055))
 
@@ -677,18 +864,21 @@ def build_gun(root):
     parts.append(cyl("gun_barrel_collar", 0.31, 0.12, (0, 0.50, Z),
                      rot=(math.pi / 2, 0, 0), mat="steel_dark", verts=18, bev=0.008))
 
-    # ---- ribbed copper heat coils -----------------------------------------
-    for i, (y, R) in enumerate(((0.50, 0.40), (0.62, 0.415), (0.74, 0.405),
-                                (0.86, 0.395), (0.98, 0.375))):
-        parts.append(torus("gun_coil{}".format(i), R, 0.072, (0, y, Z),
-                           rot=(math.pi / 2, 0, 0), mat="copper",
+    # ---- heat coils: three fat steel rings, not five thin copper ones ------
+    # Five thin copper rings at 0.072 minor radius were 2-3 screen px apart, so they
+    # aliased into a corrugated orange sausage and made the whole turret read as a
+    # steampunk boiler. Three rings at 0.10 minor read as one ribbed barrel, and the
+    # copper budget goes to the fluid hardware, which is where the brief wants it.
+    for i, (y, R) in enumerate(((0.52, 0.395), (0.74, 0.405), (0.96, 0.385))):
+        parts.append(torus("gun_coil{}".format(i), R, 0.100, (0, y, Z),
+                           rot=(math.pi / 2, 0, 0), mat="cast",
                            maj_seg=24, min_seg=8))
     # glow collar between the coils: a full ring, so it reads from every angle
-    parts.append(cyl("gun_glow_core", 0.36, 0.50, (0, 0.74, Z),
+    parts.append(cyl("gun_glow_core", 0.355, 0.52, (0, 0.74, Z),
                      rot=(math.pi / 2, 0, 0), mat="glow_dim", verts=20, bev=0.0))
-    for i in (1, 2, 3):
-        parts.append(torus("gun_glow{}".format(i), 0.385, 0.022,
-                           (0, 0.50 + i * 0.12, Z), rot=(math.pi / 2, 0, 0),
+    for i in (1, 2):
+        parts.append(torus("gun_glow{}".format(i), 0.382, 0.026,
+                           (0, 0.52 + i * 0.22, Z), rot=(math.pi / 2, 0, 0),
                            mat="glow", maj_seg=20, min_seg=5))
 
     # ---- vented heat shroud -----------------------------------------------
@@ -707,35 +897,46 @@ def build_gun(root):
         parts.append(box("gun_vent_r{}".format(i), 0.04, 0.035, 0.13,
                          (0.33, y, Z + 0.18), mat="grime", bev=0.004))
 
-    # ---- barrel and wide-bore muzzle projector ----------------------------
-    parts.append(cyl("gun_barrel", 0.26, 0.46, (0, 1.32, Z),
-                     rot=(-math.pi / 2, 0, 0), mat="steel", verts=18, taper=0.24,
+    # ---- barrel into the melta projector ----------------------------------
+    parts.append(cyl("gun_barrel", 0.215, 0.58, (0, 1.24, Z),
+                     rot=(-math.pi / 2, 0, 0), mat="steel", verts=18, taper=0.205,
                      bev=0.0))
-    parts.append(cyl("gun_barrel_band", 0.28, 0.05, (0, 1.40, Z),
+    parts.append(cyl("gun_barrel_band", 0.240, 0.055, (0, 1.34, Z),
                      rot=(math.pi / 2, 0, 0), mat="steel_dark", verts=18))
-    # The melta signature: a short barrel that flares into a wide heat projector.
-    # The flare widens forward (rot -pi/2 puts the cone's wide cap at +Y).
-    parts.append(cyl("gun_flare", 0.28, 0.30, (0, 1.60, Z),
-                     rot=(-math.pi / 2, 0, 0), mat="cast", verts=20, taper=0.52,
-                     bev=0.01, dents=0.008))
-    parts.append(torus("gun_mouth_lip", 0.50, 0.042, (0, 1.76, Z),
-                       rot=(math.pi / 2, 0, 0), mat="cast", maj_seg=24, min_seg=6))
-    # throat: a cone read as the inside of the projector, dark, with the hot core
-    parts.append(cyl("gun_throat", 0.42, 0.18, (0, 1.70, Z),
-                     rot=(math.pi / 2, 0, 0), mat="grime", verts=20, taper=0.24,
-                     bev=0.0))
-    parts.append(cyl("gun_bore_ring", 0.30, 0.04, (0, 1.68, Z),
-                     rot=(math.pi / 2, 0, 0), mat="glow_dim", verts=20, bev=0.0))
-    parts.append(cyl("gun_bore_hot", 0.20, 0.04, (0, 1.64, Z),
-                     rot=(math.pi / 2, 0, 0), mat="glow", verts=18, bev=0.0))
-    # radiating heat-sink fins around the projector mouth
-    for i in range(6):
-        a = 2 * math.pi * i / 6 + 0.26
-        parts.append(box("gun_mouth_fin{}".format(i), 0.075, 0.20, 0.16,
-                         (math.cos(a) * 0.44, 1.52, Z + math.sin(a) * 0.44),
-                         rot=(0, 0, a), mat="steel_dark", bev=0.006))
-    parts.extend(bolt_ring("gun_mouth_bolt", (0.0, Z), 0.60, 8, 1.50,
-                           size=0.034, depth=0.06, axis='Y'))
+    # The melta signature, WH40K style: a fat cylindrical projector at the muzzle with
+    # a ring of RADIAL VENTS. Deliberately no flat plate at the muzzle face (the old
+    # heat-projector flare read as a pale disc from the icon camera and as a white
+    # plate in game). One ring of vents only: a second ring on the face turned the
+    # muzzle into a "gear" at 128 px, so the face is a plain dark bore with a steel
+    # lip and the vents carry the whistle at the sides of the projector.
+    parts.append(cyl("gun_proj_shoulder", 0.270, 0.10, (0, 1.45, Z),
+                     rot=(-math.pi / 2, 0, 0), mat="cast", verts=20, taper=0.345,
+                     bev=0.008))
+    parts.append(cyl("gun_proj_body", 0.345, 0.24, (0, 1.62, Z),
+                     rot=(math.pi / 2, 0, 0), mat="cast", verts=20, bev=0.012,
+                     dents=0.006))
+    for i, y in enumerate((1.505, 1.735)):
+        parts.append(torus("gun_proj_band{}".format(i), 0.338, 0.028,
+                           (0, y, Z), rot=(math.pi / 2, 0, 0), mat="cast",
+                           maj_seg=24, min_seg=5))
+    parts.append(cyl("gun_proj_chamfer", 0.343, 0.07, (0, 1.775, Z),
+                     rot=(-math.pi / 2, 0, 0), mat="steel_dark", verts=20,
+                     taper=0.300, bev=0.008))
+    parts.append(torus("gun_proj_lip", 0.310, 0.052, (0, 1.798, Z),
+                       rot=(math.pi / 2, 0, 0), mat="hotmetal",
+                       maj_seg=26, min_seg=6))
+    # radial vents around the projector body: this is what the stream jets out of
+    vent_ports(parts, "gun_vent", 6, 1.615, 0.347, 0.090, phase=0.30)
+    # recessed bore: an actually hollow tube, so the muzzle reads as an opening with a
+    # warm floor rather than a capped face. The far end is plugged with a dark disc so
+    # you can never see through the gun.
+    parts.append(cyl("gun_bore_tube", 0.180, 0.26, (0, 1.680, Z),
+                     rot=(math.pi / 2, 0, 0), mat="grime", verts=20, bev=0.0,
+                     hollow=True))
+    parts.append(cyl("gun_bore_back", 0.184, 0.03, (0, 1.556, Z),
+                     rot=(math.pi / 2, 0, 0), mat="grime", verts=20, bev=0.0))
+    parts.append(cyl("gun_bore_hot", 0.086, 0.02, (0, 1.600, Z),
+                     rot=(math.pi / 2, 0, 0), mat="lamp", verts=14, bev=0.0))
 
     # ---- hydraulics, sight, hose: the asymmetry ---------------------------
     parts.append(cyl("gun_piston", 0.085, 0.66, (-0.46, 0.24, Z - 0.24),
@@ -747,13 +948,37 @@ def build_gun(root):
     parts.append(box("gun_sight", 0.18, 0.40, 0.15, (0.42, 0.02, Z + 0.40),
                      rot=(0, 0, -0.10), mat="steel_dark", bev=0.01, dents=0.008))
     parts.append(cyl("gun_sight_lens", 0.06, 0.03, (0.42, 0.24, Z + 0.40),
-                     rot=(math.pi / 2, 0, 0), mat="glow_dim", verts=12, bev=0.0))
-    parts.append(tube("gun_hose", [(-0.36, -0.70, Z + 0.16), (-0.54, -0.36, Z + 0.34),
-                                   (-0.52, 0.20, Z + 0.30), (-0.36, 0.62, Z + 0.12)],
-                      0.055, mat="rubber"))
-    for i, (y, z) in enumerate(((-0.40, Z + 0.32), (0.10, Z + 0.32))):
-        parts.append(box("gun_hose_clamp{}".format(i), 0.10, 0.10, 0.10,
-                         (-0.52, y, z), mat="cast", bev=0.006))
+                     rot=(math.pi / 2, 0, 0), mat="lamp", verts=12, bev=0.0))
+    # ---- fuel / fluid lines: tank -> receiver, compressor -> tank ----------
+    # Copper hard lines, not a single rubber hose: the melta's fuel has to be carried
+    # from the pressure tank into the breech, and the plumbing is what makes the model
+    # read as a combustion weapon at a glance. Radius 0.075 tiles = 4.8 screen px, the
+    # thinnest line that still reads at native zoom (the old 0.055 hose read as noise).
+    parts.append(tube("gun_line_feed",
+                      [(-0.60, 0.00, Z + 0.20), (-0.60, 0.22, Z + 0.14),
+                       (-0.46, 0.40, Z + 0.02), (-0.26, 0.50, Z - 0.06)],
+                      0.075, mat="copper"))
+    parts.append(tube("gun_line_cross",
+                      [(0.56, 0.12, Z + 0.14), (0.42, 0.30, Z + 0.34),
+                       (0.02, 0.34, Z + 0.44), (-0.44, 0.18, Z + 0.32),
+                       (-0.60, 0.02, Z + 0.22)], 0.062, mat="copper"))
+    parts.append(tube("gun_line_tank",
+                      [(-0.60, -0.42, Z + 0.20), (-0.52, -0.56, Z + 0.06),
+                       (-0.34, -0.64, Z - 0.04), (-0.14, -0.68, Z - 0.06)],
+                      0.070, mat="copper"))
+    parts.append(tube("gun_line_comp",
+                      [(0.56, -0.36, Z + 0.14), (0.52, -0.50, Z + 0.00),
+                       (0.32, -0.58, Z - 0.06), (0.10, -0.62, Z - 0.08)],
+                      0.062, mat="copper"))
+    for i, (x, y, z) in enumerate(((-0.55, 0.30, Z + 0.08), (-0.32, 0.46, Z - 0.04),
+                                   (-0.44, -0.58, Z + 0.02))):
+        parts.append(box("gun_line_clamp{}".format(i), 0.13, 0.11, 0.11, (x, y, z),
+                         mat="cast", bev=0.006))
+    # pressure dial on the receiver cheek, the second of the two warm accent lights
+    parts.append(cyl("gun_gauge", 0.105, 0.05, (0.0, -0.02, Z + 0.40),
+                     rot=(math.pi / 2, 0, 0), mat="steel_dark", verts=14, bev=0.006))
+    parts.append(cyl("gun_gauge_face", 0.076, 0.02, (0.0, 0.01, Z + 0.40),
+                     rot=(math.pi / 2, 0, 0), mat="lamp", verts=14, bev=0.0))
     for sign in (-1, 1):
         parts.append(box("gun_gusset{}".format(sign), 0.06, 0.40, 0.26,
                          (sign * 0.43, 0.04, Z - 0.14), mat="cast", bev=0.006,
@@ -786,6 +1011,9 @@ def setup_camera():
 
 
 def add_sun(name, direction, energy, color, angle_deg=6.0, spec=1.0):
+    """Kept for a Blender whose Cycles honours lamp energy (3.x+). Inert here: on
+    this 2.79b the whole lamp path renders pixel-identical at energy 0 and 8, which
+    is why setup_lights uses the emissive rig instead. See the RIG comment."""
     lamp = bpy.data.lamps.new(name, type='SUN')
     lamp.energy = energy * SUN_SCALE
     lamp.color = color
@@ -802,18 +1030,96 @@ def add_sun(name, direction, energy, color, angle_deg=6.0, spec=1.0):
     return ob
 
 
+def add_softbox(name, loc, size, strength, color, aim=(0.0, 0.0, 0.5)):
+    """An emissive plane: the only light source this build responds to.
+
+    Placement is constrained by the orthographic camera. The camera's visible volume
+    is an infinite prism 4 tiles wide in X and in the screen-up axis
+    `(0, cos51, sin51) = (0, 0.629, 0.777)`; anything projecting inside +-2 tiles of
+    that axis is photographed as a flat white sheet (which is exactly what the first
+    strength-calibration run produced until the plates were pushed up to z >= 5).
+    `check_rig_in_frame` verifies the clearance by projecting the plates through the
+    real camera, so this cannot regress silently.
+    """
+    name = "soft:" + name
+    bpy.ops.mesh.primitive_plane_add(radius=0.5, location=loc)
+    ob = bpy.context.active_object
+    ob.name = name
+    ob.scale = (size, size, size)
+    apply_scale(ob)
+    d = Vector(aim) - Vector(loc)
+    ob.rotation_euler = d.to_track_quat('Z', 'Y').to_euler()
+    mat = bpy.data.materials.new(name + "_m")
+    mat.use_nodes = True
+    nt = mat.node_tree
+    for n in list(nt.nodes):
+        nt.nodes.remove(n)
+    out = nt.nodes.new("ShaderNodeOutputMaterial")
+    em = nt.nodes.new("ShaderNodeEmission")
+    em.inputs["Color"].default_value = (color[0], color[1], color[2], 1.0)
+    em.inputs["Strength"].default_value = strength * KEYPOWER
+    nt.links.new(em.outputs["Emission"], out.inputs["Surface"])
+    ob.data.materials.append(mat)
+    # A lighting plate must light the model and never be photographed itself. Hiding
+    # it from camera rays is the only fix that holds for EVERY camera: the sheet rig
+    # (51 deg, 4.0 tiles) and the icon rig (34 deg, 4.2 tiles) have different prisms,
+    # so a plate that clears one is inside the other -- which is how a flat white
+    # triangle ended up in the shipped icon and thumbnail while the sheet camera
+    # reported "rig clear". Emission still lights the scene; the plate is just not a
+    # camera-visible surface.
+    if hasattr(ob, "cycles_visibility"):
+        ob.cycles_visibility.camera = False
+    ob.hide_render = False
+    return ob
+
+
+def clear_softboxes():
+    for ob in list(bpy.data.objects):
+        if ob.name.startswith("soft:"):
+            bpy.data.objects.remove(ob, do_unlink=True)
+
+
+def check_rig_in_frame():
+    """Fail loudly if a light plate would be photographed (a white sheet in frame)."""
+    from bpy_extras.object_utils import world_to_camera_view
+    scene = bpy.context.scene
+    cam = scene.camera
+    bad = []
+    for ob in scene.objects:
+        if not ob.name.startswith("soft:"):
+            continue
+        inside = 0
+        # Sample the object's REAL bounds, not local +-0.5: add_softbox scales the
+        # primitive by `size` and applies it, so a plate's vertices sit at
+        # +-0.5*size and a +-0.5 local sample only tests the middle of the plate.
+        # That blind spot let a 4.2-tile key plate's corner sit in the icon frame
+        # while this function still printed "rig clear".
+        pts = [Vector(c) for c in ob.bound_box] + [Vector((0.0, 0.0, 0.0))]
+        for co_local in pts:
+            co = ob.matrix_world * co_local
+            pr = world_to_camera_view(scene, cam, co)
+            if 0.0 <= pr.x <= 1.0 and 0.0 <= pr.y <= 1.0 and pr.z > 0:
+                inside += 1
+        if inside:
+            bad.append((ob.name, inside))
+    if bad:
+        print("DIAG RIG WARNING: light plates inside the frame", bad)
+    else:
+        print("DIAG rig clear of the frame")
+    return not bad
+
+
 def setup_lights():
-    # Key from upper-left, tipped toward the viewer: vanilla's sun direction, so
-    # shadows fall to the lower right. Energies are set hot on purpose -- the
-    # luminance check (vanilla turret art: p50 ~25, p90 ~120) needs a wide range,
-    # so ambient stays low and the key does the work.
-    add_sun("key", (0.58, 0.32, -1.0), 8.0, (1.0, 0.96, 0.89), angle_deg=8.0)
-    add_sun("fill", (-0.55, -0.45, -0.55), 0.30, (0.72, 0.80, 1.0), angle_deg=20.0,
-            spec=0.20)
-    add_sun("bounce", (0.0, -0.12, 1.0), 0.10, (0.55, 0.50, 0.42), angle_deg=32.0,
-            spec=0.0)
-    add_sun("rim", (-0.30, 0.72, -0.35), 0.30, (0.80, 0.84, 0.95), angle_deg=16.0,
-            spec=0.5)
+    """Three emissive softboxes plus a near-black world.
+
+    Warm key from the upper left (vanilla's sun direction, so the baked cast shadow
+    falls to the lower right), cool fill from the right, cool rim from behind. Suns
+    are NOT used: this Cycles ignores lamp energy (see add_sun).
+    """
+    clear_softboxes()
+    add_softbox("key", (-3.00, -2.20, 8.00), 4.2, RIG["key"], (1.0, 0.94, 0.84))
+    add_softbox("fill", (5.20, -1.20, 5.60), 3.6, RIG["fill"], (0.72, 0.80, 1.0))
+    add_softbox("rim", (0.60, 6.20, 5.40), 3.4, RIG["rim"], (0.80, 0.84, 0.95))
     world = bpy.context.scene.world
     if world is None:
         world = bpy.data.worlds.new("world")
@@ -858,8 +1164,9 @@ def main():
     setup_render()
     setup_camera()
     setup_lights()
+    check_rig_in_frame()
 
-    hull = build_hull()
+    hull = build_hull_in_place()
     root = bpy.data.objects.new("gun_root", None)
     link(root)
     gun = build_gun(root)

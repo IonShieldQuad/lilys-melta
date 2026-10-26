@@ -216,10 +216,17 @@ the contract between the scripts and the prototype.
   `fluid_box.pipe_connections`), and a bearing well with spokes so pointing the gun
   away does not expose a blank disc.
 - **cannon** — 64 directions, frame 256x256, 8 files of 8 rows (256x2048, power of
-  two): chunky breech with a heat-exchanger fin stack, ribbed copper heat coils with
-  a glow ring between them, vented shroud, wide-bore projector mouth with a
-  white-hot throat, hydraulic ram, optic block and a bent armour flap — asymmetric
-  on purpose.
+  two): chunky breech, three fat ribbed heat rings with a dim glow collar between
+  them, vented shroud, and a WH40K-style melta projector at the front — a fat
+  cylinder with a ring of six radial vents over a hollow, warm bore, closed by a
+  hot-metal lip. No flat face anywhere on the barrel: that plate was the "unfinished"
+  read. The fluid hardware hangs off the receiver — a brass compressor drum with a
+  finned body and intake on the right, a cast turbine housing with an exhaust stack on
+  the roof, a banded brass pressure tank on the left, and copper hard lines carrying
+  fuel from the tank and the compressor into the breech. Every one of them is sized
+  for the sprite (>= 0.4 tiles across) rather than for the render, because 1 tile is
+  32 art px and anything thinner downsamples to noise. Hydraulic ram, optic block and a
+  bent armour flap keep it asymmetric.
 - **size** — the cannon's muzzle reaches 1.51 tiles from the pivot (it was 0.66):
   ~2.3x longer and ~2x fatter, which is what "too small next to base turrets" was
   about. The model is scaled 0.84 so the frame can hold the barrel at every angle.
@@ -227,14 +234,28 @@ the contract between the scripts and the prototype.
   the pivot lands on the frame centre: `shift = {0, 0}`, no wobble in any direction.
 - **wear** — chipped paint over bare metal, edge wear on convex pointiness, rust
   streaks stretched down Z, oil streaks, and grime packed into concave pointiness.
-  The palette (dark steel, muted warning yellow, rust, copper) is picked to sit next
-  to the vanilla gun/laser turret sprites.
+  The palette is picked off the vanilla sprites rather than by eye: a mid-value warm
+  gunmetal body (mean 79, vanilla gun head 75), near-black recesses, brass and copper
+  on everything that carries fluid, and a warm orange emissive used *only* on the
+  vent bores, the muzzle lip and the gauge lights. The hull keeps its own, darker
+  values (mean 61, vanilla flamethrower hull 56-60) because vanilla turret bases sit a
+  step below their heads.
+- **lighting** — three emissive softboxes (warm key upper-left so the baked cast
+  shadow falls lower-right, cool fill right, cool rim behind). Lamp energy is ignored
+  by Cycles in this Blender build, so the rig is emissive geometry and the plates are
+  hidden from camera rays; `check_rig_in_frame()` fails loudly if one would be
+  photographed.
 - no fold/unfold strip: the cannon is always deployed, which keeps the head one sheet.
 
 Brightness is tuned against vanilla art rather than by eye: the tone curve in
-`assemble.py` maps the render's range onto the spread measured from the vanilla
-turret sprites (p10 ~4, p50 ~26, p90 ~120), so the turret does not read as a
-brighter or flatter object pasted into the world.
+`assemble.py` is quantile-matched to `gun-turret-shooting-1.png` and refit with
+`fit_final.py` whenever the model or the rig changes (it is not a constant — the
+curve fitted to the old dark model sent the new render to p90 234, which is what read
+as a white plate at the muzzle). The assembled head now measures p50 63, p75 116,
+p90 177, mean 79 with 0.00% pure-white pixels, against vanilla gun head 60 / 105 / 160
+/ 75. `palette_vs_vanilla.py` prints that table, and `check_sheets.py` audits the
+sheet geometry: frame size, clipping, pivot radius, and that the 64 directions walk
+one closed loop.
 
 ## Plumbing (pipes and sockets)
 

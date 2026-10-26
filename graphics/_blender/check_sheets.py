@@ -69,7 +69,6 @@ if n:
     cy = np.array([c[1] for c in centroids])
     y_off = cy.mean()
     radii = np.hypot(cx, (cy - y_off) / squash)
-    angles = np.arctan2(cx, (cy - y_off) / squash)
     print("\ndirections checked: {}".format(n))
     print("centroid radius (de-squashed, pivot-relative): min {:.2f} max {:.2f} "
           "mean {:.2f} std {:.2f} px".format(radii.min(), radii.max(), radii.mean(),
@@ -78,9 +77,27 @@ if n:
     if radii.std() > 4.0:
         problems.append("centroid radius varies by {:.2f} px std -> pivot wobble".format(
             radii.std()))
-    uniq = len(set(np.round(np.degrees(angles) / 5.625).astype(int)))
-    if uniq < n - 2:
-        problems.append("centroid angles collapse onto {} clusters (expected {})".format(uniq, n))
+
+    # Ordered-rotation check: the centroid walks a closed loop about the pivot, one
+    # small step per direction. That -- not the bearing of the centroid -- is what a
+    # misordered, duplicated or reversed frame breaks. The old test compared the
+    # centroid's BEARING against 64 bins, which this model cannot pass: the receiver is
+    # heavier than the barrel, so the centroid trails the muzzle and its bearing is
+    # near-constant and flips sign at the poles (measured: 60-63 distinct bins on both
+    # the shipped and the reworked sheets, i.e. the test was noise, not a pivot check).
+    path = np.stack([cx, (cy - y_off) / squash], axis=1)
+    steps = np.linalg.norm(np.diff(np.vstack([path, path[:1]]), axis=0), axis=1)
+    closure = float(np.linalg.norm(path[-1] - path[0]))
+    print("centroid loop: step mean {:.2f} max {:.2f} px, closure {:.2f} px".format(
+        steps.mean(), steps.max(), closure))
+    if steps.max() > 4.0:
+        problems.append("centroid jumps {:.2f} px between directions {} and {} "
+                        "(misordered or missing frame)".format(
+                            steps.max(), int(np.argmax(steps)) + 1,
+                            int(np.argmax(steps)) + 2))
+    if closure > 4.0:
+        problems.append("centroid loop does not close ({:.2f} px gap) -> a direction "
+                        "is missing or duplicated".format(closure))
 
 base = os.path.join(sheet_dir, "melta-turret-base.png")
 if os.path.exists(base):

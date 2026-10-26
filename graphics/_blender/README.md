@@ -8,6 +8,11 @@ damage level by changing numbers instead of pixels.
                       cannon 64 times (5.625 deg apart)
     assemble.py       downsamples, applies the tone curve, bakes cast shadows,
                       writes the sheets the prototype loads
+    fit_final.py      refits assemble.py's tone curve against the vanilla turret
+                      sprites -- run it after any model/lighting change, then paste
+                      the printed CURVE into assemble.py
+    check_sheets.py   geometry audit of the assembled sheets: sizes, clipping, pivot
+                      radius, and that the 64 directions walk one closed loop
     render_icons.py   imports that same model and renders the ICON stills (one
                       direction at a time, supersampled, transparent)
     assemble_icons.py fits those stills into vanilla-shaped icon files, including
@@ -77,6 +82,26 @@ does not move. Measure the result, do not eyeball it:
 ```bash
 python pipe_sockets.py --check        # gap table per side, exit 1 over 0.22 tiles
 ```
+
+### The tone curve is a fit, not a constant
+
+`assemble.py`'s `CURVE` is what maps the Cycles render's luma onto the band vanilla
+turret sprites live in, and it is only valid for the model it was fitted to. A brighter
+palette, a different rig or a changed emissive strength moves every quantile: the curve
+that shipped through 0.5.0 was fitted to the old dark-grey model and, applied to the
+reworked one, put p90 at 234 -- near-white highlights that read as a white plate at the
+muzzle. Refit it whenever the model changes:
+
+```bash
+python fit_final.py <raw_dir>          # prints the CURVE to paste into assemble.py
+python palette_vs_vanilla.py <sheet_dir>   # the numbers the fit is aiming at
+```
+
+`fit_final.py` starts from identity, quantile-matches the assembled head against
+`vanilla base/graphics/entity/gun-turret/gun-turret-shooting-1.png`, then re-measures its
+own output and corrects; three passes land every quantile within ~1 luma. `TINT` is the
+second knob: it multiplies R/G/B after the curve, so it sets the warm bias (vanilla gun
+head measures +28 red-over-blue, the flamethrower hull +16..+21).
 
 ## Icons and thumbnail
 

@@ -73,13 +73,33 @@ def main():
     cam.location = Vector((0.0, math.sin(math.radians(TILT)),
                            -math.cos(math.radians(TILT)))) * -22.0
     M.setup_lights()
+    # The icon camera sees MORE than the sheet camera: ortho 4.2 tiles here against the
+    # sheets' 4.0, and a steeper 34 deg pitch. A softbox whose corner is outside the
+    # sheet frame therefore projects *inside* this one and renders as a flat pale
+    # peach tab -- which is what the shipped icons had at 10 o'clock (measured: 224 px
+    # of one flat colour, alpha 255, on every generated icon and thumbnail). The sheet
+    # pass calls check_rig_in_frame() and prints DIAG; the icon pass never did, so the
+    # artefact shipped. Push the plates along the camera's screen-up axis until the
+    # real camera reports them clear, then keep the aim on the rig target.
+    scene_u = Vector((0.0, math.cos(math.radians(TILT)), math.sin(math.radians(TILT))))
+    for attempt in range(8):
+        if M.check_rig_in_frame():
+            break
+        for ob in bpy.data.objects:
+            if ob.name.startswith("soft:"):
+                ob.location = ob.location + scene_u * 1.5
+                aim = Vector((0.0, 0.0, 0.5)) - ob.location
+                ob.rotation_euler = aim.to_track_quat('Z', 'Y').to_euler()
+        print("icon rig: pushed plates clear, attempt", attempt + 1)
+    else:
+        raise SystemExit("icon rig: a light plate is still inside the icon frame")
 
     scene = bpy.context.scene
     scene.render.resolution_x = RES
     scene.render.resolution_y = RES
     scene.cycles.samples = SAMPLES
 
-    M.build_hull()
+    M.build_hull_in_place()
     root = bpy.data.objects.new("gun_root", None)
     M.link(root)
     M.build_gun(root)

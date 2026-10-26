@@ -1,5 +1,10 @@
 # In-game verification of the 0.4.0 melta rework
 
+> **Art rework (0.5.1, pre-release):** the cannon model, muzzle and palette were
+> rebuilt toward vanilla. Report:
+> [`art-rework-verification.md`](art-rework-verification.md); evidence in `art/`,
+> harness in `harness/run_look.py` + `harness/melta-look` + `harness/build_art_evidence.py`.
+
 > **Later pass (0.5.0, tree `f5aa887`):** the five improvement cards were re-verified
 > together — pipes, range/quality/rotation, damage description, beam, asteroids — in one
 > scene with space-age and quality loaded at once. Report:

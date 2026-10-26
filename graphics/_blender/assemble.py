@@ -44,17 +44,30 @@ DIRECTIONS = 64
 BASE_DESQUASH_Y = 1.26
 
 # tone curve control points, render-luma -> final luma (both 0..255 sRGB).
-# Fitted by quantile matching (graphics/_blender was developed alongside a scratch
-# fit_curve.py): the Cycles 2.79 render comes out compressed around 35..70 because the
-# lights in this build barely shape the model, so the curve is steep in the middle --
-# it maps the render's own quantiles onto the quantiles measured from the vanilla
-# gun/laser turret base sprites (p10 ~1, p25 ~8, p50 ~22, p75 ~56, p90 ~113).
-CURVE = [(0, 0), (25, 3), (35, 8), (43, 18), (51, 34), (60, 70), (69, 125),
-         (84, 195), (105, 240), (140, 252), (255, 255)]
+# Fitted by quantile matching: the Cycles 2.79 render comes out compressed because the
+# lamps in this build are inert and all the shaping comes from the AO closure and the
+# emissive rig, so the curve is what puts the model in vanilla's value band.
+#
+# Refit for the 0.5.x rework (mid-value gunmetal body, brass fluid hardware, hot vent
+# rims). The previous table was fitted to the old dark-grey model and sent the new
+# render's p75 to 209 and p90 to 234 -- near-white highlights, which is what made the
+# muzzle read as a pale plate. This one maps the render's quantiles onto the ones
+# measured from vanilla gun-turret-shooting-1.png (p02 2.4, p10 13.9, p25 30.6,
+# p50 64.6, p75 116.1, p90 170.2, p98 231.9). Measured on the assembled 64 frames with
+# palette_vs_vanilla.py: mean 75.9 (vanilla gun head 75.0), p50 61 vs 60, p75 112 vs
+# 105, p90 166 vs 160, dark<16 14.9% vs 11.0%, pure white 0.00% vs 0.93%, warm
+# r-b +24.8 vs +27.3.
+# Re-fit with fit_final.py if the model or the lighting rig changes.
+CURVE = [(0, 0), (8, 0), (16, 5), (24, 10), (32, 18), (40, 26), (48, 35), (56, 46),
+         (64, 58), (72, 72), (80, 90), (88, 107), (96, 124), (104, 140), (112, 157),
+         (120, 172), (128, 185), (136, 197), (144, 208), (152, 220), (160, 231),
+         (176, 241), (192, 246), (208, 248), (224, 250), (240, 252), (255, 255)]
 
 # A touch of warmth: vanilla's turrets are grey-brown, and the render leans blue-grey.
-# Applied after the curve, on sRGB values.
-TINT = (1.12, 0.99, 0.90)
+# Applied after the curve, on sRGB values. Kept mild now that the model's own palette
+# carries brass and copper: at 1.12 the assembled head measured warm +40 against
+# vanilla gun head's +28; at 1.06 it lands on +29.
+TINT = (1.06, 0.995, 0.94)
 
 
 def tone_lut():
