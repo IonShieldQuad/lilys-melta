@@ -26,8 +26,15 @@ CHANGED = ["constants.lua", "control.lua", "data-updates.lua",
 
 
 def extract_head(dest):
-    """git archive HEAD -> dest (no checkout side effects, no dirty files)."""
-    archive = subprocess.run(["git", "-C", REPO, "archive", "--format=tar", "HEAD"],
+    """git archive <ref> -> dest (no checkout side effects, no dirty files).
+
+    MELTA_BASE selects the ref, default HEAD. Once a change is committed HEAD *is* the
+    new tree, so re-measuring the old one needs e.g.
+        MELTA_BASE=3f0a50e python run_balance.py before
+    (3f0a50e is the melta 0.5.0 balance tree this comparison was measured against).
+    """
+    base = os.environ.get("MELTA_BASE", "HEAD")
+    archive = subprocess.run(["git", "-C", REPO, "archive", "--format=tar", base],
                              capture_output=True)
     if archive.returncode != 0:
         raise SystemExit("git archive failed: " + archive.stderr.decode("utf-8", "ignore")[-800:])

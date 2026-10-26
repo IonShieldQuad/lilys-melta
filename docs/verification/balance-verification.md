@@ -197,6 +197,9 @@ of damage is flat across research — the same property a gun turret's ammo has)
 ```bash
 # measurement (before/after, four dummies, six tiers)
 python <card>/run_balance.py both
+# ... or the pre-change tree after the change was committed: HEAD is now the "after"
+# tree, so name the old release explicitly
+MELTA_BASE=3f0a50e python <card>/run_balance.py before
 
 # the tooltip the player will read (headless: --create runs on_init, where
 # localised_print resolves real locale strings)
