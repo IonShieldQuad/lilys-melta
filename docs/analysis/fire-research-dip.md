@@ -235,8 +235,9 @@ If the fire bonus is applied to the fire share only (85 %), double-dip cold dps 
 
 ## 6. How the numbers were obtained
 
-`C:/Users/Lily/AppData/Local/hermes/cache/scratch/dip-probe/` (scratch env, `--mod-directory` +
-`--config` pointing at its own `write/`, so the live install was untouched):
+Rig copied into the repo as `docs/verification/harness/dip-probe/`; it was run in a throwaway
+staging env (`--mod-directory` + `--config` pointing at its own `write/`, so the live install was
+untouched):
 
 * `mods/dip-probe_0.1.0/data.lua` — `dip-dummy`, a `small-biter` deepcopy with
   `max_health = 1e6`, `movement_speed = 0`, `resistances = {}`, harmless.

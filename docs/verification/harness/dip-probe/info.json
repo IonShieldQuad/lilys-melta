@@ -1,0 +1,9 @@
+{
+  "name": "dip-probe",
+  "version": "0.1.0",
+  "title": "damage dip probe",
+  "author": "hermes",
+  "description": "measures whether ammo-damage and turret-attack research stack on a gun turret, and whether script damage bypasses them",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1"]
+}
