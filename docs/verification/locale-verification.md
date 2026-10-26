@@ -85,7 +85,15 @@ show, both fixed:
 | fluid names in the fuel list | probe prints each accepted fluid's `[fluid-name.*]` | Light oil / Petroleum gas / Enriched melta fuel |
 
 Harness: `docs/verification/harness/melta-locale-probe/`
-(`stage.sh` builds an isolated env, `capture_quickbar.py` photographs both tooltips).
+(`stage.sh` builds an isolated env, `capture_quickbar.py` photographs both tooltips,
+`stage_rev.py` extracts an exact commit with python's tarfile -- `git archive | tar -x`
+does not survive this box's bsdtar).
+
+The final check was run on the commit itself, not the working tree: the tree of
+`melta: put every turret string in vanilla voice, and make the block render` was
+extracted with `stage_rev.py`, loaded with `--create`, and answered all 15 keys plus
+the item and entity flavour lines correctly. So the committed files are the ones that
+were proven, not a neighbour's uncommitted edits.
 
 Screenshots from that run (2.1.23, en):
 

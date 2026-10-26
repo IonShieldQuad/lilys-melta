@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 # Stage an isolated Factorio environment for the melta locale/tooltip check.
 #
-#   ./stage.sh new [rev] [language]   the working tree (what the card changes)
-#   ./stage.sh head [rev] [language]  a git revision instead (the before/after pair)
+#   ./stage.sh new  [rev] [locale]   the WORKING TREE, with that rev's locale files
+#   ./stage.sh head [rev] [locale]   the same thing (kept for the old call sites)
+#
+# Note what "new"/"head" really do: both tar the working tree and then overwrite
+# locale/en + locale/ru from REV. That is deliberate -- the question these runs answer
+# is "same code, which strings", so the A/B pair only varies the locale. Proving a
+# *commit* loads (code included) is a different job: python stage_rev.py <rev> <dest>
+# extracts that commit's tree and is what should be handed to the game for that.
 #
 # Her own install, saves, mod-list and factorio-current.log are never touched: the
 # environment gets its own --config (write-data in scratch) and --mod-directory.
@@ -10,12 +16,12 @@
 # Then, in the printed directory:
 #   Factorio.exe --config <env>/config.ini --mod-directory <env>/mods --create <env>/write/scene.zip
 #   grep -a "\[locale-probe\]" <env>/write/factorio-current.log   # resolved strings, no GUI
-#   python capture.py <env> <env>/out                             # real tooltip screenshots
+#   python capture_quickbar.py <env> <env>/out                    # real tooltip screenshots
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)"
 SCR="${MELTA_PROBE_SCRATCH:-C:/Users/Lily/AppData/Local/hermes/cache/scratch}"
-KIND="${1:?usage: stage.sh new|head [rev] [language]}"
+KIND="${1:?usage: stage.sh new|head [rev] [locale]}"
 REV="${2:-HEAD}"
 LANGUAGE_CODE="${3:-en}"
 W="$SCR/melta-locale-$KIND-$LANGUAGE_CODE"
