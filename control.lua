@@ -88,7 +88,14 @@ local function sample_fuel(turret, state)
   state.burn_fuel = chosen and chosen.name or nil
 end
 
+-- The answer cannot change inside one tick, and this is called from the damage path, the
+-- draw path, the mouth glow, the wind-up and the gauge, so it is cached per tick: four
+-- engine reads per turret per tick instead of four per call.
 local function fuel_profile(turret, state)
+  local now = game.tick
+  if state and state.profile_tick == now then
+    return state.profile_cached
+  end
   local burn = state and state.burn_fuel
   local best, best_amount = nil, 0
   for _, fuel in ipairs(fuels_here()) do
@@ -102,7 +109,12 @@ local function fuel_profile(turret, state)
       end
     end
   end
-  return best or DEFAULT_PROFILE
+  local chosen = best or DEFAULT_PROFILE
+  if state then
+    state.profile_tick = now
+    state.profile_cached = chosen
+  end
+  return chosen
 end
 
 -- one entry per placed melta turret, keyed by unit_number:
@@ -579,20 +591,86 @@ local function pop(surface, position, base, radius, alpha, layer)
   }
 end
 
------------------------------------------------------------------ pulse -------
+-------------------------------------------------------------- corridor -------
 
--- Cuts everything standing on the beam axis and returns where the beam stopped.
-local function pulse(turret, state, muzzle, dx, dy, reach)
+-- The beam is continuous, the damage clock is not.
+--
+-- Up to 0.6.1 the corridor was tested only on the tick a pulse happened, so a turret
+-- sweeping across a swarm cut a visible arc through bodies that never took anything: a
+-- biter could sit inside the drawn beam for seven of every eight ticks and be untouched if
+-- no pulse landed on it. (Reported playtest: "some of them get touched by beam visually,
+-- yet take no damage".) The fix is to separate the two clocks that were fused:
+--
+--   * DAMAGE runs every tick, at `pulse damage / pulse interval`, so what the beam visibly
+--     touches for one tick is burnt for one tick's worth. Sweeping spreads one pulse over
+--     everything the arc crossed instead of picking whoever happened to be on the axis at
+--     the pulse tick;
+--   * the PULSE clock keeps its job: the thump (muzzle flash, cut marks, impact pop), the
+--     fuel surcharge and the "what is burning" sample all still happen 7.5x a second, so
+--     the look and the balance of a locked-on beam are unchanged.
+--
+-- Cost discipline: the engine query is the expensive part, so the body list is only rebuilt
+-- when the beam's GEOMETRY moved (a locked-on turret keeps it for a whole pulse window, i.e.
+-- one query per 8 ticks, exactly as before) or every `C.hit_refresh_ticks` so bodies that
+-- walked in are still picked up. A turret mid-sweep rebuilds it every tick -- which is
+-- precisely when being right matters.
+--
+-- Per tick the cached bodies are re-tested with cheap maths, so a body that walked out of
+-- the beam stops burning immediately instead of waiting for the next refresh.
+
+-- where a body sits relative to the beam axis: distance along it, and across it
+local function axis_of(position, muzzle, dx, dy)
+  local vx = position.x - muzzle.x
+  local vy = position.y - muzzle.y
+  local along = vx * dx + vy * dy
+  local across = math.sqrt((vx - dx * along) ^ 2 + (vy - dy * along) ^ 2)
+  return along, across
+end
+
+local function body_radius(entity)
+  local box = entity.bounding_box
+  return math.max(box.right_bottom.x - box.left_top.x, box.right_bottom.y - box.left_top.y) * 0.5
+end
+
+local function corridor_clear(state)
+  local hits = state.hits
+  if hits then
+    for index = 1, (state.hit_count or 0) do
+      hits[index].entity = nil
+      hits[index].along = 0
+      hits[index].radius = 0
+    end
+  end
+  state.hit_count = 0
+  state.hit_tick = nil
+end
+
+local function corridor_stale(state, muzzle, dx, dy, reach, tick)
+  local last = state.hit_tick
+  if not last then
+    return true
+  end
+  if tick - last >= C.hit_refresh_ticks then
+    return true
+  end
+  -- ~0.1 deg of aim change, or a muzzle that moved by more than a fifth of a tile
+  return math.abs(dx - state.hit_ax) > 0.002
+      or math.abs(dy - state.hit_ay) > 0.002
+      or math.abs(reach - state.hit_reach) > 0.05
+      or math.abs(muzzle.x - state.hit_mx) > 0.2
+      or math.abs(muzzle.y - state.hit_my) > 0.2
+end
+
+-- Rebuild the list of enemies whose skin crosses the beam axis, nearest first.
+local function corridor_refresh(turret, state, muzzle, dx, dy, reach, tick)
+  local hits = state.hits
+  if not hits then
+    hits = {}
+    state.hits = hits
+  end
   local force = turret.force
-  -- once per shot is the natural sampling rate for "what is burning": the engine has just
-  -- taken its fluid, and a shot is 7.5/s, so this costs four engine reads per shot.
-  sample_fuel(turret, state)
-  local profile = fuel_profile(turret, state)
-  local damage = (C.damage_cold + (C.damage_hot - C.damage_cold) * state.charge)
-                 * profile.damage_modifier * damage_multiplier(turret)
   local far_x = muzzle.x + dx * reach
   local far_y = muzzle.y + dy * reach
-
   local pad = 1.5
   local candidates = turret.surface.find_entities_filtered
   {
@@ -604,82 +682,164 @@ local function pulse(turret, state, muzzle, dx, dy, reach)
     is_military_target = true
   }
 
-  local hits = {}
+  local count = 0
   for _, candidate in pairs(candidates) do
     if candidate.valid and candidate ~= turret and candidate.force and force.is_enemy(candidate.force) then
-      local vx = candidate.position.x - muzzle.x
-      local vy = candidate.position.y - muzzle.y
-      local along = vx * dx + vy * dy
-      local box = candidate.bounding_box
-      local radius = math.max(box.right_bottom.x - box.left_top.x, box.right_bottom.y - box.left_top.y) * 0.5
+      local along, across = axis_of(candidate.position, muzzle, dx, dy)
+      local radius = body_radius(candidate)
       -- `along <= reach + radius`: a body whose *centre* is a fraction of a tile past the
       -- end of the corridor still has its skin inside it, and that is exactly how far the
       -- engine's own range test reaches (it measures to the bounding box). Without the
       -- radius the turret would aim at and burn fluid on a spawner 17 tiles out with a
       -- 16-tile beam and never hurt it.
-      if along > 0 and along <= reach + radius then
-        local offset = math.sqrt((vx - dx * along) ^ 2 + (vy - dy * along) ^ 2)
-        if offset <= C.hit_half_width + radius then
-          hits[#hits + 1] = {entity = candidate, along = along, position = candidate.position}
+      if along > 0 and along <= reach + radius and across <= C.hit_half_width + radius then
+        count = count + 1
+        local hit = hits[count]
+        if not hit then
+          hit = {}
+          hits[count] = hit
         end
+        hit.entity = candidate
+        hit.along = along
+        -- the radius is a prototype property, but `bounding_box` builds two tables every
+        -- time it is read: keep it, because the per-tick path needs it and cannot afford it
+        hit.radius = radius
       end
     end
   end
-  table.sort(hits, function(left, right) return left.along < right.along end)
+  state.hit_count = count
+  state.hit_tick = tick
+  state.hit_ax, state.hit_ay, state.hit_reach = dx, dy, reach
+  state.hit_mx, state.hit_my = muzzle.x, muzzle.y
 
-  local stop = {x = far_x, y = far_y}
-  -- nearest body the pulse cuts: the impact flare follows it (see render_beam)
-  local impact = nil
-  local impact_entity = nil
-  local cut = math.min(#hits, C.pierce_max)
-  for index = 1, cut do
+  -- Near-to-far, so a falloff ladder can put the first body in the line at full damage.
+  -- With C.pierce_falloff = 1 (the default since damage went continuous) the order means
+  -- nothing, so the sort is skipped entirely -- it is the only O(n^2) step in this path and
+  -- it runs on every refresh of a sweeping beam.
+  if (C.pierce_falloff or 1) >= 1 then
+    return count
+  end
+  for index = 2, count do
+    local moving = hits[index]
+    local at = index - 1
+    while at >= 1 and hits[at].along > moving.along do
+      hits[at + 1] = hits[at]
+      at = at - 1
+    end
+    hits[at + 1] = moving
+  end
+  return count
+end
+
+----------------------------------------------------------------- damage ------
+
+-- One tick of burning. `share` is 1/interval, so a body that stays on the axis for a whole
+-- pulse interval takes exactly one pulse's damage, and a body the beam only crosses for a
+-- tick or two takes that fraction of it.
+local function burn_tick(turret, state, muzzle, dx, dy, reach, tick)
+  if corridor_stale(state, muzzle, dx, dy, reach, tick) then
+    corridor_refresh(turret, state, muzzle, dx, dy, reach, tick)
+  end
+  local hits, count = state.hits, state.hit_count or 0
+  if count == 0 then
+    return nil, nil
+  end
+
+  local force = turret.force
+  local profile = fuel_profile(turret, state)
+  local interval = pulse_interval(turret)
+  local damage = (C.damage_cold + (C.damage_hot - C.damage_cold) * state.charge)
+                 * profile.damage_modifier * damage_multiplier(turret) / interval
+
+  local falloff = C.pierce_falloff or 1
+  -- ONE engine call per body per tick, not two. The fire and physical halves of a tick are
+  -- applied on alternating ticks at double the amount: every resistance in the game is
+  -- linear in the amount ((x + flat) * (1 - percent)), so over any two-tick window the body
+  -- takes exactly what two calls per tick would have given it, and the loop costs half the
+  -- engine calls. Measured with 20 turrets firing: docs/verification/sweep-damage.md.
+  local fire_tick = (tick % 2) == 0
+  local nearest, nearest_entity, nearest_along
+  local rank = 0
+  for index = 1, count do
     local hit = hits[index]
     local victim = hit.entity
-    -- everything in the corridor burns, enemies only: friendly forces and neutral
-    -- scenery are filtered out above, so your own base is never in the line of fire
-    local dealt = damage * C.pierce_falloff ^ (index - 1)
-    if dealt > 0 and victim.valid and victim.health then
-      -- Fire is what a melta is; the physical share is the mass of the stream hitting
-      -- the body. Two calls because `damage()` takes one type per call (positional:
-      -- amount, force, type, cause). The total is unchanged -- the split is taken out
-      -- of `dealt`, so balance is identical and only the resistance maths differs:
-      -- a 100 % fire-resistant target still eats C.physical_share of the pulse.
-      --
-      -- Flat armour is compensated out of both halves (C.pierce_flat_armor): the
-      -- engine subtracts `resistances[type].decrease` before the percentage, which
-      -- is what eats a short-range burst weapon alive against armoured targets, so
-      -- the pulse is handed exactly that much extra. Percentage resistance is NOT
-      -- touched -- a resistant target still takes its cut.
-      local fire_damage = dealt * (1 - C.physical_share)
-      local physical_damage = dealt * C.physical_share
-      if C.pierce_flat_armor then
-        fire_damage = fire_damage + flat_armor(victim, C.damage_type)
-        physical_damage = physical_damage + flat_armor(victim, C.damage_type_hit)
+    if victim and victim.valid and victim.health and victim.health > 0 then
+      local along, across = axis_of(victim.position, muzzle, dx, dy)
+      local radius = hit.radius or 0
+      if along > 0 and along <= reach + radius and across <= C.hit_half_width + radius then
+        local dealt = damage * 2   -- two ticks' worth, because each type lands every other tick
+        if falloff ~= 1 then
+          rank = rank + 1
+          dealt = dealt * falloff ^ (rank - 1)
+        end
+        if nearest_along == nil or along < nearest_along then
+          nearest, nearest_entity, nearest_along = victim.position, victim, along
+        end
+        -- Fire is what a melta is; the physical share is the mass of the stream hitting the
+        -- body. `damage()` takes one type per call (positional: amount, force, type, cause),
+        -- and the split is taken out of `dealt`, so balance depends only on the total -- a
+        -- 100 % fire-resistant target still eats C.physical_share of the damage.
+        --
+        -- Flat armour is compensated out of the call (C.pierce_flat_armor): the engine
+        -- subtracts `resistances[type].decrease` before the percentage, which is what eats a
+        -- short-range burst weapon alive against armoured targets, so the hit is handed
+        -- exactly that much extra. Percentage resistance is NOT touched.
+        local amount, damage_type
+        if fire_tick then
+          amount, damage_type = dealt * (1 - C.physical_share), C.damage_type
+        else
+          amount, damage_type = dealt * C.physical_share, C.damage_type_hit
+        end
+        if C.pierce_flat_armor then
+          amount = amount + flat_armor(victim, damage_type)
+        end
+        victim.damage(amount, force, damage_type, turret)
+        -- Asteroids are 100 % fire resistant and their big/huge tiers subtract 2000/3000
+        -- from every physical hit -- which the bypass above cancels, so a rock takes its
+        -- 10 % percentage cut of the 15 % slice and nothing more. Rocks get an extra hit in
+        -- `explosion`, the ladder the vanilla asteroid set is balanced around, sized off the
+        -- same damage, on the same every-other-tick cadence.
+        if victim.valid and victim.health and victim.health > 0 and victim.type == "asteroid" then
+          victim.damage(dealt * C.asteroid_damage_multiplier, force, C.asteroid_damage_type, turret)
+        end
+        hit.along = along
+      else
+        -- walked out of the beam between refreshes: stop burning it now, not at the refresh
+        hit.entity = nil
       end
-      victim.damage(fire_damage, force, C.damage_type, turret)
-      -- the fire hit may have killed it; a dead entity has nothing left to damage
-      if victim.valid and victim.health and victim.health > 0 then
-        victim.damage(physical_damage, force, C.damage_type_hit, turret)
-      end
-      -- Asteroids are 100 % fire resistant and their big/huge tiers subtract 2000/3000
-      -- from every physical hit -- which the bypass above cancels, so a rock takes its
-      -- 10 % percentage cut of the 15 % slice and nothing more. That slice is a fraction
-      -- of a percent of a big rock, so rocks get an extra hit in `explosion` -- the
-      -- damage type the vanilla asteroid ladder is balanced around -- sized off the same
-      -- pulse, so it ramps with charge, with fuel and with pierce falloff like
-      -- everything else. Gated on the entity type, so pawns, spawners and buildings
-      -- never take it (constants.lua).
-      if victim.valid and victim.health and victim.health > 0 and victim.type == "asteroid" then
-        victim.damage(dealt * C.asteroid_damage_multiplier, force, C.asteroid_damage_type, turret)
-      end
-      pop(turret.surface, hit.position, tier_color("sheath", state.charge, profile),
+    else
+      hit.entity = nil
+    end
+  end
+  return nearest, nearest_entity
+end
+
+----------------------------------------------------------------- pulse -------
+
+-- The thump: cut marks on every body on the axis, the muzzle flash, the fuel surcharge and
+-- the per-shot fuel sample. Damage no longer happens here (see burn_tick) -- this is the
+-- 7.5 Hz clock that makes the beam feel like it has a pressure behind it.
+local function pulse(turret, state, muzzle, dx, dy, reach)
+  -- once per shot is the natural sampling rate for "what is burning": the engine has just
+  -- taken its fluid, and a shot is 7.5/s, so this costs four engine reads per shot.
+  sample_fuel(turret, state)
+  local profile = fuel_profile(turret, state)
+
+  local hits, count = state.hits, state.hit_count or 0
+  local stop = {x = muzzle.x + dx * reach, y = muzzle.y + dy * reach}
+  for index = 1, count do
+    local hit = hits[index]
+    local victim = hit.entity
+    if victim and victim.valid and victim.health and victim.health > 0 then
+      pop(turret.surface, victim.position, tier_color("sheath", state.charge, profile),
         0.38 + 0.42 * state.charge, 0.85, "higher-object-above")
+      stop = victim.position
     end
-    if not impact then
-      impact = hit.position
-      impact_entity = victim
-    end
-    stop = hit.position
+  end
+  if C.debug then
+    log(string.format("melta pulse unit=%s charge=%.2f interval=%.2f bodies=%d fuel=%d",
+      tostring(turret.unit_number), state.charge, pulse_interval(turret), count,
+      turret.get_fluid_count()))
   end
 
   -- muzzle flash: forward of the barrel so it does not sit inside the sprite
@@ -688,18 +848,6 @@ local function pulse(turret, state, muzzle, dx, dy, reach)
     0.70 + 0.80 * state.charge, 0.55)
   pop(turret.surface, flash, tier_color("core", state.charge, profile),
     0.30 + 0.35 * state.charge, 0.95)
-  -- the impact flare is drawn with the beam itself, every tick, and tracks the body
-  -- it is burning (so it cannot be left glowing on a corpse)
-  if state.beam then
-    state.beam.hit = impact
-    state.beam.hit_entity = impact_entity
-  end
-
-  if C.debug then
-    log(string.format("melta pulse unit=%s charge=%.2f damage=%.1f reach=%.1f candidates=%d hits=%d fuel=%d research=%.2f interval=%.2f",
-      tostring(turret.unit_number), state.charge, damage, reach, #candidates, #hits,
-      turret.get_fluid_count(), damage_multiplier(turret), pulse_interval(turret)))
-  end
 
   burn_surcharge(turret, state)
   return stop
@@ -1218,6 +1366,15 @@ local function update(turret, state, tick)
       local along = (muzzle.x - turret.position.x) * ax + (muzzle.y - turret.position.y) * ay
       local reach = math.max(1, range - along)
 
+      -- DAMAGE every tick, so whatever the drawn beam crosses is burnt for as long as it
+      -- is crossed (see burn_tick). The impact flare follows the nearest body from here,
+      -- which also makes it track a moving target smoothly instead of jumping once a pulse.
+      local impact, impact_entity = burn_tick(turret, state, muzzle, ax, ay, reach, tick)
+      if state.beam then
+        state.beam.hit = impact
+        state.beam.hit_entity = impact_entity
+      end
+
       if tick >= state.pulse_at then
         local interval = pulse_interval(turret)
         if state.pulse_at < tick - interval then
@@ -1259,6 +1416,7 @@ local function update(turret, state, tick)
     -- still swinging onto the target: charge the mouth, draw no beam, deal no damage.
     -- `state.pulse_at` is deliberately NOT advanced, so the first shot is due the
     -- moment the barrel arrives instead of a cooldown later.
+    corridor_clear(state)
     fade_current_beam(state)
     draw_windup(turret, state, muzzle, elapsed, tick)
     if C.debug then
@@ -1269,6 +1427,7 @@ local function update(turret, state, tick)
   end
 
   -- not shooting: the beam is gone, the emitter bleeds off its heat
+  corridor_clear(state)
   state.aim_target = nil
   state.pulse_at = tick + C.cooldown
   state.beam_end = nil

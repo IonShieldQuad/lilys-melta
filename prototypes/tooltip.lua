@@ -79,8 +79,41 @@ local function apply()
   -- is the documented way to remove that channel, and a tooltip that still promised an
   -- explosion hit at 0 % would be exactly the sort of lie this file exists to stop.
   local asteroid_percent = C.asteroid_damage_multiplier or 0
+  -- With C.pierce_falloff = 1 every body on the beam takes the whole hit, so the ladder
+  -- sentence ("each enemy behind it takes __8__ of the hit before it") would be a lie.
+  -- Two string sets, picked from the same constant the damage path reads.
+  local flat = (C.pierce_falloff or 1) >= 1
   local block
-  if asteroid_percent > 0 then
+  if flat then
+    if asteroid_percent > 0 then
+      block =
+      {
+        "melta-tooltip.flat",
+        num(C.damage_cold),
+        num(C.damage_hot),
+        percent(1 - C.physical_share),
+        percent(C.physical_share),
+        num(per_second),
+        num(C.damage_cold * per_second),
+        num(C.damage_hot * per_second),
+        fuel_list,
+        percent(asteroid_percent)
+      }
+    else
+      block =
+      {
+        "melta-tooltip.flat-no-rocks",
+        num(C.damage_cold),
+        num(C.damage_hot),
+        percent(1 - C.physical_share),
+        percent(C.physical_share),
+        num(per_second),
+        num(C.damage_cold * per_second),
+        num(C.damage_hot * per_second),
+        fuel_list
+      }
+    end
+  elseif asteroid_percent > 0 then
     block =
     {
       "melta-tooltip.block",

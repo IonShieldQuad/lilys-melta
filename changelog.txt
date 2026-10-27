@@ -1,3 +1,35 @@
+Version: 0.6.2
+Date: 2026-10-27
+  Bugfixes:
+    - The beam now damages what it visibly touches. Damage was tested against the corridor on
+      the tick a pulse happened (8 ticks apart), while the beam is redrawn along a moving
+      target every tick, so a turret dragging its beam across a swarm cut through bodies that
+      took nothing whenever no pulse landed on them. Damage is now applied EVERY tick at
+      pulse damage / pulse interval, which is the same damage per second on a locked target
+      and the right damage per second of exposure for everything the beam crosses
+    - Damage rollup is now visible per tick rather than per pulse in the health bar of
+      anything being burnt (measured series in docs/verification/sweep-damage.md)
+  Changes:
+    - Pierce falloff is off by default (C.pierce_falloff = 1): every body on the beam axis
+      takes the whole hit, up to C.pierce_max bodies. With per-tick damage a "who is in
+      front" ranking decides damage at the moment the corridor is refreshed rather than at
+      the moment of a pulse, so the ladder stopped meaning anything; setting the constant
+      below 1 brings it back
+    - The pulse clock is now purely the thump: muzzle flash, cut marks, impact pop, the fuel
+      surcharge and the fuel sample. Nothing about the look or the fuel bill changed
+    - Corridor refreshes only when the beam moved (or every C.hit_refresh_ticks), so a
+      locked-on turret still costs one spatial query per pulse window; a sweeping one costs
+      one per tick, which is exactly when it matters
+    - Cost: measured with 20 turrets firing, 9.09 -> 10.21 ms per update (+12 %). Per body
+      radius is cached at refresh (bounding_box allocates), and the fire and physical halves
+      of a hit land on alternating ticks at double the amount -- every resistance is linear
+      in the amount, so a two-tick window is identical for half the engine calls
+    - Tooltip: with no falloff the description no longer claims a ladder it does not apply
+  Balance:
+    - Single-target dps is unchanged (a body on the axis for a full interval takes exactly
+      one pulse's damage). Total damage against a LINE goes up, because there is no falloff:
+      the old ladder paid 82 % to the second body; it now pays 100 %
+
 Version: 0.6.1
 Date: 2026-10-27
   Bugfixes:

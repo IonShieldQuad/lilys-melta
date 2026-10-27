@@ -73,8 +73,15 @@ C.damage_cold     = 32    -- damage per pulse, cold barrel (85 % fire + 15 % phy
 C.damage_hot      = 128    -- damage per pulse, fully spun up (same split) = 4.0x cold
 C.spin_up_ticks   = 150   -- 2.5 s of unbroken fire from cold to white-hot
 C.spin_down_ticks = 60    -- 1 s to fall back to cold once the target is gone
-C.pierce_falloff  = 0.95  -- each further body in the line takes this fraction of the last hit
-C.pierce_max      = 30    -- hard cap on bodies a single pulse can cut through
+-- 1.0 = every body on the beam takes the whole hit. Set below 1.0 to restore the old
+-- "each body behind the first takes this fraction of the one in front" ladder. The author
+-- turned it off once damage went continuous: with a beam that burns whatever it crosses, a
+-- ranking of "who is in front" decides damage at the moment of the corridor refresh rather
+-- than at the moment of the pulse, so the ORDER stops being meaningful and the ladder only
+-- made a line's damage depend on which body the sort happened to put first. 1.0 also lets
+-- control.lua skip both the `^` and the ordering sort entirely.
+C.pierce_falloff  = 1.0   -- 1 = no falloff; < 1 = each further body takes this fraction
+C.pierce_max      = 30    -- hard cap on bodies the beam can burn at once
 C.hit_half_width  = 0.9  -- tiles: half-width of the line hit test around the beam axis
 
 -- research scaling ------------------------------------------------------------
@@ -147,6 +154,20 @@ C.research_rate_ammo      = {"melta"}  -- ammo categories whose gun-speed resear
 -- This touches nothing outside the melta's own pulse: no engine behaviour, no
 -- other turret, no fraction of it.
 C.pierce_flat_armor = true   -- ignore resistances[type].decrease on both damage components
+
+-- Damage granularity ----------------------------------------------------------
+-- The beam is drawn every tick but the damage used to be applied once per pulse, so a
+-- body the beam swept across between two pulses took nothing (reported: "some of them get
+-- touched by beam visually, yet take no damage"). Damage now runs every tick at
+-- `pulse damage / pulse interval`, which is the same number per second; the pulse clock
+-- keeps the thump, the fuel surcharge and the fuel sample.
+--
+-- `hit_refresh_ticks` is how long the list of bodies on the axis may be reused while the
+-- beam is not moving: the engine query is the expensive part, and a locked-on turret does
+-- not need a new one every tick. Sweeping turrets re-query every tick regardless (the
+-- geometry moved), which is exactly when accuracy matters. Raise it to save script time,
+-- lower it if bodies that walk into a static beam feel late to take damage.
+C.hit_refresh_ticks = 8      -- ticks
 
 -- asteroids / rocks ------------------------------------------------------------
 -- A melta pulse is 85 % fire, and EVERY space-age asteroid is 100 % fire resistant:

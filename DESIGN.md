@@ -23,11 +23,11 @@ render-object leaks).
 | health | 1200 | an emitter, not an armoured box (rocket turret: 1500) |
 | range | 16 tiles, scaling with quality through the engine's `range_multiplier` (17.6 / 19.2 / 20.8 / 24 at uncommon / rare / epic / legendary) | laser 24, rocket 36: the melta is still the close-in emitter, and quality is what buys the extra tiles. The engine does the scaling; the script mirrors it for the beam and clamps at 24 — see **Quality range** below |
 | head rotation | 0.03 turns/tick (10.8 deg/tick) | was 0.006 (2.16 deg/tick, inherited from the rocket turret): a half turn took 83 ticks (1.4 s) and the head could not track a behemoth biter (0.3 tiles/tick) crossing at 4 tiles, which needs 0.012 turns/tick. 0.03 = half a turn in 17 ticks (0.28 s), twice the vanilla gun turret's 0.015 |
-| pulse rate | 8 ticks (7.5/s) | fast enough that discrete pulses read as one beam |
+| pulse rate | 8 ticks (7.5/s) | the *thump*: muzzle flash, cut marks, fuel surcharge. Damage itself is continuous — see the damage model below |
 | damage / pulse | 32 cold → 56 hot (1.75x) | 240 → 420 dps single target, before pierce; cold is level with a gun turret on uranium rounds (240), hot is 1.76-2.02x it across the research tiers. Scales with the fire damage and turret firing-speed research — see the balance note below |
 | spin-up | 150 ticks (2.5 s) | one biter wave is not enough time to peak |
 | spin-down | 60 ticks (1 s) | it cools fast, so holding a line is the skill |
-| pierce | 12 bodies, 0.82 falloff each | front rank eats it, back ranks eat 82 % of the one in front |
+| pierce | every body on the axis, up to `pierce_max` | no falloff by default (`C.pierce_falloff = 1`): the beam burns what it crosses, so a ranking of "who is in front" stopped meaning anything once damage went per-tick. Set it below 1 to bring the ladder back |
 | damage type | `fire`, with 15 % of each pulse dealt as `physical` | fire is what a melta is (and fire-vulnerable biters take it in full); the physical slice is the mass of the stream, so a fire-immune target still takes 15 % instead of nothing |
 | fuel | light-oil 1.0x, petroleum-gas 0.85x, enriched melta-fuel 1.6x, incendiaries napalm 1.35x | each fuel sets damage *and* beam colour; see the fuel table below |
 | burn rate | 2.5 units/shot engine-side + 3.8 per pulse at full charge | ~19/s cold, ~47/s white-hot |
@@ -90,8 +90,9 @@ already account for. Measurements: `docs/verification/research-scaling.md`.
 Cold holds parity with the gun turret at every tier (1.00x-1.16x) despite 16 tiles of reach
 and a fluid bill; hot is 1.76x-2.02x the gun turret, which is what pays for the short range.
 The tesla turret is the other comparison: 60 dps on one body, up to ~600 across its chain,
-against the melta's 12-body piercing line (32 + 0.82 falloff ≈ 1290 dps cold across a full
-line). Method, probe and the before/after measurement:
+against the melta's line: with no falloff every body it crosses takes the whole hit, so the
+line's dps is (bodies on the axis) x single-target dps — which is what the author asked for
+when the ladder was removed; the cap is `C.pierce_max` bodies. Method, probe and the before/after measurement:
 `docs/verification/balance-verification.md`.
 
 ## Asteroids (space age)
@@ -187,6 +188,34 @@ Two consequences, both handled:
   hull stands on its own tile instead of the tile boundary behind it; the engine-drawn
   pipe stubs do NOT move (they belong to the tile grid, not to the art). `muzzle_point`
   adds the same shift, so the lance leaves the mouth the player can see.
+
+## Damage model: continuous, not pulses
+
+The beam is drawn every tick and follows its target, so the corridor it covers moves every
+tick. The damage clock was separate and much slower (one application per 8-tick pulse), and
+that mismatch showed: a turret dragging its beam across a swarm cut a visible arc through
+bodies that took nothing because no pulse landed on them. Reported from playtest and fixed
+by splitting the two clocks.
+
+* **Damage runs every tick**, `pulse damage / pulse interval` per tick. A body on the axis
+  for a whole interval takes exactly one pulse; a body the beam only crosses for two ticks
+  takes two eighths of one. Dps on a locked target is unchanged.
+* **The pulse clock keeps the thump**: muzzle flash, cut marks, the impact pop, the fuel
+  surcharge and the "which fluid is burning" sample all still happen 7.5 times a second.
+* **No pierce falloff by default** (`C.pierce_falloff = 1`). Everything the beam crosses
+  takes the full hit, up to `C.pierce_max` bodies. With per-tick damage the near-to-far
+  ranking decides damage at the moment of a corridor refresh rather than at the moment of a
+  pulse, and the author preferred the simpler, fairer rule; the constant is still there for
+  the old behaviour, and at 1 the sort and the `^` are skipped.
+* **Cost control**: the engine's spatial query runs only when the beam's geometry moved (or
+  every `C.hit_refresh_ticks`), so a locked-on turret costs one query per pulse window
+  exactly as before and a sweeping one costs one per tick — which is when it matters. Each
+  body's radius is cached at refresh (`bounding_box` allocates), and the fire and physical
+  halves land on alternating ticks at double the amount, so a body costs one `damage()` call
+  per tick instead of two with no change to the damage per window.
+  Measured with 20 turrets firing: 9.09 -> 10.21 ms per update (+12 %), and the drawing path
+  (17 render objects per turret, updated every tick) is the larger half of that budget.
+  Details, series and profiler runs: `docs/verification/sweep-damage.md`.
 
 ## Quality range
 
