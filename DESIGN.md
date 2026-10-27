@@ -144,17 +144,15 @@ Two consequences, both handled:
 **Runtime (`control.lua`)**
 - `charge` per turret: +1/150 per tick while a target is held *and* the turret has fluid,
   −1/60 per tick otherwise.
-- **aiming gate** — the beam is not allowed to exist before the barrel points at the
-  target. `LuaEntity::orientation` on a turret *is the weapon's* smooth orientation
-  (0 = north, 0.25 = east), so each tick the script compares it with the bearing to the
-  target and only fires when the head is within `C.aim_tolerance` (0.006 turns = 2.16 deg;
-  deliberately tighter than one rotation step, so the shot leaves on the tick the engine
-  clamps onto the exact bearing instead of up to 11 deg off-bore). While the
-  head is still swinging it plays a **charge-up glow at the mouth** instead: no beam, no
-  damage, and `pulse_at` is not advanced, so the first shot leaves the moment the barrel
-  arrives rather than a cooldown later. A target the barrel is *already* on does not pay
-  that wind-up (killing a biter and picking the next one on the same line stays at full
-  rate).
+- **the beam follows the barrel, and never goes quiet mid-fight.** `LuaEntity::orientation`
+  on a turret *is the weapon's* smooth orientation (0 = north, 0.25 = east), so the lance is
+  drawn from the muzzle along that facing and damages whatever it crosses -- a target switch
+  sweeps the beam across everything between the old bearing and the new one. There is no
+  off-bore gate and no wind-up: refusing to fire while turning is exactly what a melta should
+  not do. While the engine re-acquires after a kill, `C.target_grace_ticks` keeps the lance
+  lit and the script looks for the next body itself, so kills chain without restarting the
+  spin-up. A dry turret stops dead: the fuel gate is `C.fuel_empty` (0.1 units), not `> 0`,
+  because a drained buffer holds dust and `> 0` fired on it forever.
 - **muzzle** — the beam starts where the sprite *draws* the mouth, which is not
   `position + forward * length`: the head is a pitched-camera render (51 deg from
   vertical), so the forward reach is foreshortened by cos(51°) on the screen's vertical

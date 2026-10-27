@@ -34,9 +34,12 @@ local function fuels_here()
   return available_fuels
 end
 
+-- A turret is only "fuelled" above C.fuel_empty, not above zero: fluids are doubles, so a
+-- drained buffer holds dust (measured 0.0005 units) and `> 0` let a turret fire forever on it.
 local function has_fuel(turret)
+  local empty = C.fuel_empty or 0
   for _, fuel in ipairs(fuels_here()) do
-    if turret.get_fluid_count(fuel.name) > 0 then
+    if turret.get_fluid_count(fuel.name) > empty then
       return true
     end
   end
@@ -70,10 +73,11 @@ local function sample_fuel(turret, state)
   local previous = state.fuel_prev or {}
   local burnt, burnt_drop = nil, 0
   local biggest, biggest_amount = nil, 0
+  local empty = C.fuel_empty or 0
   for _, fuel in ipairs(fuels_here()) do
     local amount = turret.get_fluid_count(fuel.name)
     current[fuel.name] = amount
-    if amount > 0 then
+    if amount > empty then
       if amount > biggest_amount then
         biggest, biggest_amount = fuel, amount
       end
@@ -97,10 +101,11 @@ local function fuel_profile(turret, state)
     return state.profile_cached
   end
   local burn = state and state.burn_fuel
+  local empty = C.fuel_empty or 0
   local best, best_amount = nil, 0
   for _, fuel in ipairs(fuels_here()) do
     local amount = turret.get_fluid_count(fuel.name)
-    if amount > 0 then
+    if amount > empty then
       if burn == fuel.name then
         return fuel
       end
@@ -309,14 +314,6 @@ end
 
 ---------------------------------------------------------------- helpers ------
 
-local function normalize(dx, dy)
-  local length = math.sqrt(dx * dx + dy * dy)
-  if length < 0.0001 then
-    return 0, 0, 0
-  end
-  return dx / length, dy / length, length
-end
-
 local function lerp(from, to, ratio)
   return from + (to - from) * ratio
 end
@@ -443,12 +440,6 @@ end
 local function facing(orientation)
   local turn = orientation * 2 * math.pi
   return math.sin(turn), -math.cos(turn)
-end
-
--- signed angle from the head's facing to the target, in turns (-0.5 .. 0.5)
-local function aim_error(orientation, dx, dy)
-  local wanted = atan2(dx, -dy) / (2 * math.pi)
-  return (orientation - wanted + 0.5) % 1 - 0.5
 end
 
 local function destroy_object(id)
@@ -1193,7 +1184,9 @@ end
 
 -- Two additive flares at the mouth: a hot core inside a soft halo. The same two objects
 -- are the charge-up while the head swings (draw_windup) and the emitter bleeding off
--- its heat after a shot (draw_glow) -- only the colour and the size change.
+-- its heat after a shot (draw_glow) -- only the colour and the size change. (There used
+-- to be a third user, the off-bore "wind-up" while the head swung onto a target; the lance
+-- fires along the barrel now, so there is nothing left to wind up for.)
 local function draw_orb(surface, state, x, y, core, core_radius, halo, halo_radius)
   local objs = objects_of(state)
   local core_object = get_sprite(objs, "orb_core", "flare", surface)
@@ -1215,25 +1208,8 @@ local function draw_glow(turret, state, muzzle)
     ORB_HALO, 0.30 + 0.95 * charge)
 end
 
--- The charge-up that plays while the head is still swinging onto a target: a spot at
--- the mouth that grows over C.windup_ticks and pulses, then hands the mouth over to the
--- beam. Nothing is drawn along the barrel and nothing takes damage until the head is
--- within C.aim_tolerance of the target, so the shot cannot outrun the rotation.
-local function draw_windup(turret, state, muzzle, elapsed, tick)
-  local progress = math.min(1, elapsed / C.windup_ticks)
-  local throb = 0.78 + 0.22 * math.sin(tick * 0.9)
-  local sheath = fuel_profile(turret, state).sheath
-  ORB_CORE.r, ORB_CORE.g, ORB_CORE.b = 1.0, lerp(0.40, 0.92, progress), lerp(0.12, 0.60, progress)
-  ORB_CORE.a = (0.28 + 0.55 * progress) * throb
-  ORB_HALO.r, ORB_HALO.g, ORB_HALO.b = sheath.r, sheath.g, sheath.b
-  ORB_HALO.a = (0.10 + 0.28 * progress) * throb
-  draw_orb(turret.surface, state, muzzle.x, muzzle.y,
-    ORB_CORE, 0.09 + 0.25 * progress,
-    ORB_HALO, 0.20 + 0.52 * progress)
-end
-
 -- The hull's spin-up gauge --------------------------------------------------
--- Six lights around the deck, filled in order as the charge climbs and emptied in reverse
+-- Five lights around the deck, filled in order as the charge climbs and emptied in reverse
 -- as it falls, so "how far has this turret spun up" is readable from the map view instead
 -- of being a guess. Everything the beam does with charge (wider, brighter, more tongues)
 -- says "hotter"; none of it says "loading". This does.
@@ -1286,29 +1262,45 @@ end
 ------------------------------------------------------------------ tick -------
 
 local function update(turret, state, tick)
-  -- `shooting_state` is character-only (it throws on a turret), so engagement is
-  -- read off the turret's own target. The engine happily keeps *aiming* at a target
-  -- with an empty magazine, so the fuel check has to be ours: no cell, no beam.
+  -- `shooting_state` is character-only (it throws on a turret), so engagement is read off
+  -- the turret's own target -- plus the grace window below, which is what keeps the lance
+  -- alive across a target switch.
   local range = state.range or C.range
   local target = turret.shooting_target
-  -- A target handed over by a neighbour's help call can sit outside this turret's own
-  -- reach, and the engine keeps aiming at it forever (it never re-checks whether the
-  -- help call was sensible). If a reachable enemy exists, hand the engine that one
-  -- instead; the beam then matches what the turret can actually burn.
   local reachable = target ~= nil and target.valid and in_reach(turret, target, range)
-  if target ~= nil and not reachable and tick >= (state.scan_at or 0) then
+  local warm = (state.warm_until or 0) >= tick
+
+  -- Find a target ourselves in the two cases the engine does not cover:
+  --   * a target handed over by a neighbour's help call can sit outside this turret's own
+  --     reach, and the engine keeps aiming at it forever (it never re-checks the call);
+  --   * a turret that has just killed its target has NO target for a tick or three while
+  --     the engine picks the next one -- and that gap is what used to take the lance out and
+  --     restart the spin-up on every kill.
+  -- `warm` gates the scan so an idle turret does not query the surface forever; while the
+  -- beam is lit we look for the next body ourselves every `range_scan_ticks`.
+  if not reachable and (warm or target ~= nil) and tick >= (state.scan_at or 0) then
     state.scan_at = tick + C.range_scan_ticks
-    local better = nearest_enemy(turret, range)
-    if better then
-      target = better
-      turret.shooting_target = better
+    local next_target = nearest_enemy(turret, range)
+    if next_target then
+      target = next_target
+      reachable = true
+      turret.shooting_target = next_target
     end
   end
-  local firing = target ~= nil and target.valid and in_reach(turret, target, range) and has_fuel(turret)
-  local aim = firing and target.position or nil
+
+  if reachable then
+    state.warm_until = tick + C.target_grace_ticks
+  end
+  warm = (state.warm_until or 0) >= tick
+
+  -- Firing needs fuel and something to shoot: a live target, or the grace window that
+  -- carries the beam across the moment the engine has none (see above).
+  local firing = has_fuel(turret) and (reachable or warm)
 
   if C.debug and firing ~= state.was_firing then
-    log(string.format("melta unit=%s firing=%s target=%s", tostring(turret.unit_number), tostring(firing), firing and target.name or "-"))
+    log(string.format("melta unit=%s firing=%s target=%s warm=%s",
+      tostring(turret.unit_number), tostring(firing),
+      (target and target.valid) and target.name or "-", tostring(warm)))
     state.was_firing = firing
   end
 
@@ -1323,112 +1315,69 @@ local function update(turret, state, tick)
     draw_leds(turret, state)
   end
 
-  local dx, dy, distance = 0, 0, 0
-  if aim then
-    dx, dy, distance = normalize(aim.x - turret.position.x, aim.y - turret.position.y)
-  end
-
-  if firing and distance > 0.05 then
-    -- the barrel's own direction, not the target's: the beam has to leave the mouth
-    -- wherever the head currently points, and only once that IS the target
+  if firing then
+    -- The lance follows the BARREL, not the target. A continuous beam weapon burns whatever
+    -- its emitter is pointing at, so when the head swings from one body to the next the beam
+    -- sweeps across everything between them and burns that too -- which is the whole point
+    -- of a melta. (The old code gated the beam on the head being within `aim_tolerance` of
+    -- the target, i.e. it refused to fire while swinging, which is exactly the sweep this
+    -- weapon should be good at.)
     local orientation = turret.orientation
     local fx, fy = facing(orientation or 0)
     local muzzle = muzzle_point(turret, fx, fy)
     state.last_muzzle = muzzle
+    -- the lance always reaches `range` from the turret centre, so the muzzle's own forward
+    -- offset cannot shorten it
+    local along = (muzzle.x - turret.position.x) * fx + (muzzle.y - turret.position.y) * fy
+    local reach = math.max(1, range - along)
 
-    -- Is the head on the target? Compare the weapon's smooth orientation with the
-    -- bearing to the target. A turret whose orientation cannot be read (no vanilla
-    -- entity does this, but a modded one might) is treated as aligned rather than
-    -- silently mute.
-    local aligned = true
-    local error_turns = 0
-    if orientation then
-      error_turns = aim_error(orientation, dx, dy)
-      aligned = math.abs(error_turns) <= C.aim_tolerance
+    -- DAMAGE every tick, so whatever the drawn beam crosses is burnt for as long as it is
+    -- crossed (see burn_tick). The impact flare follows the nearest body from here, which
+    -- also makes it track a moving target smoothly instead of jumping once a pulse.
+    local impact, impact_entity = burn_tick(turret, state, muzzle, fx, fy, reach, tick)
+    if state.beam then
+      state.beam.hit = impact
+      state.beam.hit_entity = impact_entity
     end
 
-    -- a fresh target restarts the wind-up -- unless the barrel already points at it,
-    -- which is the common case when it finishes one biter and picks the next one on
-    -- the same line: charging up there would cost a pulse per kill for nothing.
-    if state.aim_target ~= target.unit_number then
-      state.aim_target = target.unit_number
-      state.aim_from = aligned and (tick - C.windup_ticks) or tick
-    end
-    local elapsed = tick - (state.aim_from or tick)
-
-    if aligned and elapsed >= C.windup_ticks then
-      -- The beam runs from the mouth to the target and on through whatever stands
-      -- behind it, and the corridor test runs along that same line -- so the bodies
-      -- the beam cuts are exactly the ones it visibly touches. It ends `range` from
-      -- the turret centre (16 tiles plus the quality bonus), so the per-direction
-      -- muzzle offset cannot shorten the reach.
-      local ax, ay = normalize(aim.x - muzzle.x, aim.y - muzzle.y)
-      local along = (muzzle.x - turret.position.x) * ax + (muzzle.y - turret.position.y) * ay
-      local reach = math.max(1, range - along)
-
-      -- DAMAGE every tick, so whatever the drawn beam crosses is burnt for as long as it
-      -- is crossed (see burn_tick). The impact flare follows the nearest body from here,
-      -- which also makes it track a moving target smoothly instead of jumping once a pulse.
-      local impact, impact_entity = burn_tick(turret, state, muzzle, ax, ay, reach, tick)
-      if state.beam then
-        state.beam.hit = impact
-        state.beam.hit_entity = impact_entity
+    if tick >= state.pulse_at then
+      local interval = pulse_interval(turret)
+      if state.pulse_at < tick - interval then
+        -- the clock lost time (the beam stopped and re-acquired): start the countdown from
+        -- now instead of firing a burst to "catch up"
+        state.pulse_at = tick + interval
+      else
+        -- carry the fraction of a tick forward. `tick + interval` would round the interval
+        -- UP to a whole tick every time, which silently threw away part of the researched
+        -- firing speed: at +80 % rate the interval is 4.44 ticks, and firing every 5 ticks
+        -- is 12/s instead of 13.5/s (measured: that alone cost the melta 15 % of its dps
+        -- against the gun turret at tier 4). Carrying the remainder makes the average
+        -- interval exactly the researched one while every pulse lands on a whole tick.
+        state.pulse_at = state.pulse_at + interval
       end
-
-      if tick >= state.pulse_at then
-        local interval = pulse_interval(turret)
-        if state.pulse_at < tick - interval then
-          -- the clock lost time (the beam stopped and re-acquired, or a target was
-          -- held through a wind-up): start the countdown from now instead of firing
-          -- a burst to "catch up"
-          state.pulse_at = tick + interval
-        else
-          -- carry the fraction of a tick forward. `tick + interval` would round the
-          -- interval UP to a whole tick every time, which silently threw away part of
-          -- the researched firing speed: at +80 % rate the interval is 4.44 ticks, and
-          -- firing every 5 ticks is 12/s instead of 13.5/s (measured: that alone cost
-          -- the melta 15 % of its dps against the gun turret at tier 4). Carrying the
-          -- remainder makes the average interval exactly the researched one while every
-          -- pulse still lands on a whole tick.
-          state.pulse_at = state.pulse_at + interval
-        end
-        beam_for(state).pulse_tick = tick
-        state.beam_end = pulse(turret, state, muzzle, ax, ay, reach)
-      end
-
-      -- the lance always runs its full length: it does not stop at the first body it
-      -- cuts, so whatever stands behind the current target is on the line too
-      local stop =
-      {
-        x = muzzle.x + ax * reach,
-        y = muzzle.y + ay * reach
-      }
-      draw_beam(turret, state, muzzle, stop, tick)
-      draw_glow(turret, state, muzzle)
-      if C.debug then
-        log(string.format("melta unit=%s beam err=%.2fdeg ori=%.4f muzzle=(%.3f,%.3f) at=(%.1f,%.1f) reach=%.2f",
-          tostring(turret.unit_number), error_turns * 360, orientation or -1,
-          muzzle.x, muzzle.y, turret.position.x, turret.position.y, reach))
-      end
-      return
+      beam_for(state).pulse_tick = tick
+      state.beam_end = pulse(turret, state, muzzle, fx, fy, reach)
     end
 
-    -- still swinging onto the target: charge the mouth, draw no beam, deal no damage.
-    -- `state.pulse_at` is deliberately NOT advanced, so the first shot is due the
-    -- moment the barrel arrives instead of a cooldown later.
-    corridor_clear(state)
-    fade_current_beam(state)
-    draw_windup(turret, state, muzzle, elapsed, tick)
+    -- the lance always runs its full length: it does not stop at the first body it cuts, so
+    -- whatever stands behind the current target is on the line too
+    local stop =
+    {
+      x = muzzle.x + fx * reach,
+      y = muzzle.y + fy * reach
+    }
+    draw_beam(turret, state, muzzle, stop, tick)
+    draw_glow(turret, state, muzzle)
     if C.debug then
-      log(string.format("melta unit=%s windup err=%.2fdeg aligned=%s elapsed=%d",
-        tostring(turret.unit_number), error_turns * 360, tostring(aligned), elapsed))
+      log(string.format("melta unit=%s beam ori=%.4f muzzle=(%.3f,%.3f) at=(%.1f,%.1f) reach=%.2f warm=%s",
+        tostring(turret.unit_number), orientation or -1, muzzle.x, muzzle.y,
+        turret.position.x, turret.position.y, reach, tostring(warm)))
     end
     return
   end
 
   -- not shooting: the beam is gone, the emitter bleeds off its heat
   corridor_clear(state)
-  state.aim_target = nil
   state.pulse_at = tick + C.cooldown
   state.beam_end = nil
   -- the lance fades out over C.beam_fade_ticks instead of snapping off

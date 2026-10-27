@@ -1,3 +1,27 @@
+Version: 0.6.3
+Date: 2026-10-27
+  Changes:
+    - The turret keeps firing while there are enemies in range. Two things used to break the
+      stream: the off-bore gate (the beam was only drawn when the head was within 2 degrees of
+      the target, so a turret could never sweep) and the moment of re-acquisition after a kill
+      (the engine has no target for a tick or three, and the script went down its "not
+      shooting" branch: beam out, pulse clock reset, charge decaying). Measured over 140 ticks
+      with the target forced across a nine-body fan: 123 silent ticks on 0.6.2, 0 on this
+      version, and the spin-up climbs straight through five forced 80 degree switches
+    - The lance is drawn along the BARREL now, not along the line to the target, and damages
+      whatever it crosses. A target switch therefore sweeps the beam across everything between
+      the old bearing and the new one, which is what a melta is for
+    - The off-bore charge-up glow is gone with the gate it existed for (no wind-up: the beam
+      fires from the first tick), and with it C.aim_tolerance and C.windup_ticks
+    - New C.target_grace_ticks (8): how long the lance stays lit after the last live target
+      while the turret looks for the next body itself. Idle turrets still do no surface work
+  Bugfixes:
+    - A dry turret no longer keeps firing. The fuel gate was get_fluid_count > 0 and fluids are
+      doubles, so a drained buffer's dust (measured 0.0005 units) was enough: 8580 damage dealt
+      over 240 ticks on an empty tank, and the lance drawn the whole time. The gate is now
+      C.fuel_empty = 0.1 units, and the same threshold applies to the fuel-colour choice
+    - Same measurement after the fix: 0 damage over 240 ticks with 0.0005 units in the buffer
+
 Version: 0.6.2
 Date: 2026-10-27
   Bugfixes:

@@ -213,15 +213,18 @@ C.asteroid_damage_multiplier = 1.6   -- x pulse damage per pulse, asteroids only
 -- turn at close range) and needed 83 ticks -- 1.4 s -- for a half turn.
 -- Measured on 2.1.23 with the harness in docs/verification/harness.
 C.rotation_speed  = 0.03  -- turns per tick
-C.aim_tolerance   = 0.006 -- turns (1 = full circle). ~2 deg: the beam fires only when
-                          -- the barrel is this close to the bearing. Deliberately not
-                          -- a whole rotation step: the engine clamps onto the exact
-                          -- bearing, so a small threshold fires on the tick it arrives
-                          -- instead of letting a shot leave off-bore.
-C.windup_ticks    = 3     -- 0.05 s of charge glow before the first shot at a newly
-                          -- acquired target. Short on purpose: with the fast head the
-                          -- 45 deg swing takes 5 ticks, so a long wind-up would just
-                          -- delay the first pulse on every target switch.
+-- There is no aim gate and no wind-up any more. The lance fires wherever the BARREL
+-- points, from the first tick, and burns whatever it crosses on the way round: that is what
+-- makes a melta good at sweeping a swarm, and it is why a target switch costs nothing. The
+-- engine still turns the head at `rotation_speed` towards `shooting_target`, so the barrel is
+-- where the turret is *looking*, and the beam follows it.
+--
+-- `target_grace_ticks` is what keeps a fight continuous: when the current target dies the
+-- engine has no target for a tick or three while it picks the next one, and that gap used to
+-- take the lance out and restart the 2.5 s spin-up. The beam now stays lit for this many
+-- ticks after the last live target, and control.lua looks for the next body itself while it
+-- is lit, so consecutive kills read as one continuous stream.
+C.target_grace_ticks = 8   -- ticks
 
 -- art placement --------------------------------------------------------------
 -- The model is rendered with its pivot on the frame centre, which is right for the
@@ -439,6 +442,11 @@ C.beam_fade_ticks   = 10
 C.fluid_consumption         = 2.0    -- engine-side, fluid units per shot
 C.extra_fluid_per_pulse_hot = 3.0    -- script-side, fluid units per pulse at full charge
 C.fluid_buffer              = 200    -- ~4-10 s of beam in the buffer, so a short gap in the pipe is survivable
+-- A DRY turret has to actually stop. Fluid amounts are doubles, so draining a buffer leaves
+-- dust behind, and the gate used to be `get_fluid_count(name) > 0` -- measured: a turret with
+-- 0.0005 units in it kept firing (and drawing the lance) indefinitely. Anything at or below
+-- this many units counts as empty for the fuel gate and for the colour choice.
+C.fuel_empty                = 0.1    -- units
 
 -- Anything in this list can be piped into the turret. Entries whose fluid does not
 -- exist are skipped by BOTH stages, so listing another mod's fuel is safe with or
