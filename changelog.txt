@@ -1,3 +1,37 @@
+Version: 0.6.4
+Date: 2026-10-27
+  Major Features:
+    - The melta is a continuous weapon now. Damage is applied every tick instead of once per
+      pulse, so whatever the beam visibly crosses is burnt for as long as it is crossing: a
+      turret sweeping across a swarm no longer cuts through bodies that take nothing
+    - The lance follows the BARREL and the turret does not stop firing while there are enemies
+      in range. A target switch sweeps the beam across everything between the two bearings, and
+      the 2.5 s spin-up no longer restarts on every kill
+    - Pierce falloff is off by default: every body on the beam takes the full hit, up to 30 at
+      once. (Set C.pierce_falloff below 1 in constants.lua to bring the ladder back)
+    - New spin-up gauge: five lights on the hull deck fill as the turret heats and go out as it
+      cools, so how hot it is can be read without staring at the beam
+    - The lance is drawn from a soft sprite core rather than engine line primitives, so it now
+      renders consistently with smoke and weather mods (it used to draw in front of them), and
+      its far end frays and dissolves at maximum range instead of ending on a hard edge
+    - The hull and the cannon sit half a tile lower, on the tile they actually occupy. The pipe
+      stubs stay on the pipe grid, so nothing already built disconnects
+    - Any fuel that exists in the pack is accepted, including fluids that another mod defines
+      after this one loads (cubonium gas was being dropped); the tooltip lists the real fuel
+      roster with its damage multipliers
+  Bugfixes:
+    - Fire damage research now scales the beam on the INFINITE tier, not once. Ten extra levels
+      of refined-flammables bought 0.2 damage before instead of 2.0; damage is now read from the
+      engine's own accumulators. The melta also appears in the flamethrower damage technologies,
+      so the research screen shows what improves it
+    - A turret with an empty buffer no longer keeps firing on the fluid dust left behind
+  Balancing:
+    - NOT FULLY TESTED. This is the first release of the reworked weapon and the numbers were set
+      by measurement in a single game (dps against dummies and biters, armour, asteroids), not by
+      a balance pass. Damage, fuel costs, research scaling and progression placement are expected
+      to move in a later version. If something feels off -- too strong, too weak, too expensive
+      to feed -- that is useful and expected feedback, not a finished design
+
 Version: 0.6.3
 Date: 2026-10-27
   Changes:

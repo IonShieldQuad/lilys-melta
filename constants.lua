@@ -200,7 +200,7 @@ C.hit_refresh_ticks = 8      -- ticks
 -- Pawns never see this number -- it is gated on `entity.type == "asteroid"` in
 -- control.lua, and biter dps was measured identical before and after.
 C.asteroid_damage_type       = "explosion"
-C.asteroid_damage_multiplier = 1.6   -- x pulse damage per pulse, asteroids only
+C.asteroid_damage_multiplier = 0.5   -- x pulse damage per pulse, asteroids only
 
 
 -- aiming ----------------------------------------------------------------------
