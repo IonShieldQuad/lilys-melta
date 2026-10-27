@@ -63,12 +63,20 @@ dps after its 10 % resistance), and in ~5 s on melta-fuel (1.6x).
 
 The beam's damage is dealt by `control.lua`, so no technology reached it: before this
 change the turret sat at 240/420 dps while a gun turret went 240 → 1632 and both other
-turrets pulled ahead for free. It now reads the same research a gun turret does — the fire
-damage ladder (`refined-flammables` → `ammo-damage[flamethrower]`, compounded by
-`C.research_damage_exponent = 1.5` because the fire ladder is steeper than the bullet one)
-and the turret firing-speed line, whose bullet `gun-speed` modifiers `data-updates.lua`
-copies onto the melta's own ammo category. The scripted pulse clock carries the fraction of
-a tick forward, so the researched rate is delivered in full rather than rounded up.
+turrets pulled ahead for free. It now reads the same research a gun turret does, **from the
+engine's own accumulators** — `force.get_ammo_damage_modifier("flamethrower")` or
+`force.get_turret_attack_modifier("melta-turret")` for damage (whichever is larger, so each
+researched level counts exactly once), and `force.get_gun_speed_modifier("melta")` for the
+pulse clock, whose levels `data-updates.lua` copies from the bullet line. Damage is then
+compounded by `C.research_damage_exponent = 1.5`.
+
+The engine, not a hand sum, is what makes the *infinite* tier work: `refined-flammables-7`
+is `max_level = "infinite"` and pays +0.2 per level, and a hand sum of `effect.modifier`
+pays that once no matter how deep the research goes (that was 0.6.0's bug — ten extra levels
+bought 0.2, not 2.0). `data-updates.lua` also mirrors the fire line's `turret-attack` half
+onto `melta-turret`, so the turret appears in those technologies at all; the melta's own
+engine-side stream is zeroed, so the engine cannot multiply anything the script did not
+already account for. Measurements: `docs/verification/research-scaling.md`.
 
 | tier | fire / rate | melta cold dps | melta hot dps | gun turret (uranium) |
 |---|---|---|---|---|

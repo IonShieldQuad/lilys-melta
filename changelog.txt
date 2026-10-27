@@ -1,3 +1,36 @@
+Version: 0.6.1
+Date: 2026-10-27
+  Bugfixes:
+    - Fuels that another mod defines LATER than this one now work. The turret's fuel list is
+      built in data.lua and can only keep fluids that already exist; on her install
+      lilys-melta's data.lua loads at 37.9 s and lilys-cubeine's (which defines cubonium-gas)
+      at 41.2 s, so cubonium-gas was silently dropped. data-updates now tops the list up and
+      the tooltip is rebuilt at the same stage, so what the turret accepts and what the
+      tooltip promises cannot disagree. Verified: cubonium-gas is accepted, listed, shown in
+      the tooltip, and burnt (196.4 -> 131.2 units over 200 firing ticks)
+    - Fire damage research on the INFINITE tier now counts every level. refined-flammables-7
+      is max_level = "infinite" (+0.2 per level) and the old hand sum added its modifier once,
+      so ten extra levels bought 0.2 instead of 2.0 -- the turret looked researched and
+      fought like it was not. Damage and firing speed are now read from the engine's own
+      accumulators (get_ammo_damage_modifier / get_turret_attack_modifier /
+      get_gun_speed_modifier), which include infinite levels. Measured on a dummy: +200 % on
+      either damage modifier takes the beam from 1398 to 7426 dps (5.3x, i.e. (1+2)^1.5), and
+      +100 % firing speed from 1398 to 2654 (1.9x)
+    - The bonus cache now expires after a second instead of waiting for a research event:
+      another mod's script can change a force modifier and no event this mod can hear is
+      raised for it
+  Graphics:
+    - No art changed in this version
+  Balance:
+    - Research now visibly applies, which is a large late-game buff by construction (that is
+      the fix, not a retune): at all finite tiers plus 10 levels of the infinite one the
+      damage factor is 9.9x instead of 4.7x
+    - Numbers retuned by the author on top of 0.6.0: damage_hot 56 -> 128 (4x cold),
+      pierce_falloff 0.82 -> 0.95, pierce_max 12 -> 30, hit_half_width 0.45 -> 0.9,
+      pipe_reach 1.12 -> 1.0, fluid_consumption 2.5 -> 2.0, extra_fluid_per_pulse_hot 3.8 ->
+      3.0, fuel multipliers (petroleum-gas 0.85 -> 1.25, melta-fuel 1.60 -> 3.00, napalm
+      1.35 -> 1.50) and a new cubonium-gas entry at 2.00
+
 Version: 0.6.0
 Date: 2026-10-27
   Graphics:

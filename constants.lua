@@ -70,12 +70,12 @@ C.cooldown_min    = 2     -- floor for the researched pulse interval: a modded
 -- 14 (105 dps) -- below a *piercing* gun turret -- and the turret only became
 -- worth its plumbing once it was white hot.
 C.damage_cold     = 32    -- damage per pulse, cold barrel (85 % fire + 15 % physical)
-C.damage_hot      = 56    -- damage per pulse, fully spun up (same split) = 1.75x cold
+C.damage_hot      = 128    -- damage per pulse, fully spun up (same split) = 4.0x cold
 C.spin_up_ticks   = 150   -- 2.5 s of unbroken fire from cold to white-hot
 C.spin_down_ticks = 60    -- 1 s to fall back to cold once the target is gone
-C.pierce_falloff  = 0.82  -- each further body in the line takes this fraction of the last hit
-C.pierce_max      = 12    -- hard cap on bodies a single pulse can cut through
-C.hit_half_width  = 0.45  -- tiles: half-width of the line hit test around the beam axis
+C.pierce_falloff  = 0.95  -- each further body in the line takes this fraction of the last hit
+C.pierce_max      = 30    -- hard cap on bodies a single pulse can cut through
+C.hit_half_width  = 0.9  -- tiles: half-width of the line hit test around the beam axis
 
 -- research scaling ------------------------------------------------------------
 -- The beam damage is the script's, so the engine's own ammo upgrades never see
@@ -244,7 +244,7 @@ C.camera_tilt_deg = 51    -- the render camera's pitch from vertical. control.lu
 -- on X but only 1.02-1.09 on Y (the camera is pitched 51 deg), so 1.12 sits within a
 -- tenth of a tile of the rim on all four sides and the vanilla pipe-cover sprite
 -- reads as a socket on the housing instead of a plate floating in the gap.
-C.pipe_reach = 1.12   -- tiles, all four sides
+C.pipe_reach = 1.0   -- tiles, all four sides
 
 --- Where each side's port sprite is drawn, in SCREEN tiles relative to the
 --- connection point (so +y is south on screen, whatever the world axis). The port is
@@ -415,8 +415,8 @@ C.beam_fade_ticks   = 10
 -- A fluid turret burns fluid per shot all by itself; the script adds a surcharge
 -- while the beam is hot, so holding full intensity costs about twice the fuel.
 -- 7.5 shots/s: 2.5 per shot = ~19/s cold, +3.8 per pulse at full charge = ~47/s hot
-C.fluid_consumption         = 2.5    -- engine-side, fluid units per shot
-C.extra_fluid_per_pulse_hot = 3.8    -- script-side, fluid units per pulse at full charge
+C.fluid_consumption         = 2.0    -- engine-side, fluid units per shot
+C.extra_fluid_per_pulse_hot = 3.0    -- script-side, fluid units per pulse at full charge
 C.fluid_buffer              = 200    -- ~4-10 s of beam in the buffer, so a short gap in the pipe is survivable
 
 -- Anything in this list can be piped into the turret. Entries whose fluid does not
@@ -431,14 +431,20 @@ C.fuels =
   {name = "light-oil", damage_modifier = 1.00,
    core = {r = 1.00, g = 0.88, b = 0.60}, sheath = {r = 1.00, g = 0.42, b = 0.10}},
   -- gas burns leaner: pale blue, less bite
-  {name = "petroleum-gas", damage_modifier = 0.85,
+  {name = "petroleum-gas", damage_modifier = 1.25,
    core = {r = 0.85, g = 0.95, b = 1.00}, sheath = {r = 0.35, g = 0.55, b = 1.00}},
   -- the good stuff: pyrum laced with uranium, green-white and vicious
-  {name = "melta-fuel", damage_modifier = 1.60,
+  {name = "melta-fuel", damage_modifier = 3.00,
    core = {r = 0.80, g = 1.00, b = 0.75}, sheath = {r = 0.25, g = 0.95, b = 0.40}},
   -- Lily's Incendiaries: napalm, deep red and hot
-  {name = "lilys-napalm-mix", damage_modifier = 1.35,
-   core = {r = 1.00, g = 0.82, b = 0.55}, sheath = {r = 1.00, g = 0.28, b = 0.06}}
+  {name = "lilys-napalm-mix", damage_modifier = 1.5,
+   core = {r = 1.00, g = 0.82, b = 0.55}, sheath = {r = 1.00, g = 0.28, b = 0.06}},
+  {
+    name = "cubonium-gas",
+    damage_modifier = 2.0,
+    core = { r = 1.00, g = 0.55, b = 0.82 },
+    sheath = { r = 1.00, g = 0.50, b = 0.65 }
+  }
 }
 
 -- Late-game ingredient hooks: if the named item (and optionally the named technology)

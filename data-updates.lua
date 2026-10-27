@@ -10,16 +10,49 @@ local function report(message)
 end
 
 --------------------------------------------------------------- fuels ---------
--- constants.lua lists every fluid the turret accepts; prototypes/entity.lua already
--- dropped the ones this install does not have. Report what survived so a load log
--- answers "why is napalm not burning" in one glance.
+-- constants.lua lists every fluid the turret accepts. prototypes/entity.lua builds the
+-- engine's list at DATA.LUA time and can only keep the fluids that already exist -- and
+-- another mod's fluid may not exist yet. Measured on her install: lilys-melta's data.lua
+-- loads at 37.9 s, lilys-cubeine's (which defines cubonium-gas) at 41.2 s, because
+-- cubeine's own dependency chain pushes it later in the load order. So cubonium-gas was
+-- silently dropped from the prototype even though constants.lua listed it.
+--
+-- This stage runs after EVERY mod's data.lua, so the missing fuels are added here. Same
+-- turret, same field, one append per fluid that exists now and was not there before.
 local turret = data.raw["fluid-turret"] and data.raw["fluid-turret"][C.turret]
 if turret and turret.attack_parameters and turret.attack_parameters.fluids then
+  local listed = {}
+  for _, fuel in ipairs(turret.attack_parameters.fluids) do
+    listed[fuel.type] = true
+  end
+  local added = {}
+  for _, fuel in ipairs(C.fuels) do
+    if data.raw["fluid"][fuel.name] and not listed[fuel.name] then
+      turret.attack_parameters.fluids[#turret.attack_parameters.fluids + 1] =
+      {
+        type = fuel.name,
+        damage_modifier = fuel.damage_modifier
+      }
+      listed[fuel.name] = true
+      added[#added + 1] = fuel.name
+    end
+  end
+  if #added > 0 then
+    report("late fuels added at data-updates: " .. table.concat(added, ", "))
+  end
   local names = {}
   for _, fuel in ipairs(turret.attack_parameters.fluids) do
     names[#names + 1] = fuel.type
   end
   report("fuels accepted: " .. table.concat(names, ", "))
+end
+
+-- The tooltip's fuel list is built from the same `data.raw["fluid"]` check, so it has to
+-- be rebuilt here too -- it used to run in data.lua and would have kept printing the fuel
+-- roster from before the top-up above.
+local tooltip = require("prototypes.tooltip")
+if type(tooltip) == "function" then
+  tooltip()
 end
 
 ------------------------------------------------------------- recipe hooks ----
@@ -124,4 +157,71 @@ for _, technology in pairs(data.raw["technology"] or {}) do
 end
 if sources > 0 then
   report(string.format("melta firing speed: %d gun-speed effects copied from %d technologies", copies, sources))
+end
+
+--------------------------------- research: melta damage shows in the techs ----
+-- The flamethrower turret appears in the fire line's effects because every
+-- `refined-flammables` level carries TWO effects: `ammo-damage` for the flamethrower
+-- ammo category and `turret-attack` for the `flamethrower-turret` prototype. The melta
+-- was invisible in that list -- it is not a turret any vanilla technology names -- so a
+-- player could not see that fire research touches it at all.
+--
+-- Mirroring the `turret-attack` half onto `melta-turret` fixes that: the tech tooltip
+-- then lists the melta next to the flamethrower, which is also what makes the engine
+-- report the ladder to the script (`force.get_turret_attack_modifier`, read in
+-- control.lua). It cannot double-dip the damage: the melta's engine-side stream is
+-- zeroed on purpose (`prototypes/melta.lua`), so the only damage the modifier could act
+-- on is the script's, and the script reads the modifier instead of being multiplied by
+-- the engine.
+--
+-- Donor list = the turret the vanilla fire line names. A modded damage technology that
+-- only adds `ammo-damage` for our categories is caught by the second pass, so the melta
+-- still appears wherever fire damage is researched.
+local DONOR_TURRETS = {"flamethrower-turret"}
+local mirrored, fallbacks = 0, 0
+for _, technology in pairs(data.raw["technology"] or {}) do
+  local effects = technology.effects
+  if effects then
+    local attack = {}          -- donor turret-attack modifiers to mirror
+    local ammo = {}            -- ammo-damage modifiers for our categories
+    local named_melta = false
+    for _, effect in ipairs(effects) do
+      if effect.type == "turret-attack" then
+        if effect.turret_id == C.turret then
+          named_melta = true
+        end
+        for _, donor in ipairs(DONOR_TURRETS) do
+          if effect.turret_id == donor and (effect.modifier or 0) > 0 then
+            attack[#attack + 1] = effect.modifier
+          end
+        end
+      elseif effect.type == "ammo-damage" then
+        for _, category in ipairs(C.research_damage_ammo or {}) do
+          if effect.ammo_category == category and (effect.modifier or 0) > 0 then
+            ammo[#ammo + 1] = effect.modifier
+          end
+        end
+      end
+    end
+    if not named_melta then
+      local wanted = #attack > 0 and attack or ammo
+      for _, modifier in ipairs(wanted) do
+        effects[#effects + 1] =
+        {
+          type = "turret-attack",
+          turret_id = C.turret,
+          modifier = modifier
+        }
+        if #attack > 0 then
+          mirrored = mirrored + 1
+        else
+          fallbacks = fallbacks + 1
+        end
+      end
+    end
+  end
+end
+if mirrored + fallbacks > 0 then
+  report(string.format("melta damage research: %d turret-attack effects mirrored (%d from ammo-damage only)",
+    mirrored, fallbacks))
 end

@@ -147,48 +147,76 @@ local fades
 -- ~200 technologies per pulse per turret would be the single most expensive
 -- thing in the mod.
 
-local function category_set(list)
-  local set = {}
-  for _, name in ipairs(list or {}) do
-    set[name] = true
+-- The bonus is read from the ENGINE, not summed by hand.
+--
+-- Up to 0.6.0 this walked `force.technologies` and added each technology's `ammo-damage`
+-- modifier ONCE. That is wrong for the infinite tier: `refined-flammables-7` is
+-- `max_level = "infinite"` and pays +0.2 PER LEVEL, so ten extra levels of fire damage
+-- contributed 0.2 instead of 2.0 -- the turret looked researched and fought like it was
+-- not. Measured in docs/verification/research-scaling.md.
+--
+-- `LuaForce.get_ammo_damage_modifier`, `get_gun_speed_modifier` and
+-- `get_turret_attack_modifier` return exactly what the engine would apply to a turret of
+-- its own, infinite levels included, so they are the only source now. One call each, and
+-- only when the cache is cold (research finishing throws the cache away).
+--
+-- ONE dip, not two. The vanilla fire line gives the flamethrower an `ammo-damage` AND a
+-- `turret-attack` effect with the same modifiers -- that is where a turret's double dip
+-- comes from -- and data-updates now mirrors the `turret-attack` half onto this turret so
+-- that it appears in the technology at all. Taking the LARGER of the two counts every
+-- researched level exactly once; squaring it as well is what
+-- `C.research_damage_exponent` is for, so that stays the single dial.
+local DAMAGE_LIST = C.research_damage_ammo or {}
+local RATE_LIST = C.research_rate_ammo or {}
+
+-- best value the engine reports for any key in `list`, guarded: a modded force without
+-- the category (or an older API) must not kill the tick handler.
+--
+-- The getters take exactly ONE argument -- `force.get_ammo_damage_modifier("flamethrower")`,
+-- not `(force, "flamethrower")`; passing self as well is an argument-count error, and a
+-- guarded read that swallows that error returns 0 and silently turns research off
+-- entirely. Measured both call forms in docs/verification/research-scaling.md.
+local function best_modifier(force, method, list)
+  local getter = force[method]
+  if not getter then
+    return 0
   end
-  return set
+  local best = 0
+  for _, key in ipairs(list) do
+    local ok, value = pcall(getter, key)
+    if ok and type(value) == "number" and value > best then
+      best = value
+    end
+  end
+  return best
 end
 
-local DAMAGE_CATEGORIES = category_set(C.research_damage_ammo)
-local RATE_CATEGORIES = category_set(C.research_rate_ammo)
+-- The bonus is cached per force for a second, not forever: research is not the only thing
+-- that can move these numbers (another mod's script can set a force modifier, which raises
+-- no event this mod can hear -- on_technology_effects_reset cannot even be raised from
+-- script), so the cache expires on its own instead of waiting for an event that may never
+-- come. Four engine reads per force per second is free next to a per-pulse scan of every
+-- technology.
+local BONUS_REFRESH_TICKS = 60
 
 local function research_bonus(force)
   storage.bonus_cache = storage.bonus_cache or {}
   local cached = storage.bonus_cache[force.index]
-  if cached then
+  local now = game.tick
+  if cached and now < cached.until_tick then
     return cached
   end
 
-  local damage, rate = 0, 0
-  for _, technology in pairs(force.technologies) do
-    if technology.researched then
-      -- `prototype.effects` is where the modifier list lives; guarded because a
-      -- technology with no effects is normal and a missing field must not kill
-      -- every turret on the map
-      local effects = technology.prototype and technology.prototype.effects
-      if effects then
-        for _, effect in pairs(effects) do
-          local kind = effect.type
-          if kind == "ammo-damage" and DAMAGE_CATEGORIES[effect.ammo_category] then
-            damage = damage + (effect.modifier or 0)
-          elseif kind == "gun-speed" and RATE_CATEGORIES[effect.ammo_category] then
-            rate = rate + (effect.modifier or 0)
-          end
-        end
-      end
-    end
-  end
+  local ammo = best_modifier(force, "get_ammo_damage_modifier", DAMAGE_LIST)
+  local turret_attack = best_modifier(force, "get_turret_attack_modifier", {C.turret})
+  local damage = ammo > turret_attack and ammo or turret_attack
+  local rate = best_modifier(force, "get_gun_speed_modifier", RATE_LIST)
 
   cached =
   {
     damage = damage * (C.research_damage_scale or 0),
-    rate = (C.research_rate and rate) or 0
+    rate = (C.research_rate and rate) or 0,
+    until_tick = now + BONUS_REFRESH_TICKS
   }
   storage.bonus_cache[force.index] = cached
   return cached

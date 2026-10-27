@@ -35,11 +35,11 @@ data:extend(
     categories = {"chemistry"},
     ingredients =
     {
-      {type = "fluid", name = "light-oil", amount = 20},
-      {type = "item", name = "uranium-238", amount = 2},
-      {type = "item", name = "sulfur", amount = 1}
+      {type = "fluid", name = "light-oil", amount = 500},
+      {type = "item", name = "uranium-235", amount = 1},
+      {type = "item", name = "sulfur", amount = 10}
     },
-    results = {{type = "fluid", name = C.fluid, amount = 100}},
+    results = {{type = "fluid", name = C.fluid, amount = 500}},
     allow_productivity = true,
     crafting_machine_tint =
     {
