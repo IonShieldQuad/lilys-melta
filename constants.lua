@@ -202,6 +202,20 @@ C.windup_ticks    = 3     -- 0.05 s of charge glow before the first shot at a ne
                           -- 45 deg swing takes 5 ticks, so a long wind-up would just
                           -- delay the first pulse on every target switch.
 
+-- art placement --------------------------------------------------------------
+-- The model is rendered with its pivot on the frame centre, which is right for the
+-- rotation (no wobble) but wrong for the GROUND: a pitched-camera view draws a 2x2
+-- emplacement so that its cast shadow and base plate sit on the tile's NORTH edge, so
+-- the turret reads as floating half a tile off the tile it is actually standing on.
+-- Both sprites (hull and cannon) are shifted DOWN the screen by this much. `shift` on a
+-- sprite is in TILES and +y is south, so this is "half a tile toward the camera".
+--
+-- The pipe stubs are drawn by the ENGINE at each `pipe_connections` point, in the
+-- entity's own space -- they do not take the shift, and must not: the pipes they meet
+-- are on the tile grid, and moving the stubs with the art would slide them off their
+-- pipes. Only the art moves.
+C.sprite_shift = {0, 0.5}
+
 -- muzzle geometry ------------------------------------------------------------
 -- Where the beam starts is not "1.51 tiles in front of the pivot": the head sprite
 -- is a pitched-camera render, so a ground point has to be chosen that *looks* like
@@ -249,35 +263,58 @@ C.pipe_shift =
 
 
 -- beam look ------------------------------------------------------------------
--- WIDTHS ARE IN TILES, except where a line is handed to the engine (it takes PIXELS,
--- 32 per tile -- control.lua converts once with C.px_per_tile).
---
--- This is the bug that made the old beam read as a placeholder: the previous table
--- was written as if `rendering.draw_line`'s width were tiles, but it is pixels, so the
--- whole four-line stack was at most 1.90 px = 0.06 tile wide -- a hairline, thinner
--- than the barrel it came out of. Widths below are what the beam should actually
--- cover on the ground.
-C.px_per_tile = 32
+-- WIDTHS ARE IN TILES. Everything the lance is made of is now a SPRITE -- including the
+-- core, which used to be two `rendering.draw_line` quads. Why the lines are gone:
+--   * `draw_line` has NO `render_layer` field (it is not in its parameter list at all),
+--     so the core lived on a fixed layer while every other layer obeyed ours. With a
+--     smog/weather mod installed that reads as the core drawing in front of the smoke
+--     and the rest of the lance behind it -- two different pictures of one object.
+--   * a line is a hard-edged quad: it reads as a graph line rather than plasma at every
+--     zoom, and it ended dead flat where the turret's reach ran out.
+-- A sprite core can be soft-edged, tapered at the far end, tinted like the rest and
+-- switched to the same layer as the rest -- all three complaints, one change.
 
--- The sprite layers the glow is made of (prototypes/beam.lua), with the footprint each
+-- The sprite layers the lance is made of (prototypes/beam.lua), with the footprint each
 -- one is authored at: `tiles = {width, height}` at scale 1. control.lua divides the
 -- wanted size by these to get x_scale/y_scale.
 C.beam_texture =
 {
+  core   = {sprite = "melta-beam-core",   tiles = {1, 8}},   -- soft cutting column
   haze   = {sprite = "melta-beam-haze",   tiles = {2, 8}},
   glow   = {sprite = "melta-beam-glow",   tiles = {2, 8}},
   tongue = {sprite = "melta-beam-tongue", tiles = {1, 2}},
   flare  = {sprite = "melta-beam-flare",  tiles = {4, 4}},
-  cone   = {sprite = "melta-beam-cone",   tiles = {2, 4}}   -- apex at the mouth
+  cone   = {sprite = "melta-beam-cone",   tiles = {2, 4}},  -- apex at the mouth
+  spray  = {sprite = "melta-beam-spray",  tiles = {2, 4}}   -- the dissolving far end
 }
 
--- The cutting core: two stacked lines, tiles wide. The inner one is the white-hot
--- edge; both are drawn as lines rather than sprites because the core has to stay
--- sharp at every zoom and follow the target exactly.
+-- Render layer: ONE, for every object of the lance (2.1.23, 157 = "projectile").
+-- This is deliberate and it is load-bearing twice over. The old beam split its layers --
+-- the core was two `draw_line` quads, which have NO render_layer field at all, while the
+-- glow sprites obeyed this one -- so with a smog/weather mod the core drew in front of the
+-- smoke and the rest of the lance behind it. One layer, all sprites, no exceptions.
+--
+-- A barrel pointing AWAY from the camera does not get a lower layer (drawing the lance at
+-- 122 "object-under" put it behind every biter nest, wall and tree along its length, which
+-- is far worse than the problem it solved): instead the drawn lance simply STARTS further
+-- down the barrel, past the point where the gun sprite can be in the way. See
+-- C.beam_away_offset.
+C.beam_layer = "projectile"
+-- tiles to push the START of the drawn lance forward while the barrel points away from the
+-- camera (~20 deg off north, `beam_behind_dot`) -- enough to lift the muzzle flare and the
+-- near end of the haze off the barrel's silhouette, small enough not to read as a gap
+C.beam_behind_dot = 0.35
+C.beam_away_offset = 0.55
+
+-- The cutting core: two stacked soft sprites, tiles wide (cold .. hot). `whiten` mixes
+-- the tint toward white -- the inner layer is the white-hot edge, the outer one keeps the
+-- fuel's colour so the lance still says which fluid is burning.
 C.beam_core =
 {
-  {width_cold = 0.14, width_hot = 0.34, alpha_cold = 0.85, alpha_hot = 1.00},
-  {width_cold = 0.05, width_hot = 0.12, alpha_cold = 0.95, alpha_hot = 1.00}
+  {texture = "core", tint = "sheath", whiten = 0.15,
+   width_cold = 0.18, width_hot = 0.42, alpha_cold = 0.55, alpha_hot = 0.75},
+  {texture = "core", tint = "core",   whiten = 0.70,
+   width_cold = 0.07, width_hot = 0.17, alpha_cold = 0.55, alpha_hot = 0.85}
 }
 
 -- The glow around the core: three additive sprites, tiles wide (cold .. hot), tinted
@@ -295,7 +332,9 @@ C.beam_glow =
 }
 C.beam_flicker     = 0.12   -- +/- fraction of the width that wobbles as the beam burns
 -- the boiling plasma sheath around the core: soft blobs that re-roll a few times a
--- second (they replaced short hard-edged line segments, which read as shards)
+-- second (they replaced short hard-edged line segments, which read as shards). The last
+-- `spill` of them start at the very end of the lance and run PAST it, so the tip boils
+-- and frays instead of ending on a ruled line.
 C.beam_tongues      = 6      -- segments in the sheath
 C.beam_tongue_ticks = 3      -- re-roll interval, ticks
 C.beam_tongue_len   = {0.60, 1.80}   -- tiles, cold .. hot
@@ -303,6 +342,34 @@ C.beam_tongue_width = {0.30, 0.95}   -- tiles, cold .. hot
 -- alpha has to hold up *against the core*: below ~0.15 the tongues are invisible next to
 -- it and the lance collapses back into a clean bar, which is what the first pass did
 C.beam_tongue_alpha = {0.18, 0.45}
+C.beam_tongue_spill = 2      -- how many tongues are rolled past the far end
+
+-- Spin-up indicator ---------------------------------------------------------
+-- Damage ramps 32 -> 56 over 2.5 s of unbroken fire (`spin_up_ticks`), and until now
+-- nothing on screen said so: the lance got wider and the mouth glow bigger, which reads
+-- as "further away target", not as "the turret is getting hotter". So the hull carries a
+-- ring of gauge lights that light up one after another as the charge climbs and go out
+-- one after another as it cools. They are additive sprites (the flare texture, shrunk),
+-- tinted with the fuel's sheath colour, so they look like the emitter's own light.
+--
+-- A RING, not a bar, and drawn in world space: the hull rotates with the entity (R
+-- press), so a feature that must stay on the deck has to be symmetric about the pivot.
+-- The ring is an ellipse on screen because the camera is pitched: y is squashed by
+-- cos(tilt) and the whole ring is lifted up-screen by the deck height.
+-- Five, not six, and big: a 6-dot ring at 0.26 tiles read as sparkle in the first
+-- screenshot pass (docs/verification/visual-rework.md), because five or six small glints
+-- around an octagonal hull are indistinguishable from the gauge lights the model already
+-- has. Fewer, larger, whiter lights on a tight ring read as FIXTURES, and the count is
+-- what carries the state.
+C.spin_leds        = 5      -- gauge lights around the base
+C.spin_led_radius  = 1.00   -- tiles, half-extent on X (inside the hull's 1.53)
+C.spin_led_lift    = 0.34   -- tiles up-screen: they sit on the deck, not the ground
+C.spin_led_size    = 0.34   -- tiles across, per light
+C.spin_led_alpha   = 0.92   -- peak alpha of a lit light
+C.spin_led_dim     = 0.14   -- alpha of an unlit light (a dark lens, not a hole)
+C.spin_led_white   = 0.55   -- how far a lit light is mixed toward white: they have to
+                            -- read against the fuel-tinted glow of their own beam
+C.spin_led_layer   = "higher-object-above"   -- over the hull sprite (object = 123)
 
 -- Muzzle: a burst flare at the mouth plus a cone of blast pointing down the beam. Both
 -- pop for C.beam_pulse_ticks after each pulse, so the shot has a thump instead of
@@ -324,6 +391,18 @@ C.beam_muzzle =
 -- instead of stopping in mid-air.
 C.beam_impact = {flare_cold = 0.85, flare_hot = 2.00, alpha = 0.55}
 C.beam_tip    = {flare_cold = 0.55, flare_hot = 1.10, alpha = 0.28}
+-- The lance used to stop exactly at `range`: a hard end, a small flare, nothing else, so
+-- at maximum reach it looked scissored off. The last two tiles are now a dissolving
+-- plume -- a soft spray sprite carried past the end of the beam, wide and faint, tinted
+-- with the sheath -- so the heat thins into the air instead of being cut. It sits inside
+-- the glow, so it reads as the beam running out of pressure rather than as a separate
+-- puff. `carry` is in tiles past the tip, cold .. hot.
+C.beam_dissipate =
+{
+  carry_cold = 1.20, carry_hot = 2.60,
+  width_cold = 0.55, width_hot = 1.60,
+  alpha_cold = 0.16, alpha_hot = 0.30
+}
 C.beam_pulse_pop    = 1.45   -- size multiplier while a pulse is fresh
 C.beam_pulse_ticks  = 3      -- how long "fresh" lasts, ticks
 C.beam_pop_ticks    = 6      -- how long the one-shot flares live before the engine

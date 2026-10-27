@@ -12,11 +12,13 @@
 -- alpha channel) and tinted at runtime with the burning fuel's colour, so one set of
 -- five textures serves every fuel. Footprints at scale 1 are 32 px per tile:
 --
+--   beam-core    32 x 256  -> 1 x 8 tiles   soft cutting column, dies at the far end
 --   beam-haze    64 x 256  -> 2 x 8 tiles   wide outer heat column
 --   beam-glow    64 x 256  -> 2 x 8 tiles   bright gas around the cutting line
 --   beam-cone    64 x 128  -> 2 x 4 tiles   muzzle blast, apex at the mouth
 --   beam-tongue  32 x  64  -> 1 x 2 tiles   one boiling plasma tongue
 --   beam-flare  128 x 128  -> 4 x 4 tiles   muzzle / impact burst
+--   beam-spray   64 x 128  -> 2 x 4 tiles   dissolving plume past the end of the lance
 --
 -- The long ones are TALL, because `rendering.draw_sprite` rotates about the sprite's
 -- centre and calls orientation 0 "north": the image is drawn unrotated with its
@@ -46,6 +48,8 @@ end
 
 data:extend
 {
+  beam_sprite("melta-beam-core", "beam-core.png", 32, 256),
+  beam_sprite("melta-beam-spray", "beam-spray.png", 64, 128),
   beam_sprite("melta-beam-haze", "beam-haze.png", 64, 256),
   beam_sprite("melta-beam-glow", "beam-glow.png", 64, 256),
   beam_sprite("melta-beam-cone", "beam-cone.png", 64, 128),

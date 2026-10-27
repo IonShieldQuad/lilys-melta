@@ -163,9 +163,22 @@ Two consequences, both handled:
   other 15 % (the second is skipped if the first killed the body). Enemies only.
 - fuel surcharge: `extra_fluid_per_pulse_hot * charge` per pulse, removed with
   `remove_fluid(amount, 1)` — positional API, like `damage()`.
-- visuals: 4 stacked `rendering.draw_line` layers (haze / glow / hot / white core), a
-  9-segment **boiling sheath** re-rolled every 3 ticks, a muzzle orb, a 3-tick muzzle
-  flash and a burn pop on every body the beam cuts.
+- visuals: a **soft sprite core** (two additive layers, whitened inward) inside 3 additive
+  glow layers, a 6-segment **boiling sheath** re-rolled every 3 ticks (its last 2 rolls run
+  past the tip so the end frays), a dissolving **spray plume** carried past maximum reach, a
+  muzzle orb, a muzzle flare + blast cone, an impact flare on the nearest cut body and a
+  burn pop on every body the beam cuts. Every object is a sprite on ONE render layer
+  (`C.beam_layer`) — `rendering.draw_line` has no `render_layer` field at all, so a core
+  drawn with it lands on a fixed engine layer and disagrees with the rest of the lance
+  under any mod that adds smoke or weather.
+- spin-up gauge: 5 additive lights around the hull deck that fill in sequence with
+  `charge` (2.5 s cold → white hot) and empty again as it cools, so the ramp is readable
+  as state instead of only as a thicker beam. They are placed on an ellipse
+  (`cos(tilt)` squash, `C.spin_led_lift` up-screen) because the camera is pitched.
+- art placement: both sprites carry `C.sprite_shift` (half a tile DOWN the screen) so the
+  hull stands on its own tile instead of the tile boundary behind it; the engine-drawn
+  pipe stubs do NOT move (they belong to the tile grid, not to the art). `muzzle_point`
+  adds the same shift, so the lance leaves the mouth the player can see.
 
 ## Quality range
 

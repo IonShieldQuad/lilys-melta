@@ -1,3 +1,44 @@
+Version: 0.6.0
+Date: 2026-10-27
+  Graphics:
+    - The turret stands on its own tile now. The hull AND the cannon are both drawn half a
+      tile further south, so the emplacement stops reading as balanced on the tile boundary
+      behind it. Measured on the before/after screenshots: 0.5 tiles (32 px at 64 px/tile)
+      for both sprites, which is what makes the gun sit on the deck instead of floating
+      above it
+    - The pipe stubs do not move: they are drawn by the engine on the pipe grid, not as
+      part of the art. The north stub therefore loses half a tile of overlap with the hull
+      (visible in docs/verification/visual-rework); the south stub, which used to show bare
+      ground between itself and the front rim, now tucks under it properly. No
+      pipe_connections changed, so nothing already built disconnects
+    - The beam's cutting core is a soft sprite instead of two rendering.draw_line quads.
+      draw_line has no render_layer field at all, so with a smog/weather mod installed the
+      core drew in FRONT of the smoke while the rest of the lance sat behind it -- the
+      whole lance now shares one render layer and one tint. It also loses the hard edge
+      that made it read as a graph line at every zoom
+    - The lance no longer stops dead at maximum range: a ragged plume is carried past the
+      tip (1.2 tiles cold, 2.6 white hot) and the last two sheath tongues run past the end,
+      so the heat thins out instead of being cut
+    - A barrel pointing away from the camera now fires a lance that starts past the gun
+      rather than burning over it (the drawn start moves 0.55 tiles down the barrel). The
+      lance stays in front of the world -- deliberately: an earlier attempt drew it behind
+      the turret on a lower render layer, which put it behind every biter nest and wall it
+      crossed
+    - Spin-up indicator: five lights on the hull deck fill one at a time as the turret
+      winds up (cold to white hot over 2.5 s) and go out as it cools, so "how hot is this
+      one" is readable instead of guessed from beam width
+    - The emitter's bleed-off glow follows the mouth now. It used to stay where the last
+      shot was fired, so a turret that turned left a glowing disc hanging next to the gun
+  Bugfixes:
+    - The lance is coloured by the fuel that is BURNING, not by whatever fuel is present.
+      A fluid turret holds two fluid boxes (the piped one and the internal buffer) and both
+      are reported by get_fluid_count, so "highest damage_modifier present" could colour the
+      beam with fluid that was only waiting in the pipe. The turret now samples its own
+      consumption once per pulse (docs/verification/fluid-buffer.md)
+  Balance:
+    - No damage, rate, range or fuel numbers changed. The lance follows the burning fluid's
+      damage_modifier, which is the same rule the engine uses for its own stream
+
 Version: 0.5.2
 Date: 2026-10-27
   Graphics:

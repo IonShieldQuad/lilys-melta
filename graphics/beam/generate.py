@@ -128,6 +128,39 @@ def cone():
     return save("beam-cone", a * 0.85)
 
 
+def core():
+    """The cutting column (1 x 8 tiles at scale 1). Soft across, and it DIES at the far
+    end: the top 28 % of the texture fades out, which is what stops the lance from
+    ending on a ruled edge when it reaches the turret's maximum range. The bottom 5 %
+    is a short fade so the muzzle end does not show a square corner either."""
+    w, h = 32, 256
+    u, v = grid(w, h)
+    across = np.exp(-((u / 0.42) ** 2) * 1.7)
+    far = smoothstep((v + 1.0) / 0.28)        # v = -1 is the far end (top)
+    near = smoothstep((1.0 - v) / 0.05)
+    a = across * far * near * streak_noise(w, h, 41, 0.12)
+    return save("beam-core", a)
+
+
+def spray():
+    """Where the lance runs out of reach: a ragged plume that widens and dissolves
+    (2 x 4 tiles at scale 1, apex at the bottom = the end of the beam). Deliberately
+    NO hard edge anywhere -- this is the layer that has to read as heat losing
+    pressure, so it is mostly holes and noise rather than a cone."""
+    w, h = 64, 128
+    u, v = grid(w, h)
+    t = (1.0 - v) * 0.5                        # 0 at the apex, 1 at the open end
+    half = 0.18 + 0.78 * np.power(t, 0.7)
+    edge = smoothstep((half - np.abs(u)) / np.maximum(half * 0.8, 1e-6))
+    body = np.power(1.0 - t, 1.7) * smoothstep(t / 0.10)
+    rng = np.random.default_rng(57)
+    holes = rng.random((h // 4, w // 4))
+    holes = np.asarray(Image.fromarray((holes * 255).astype(np.uint8), "L")
+                       .resize((w, h), Image.BICUBIC)).astype(np.float64) / 255.0
+    a = edge * body * (0.45 + 0.75 * holes)
+    return save("beam-spray", a)
+
+
 def preview():
     """Contact sheet: every texture at its natural footprint, on dark ground, in fuel
     orange -- i.e. what the game will show at scale 1, 32 px per tile."""
@@ -135,7 +168,9 @@ def preview():
     sheet = Image.new("RGB", (1180, 300), (18, 18, 20))
     x = 16
     # long layers, drawn the way the runtime draws them: 8 tiles long, this wide
-    for name, width_tiles in (("beam-haze", 3.0), ("beam-glow", 1.4), ("beam-cone", 1.6)):
+    for name, width_tiles in (("beam-haze", 3.0), ("beam-glow", 1.4),
+                              ("beam-cone", 1.6), ("beam-core", 0.5),
+                              ("beam-spray", 1.4)):
         img = Image.open(os.path.join(OUT, name + ".png")).convert("RGBA")
         w_px, h_px = int(round(width_tiles * tiles)), 8 * tiles
         scaled = img.resize((w_px, h_px), Image.BICUBIC)
@@ -158,7 +193,7 @@ def preview():
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    paths = [haze(), glow(), tongue(), flare(), cone()]
+    paths = [haze(), glow(), core(), tongue(), flare(), cone(), spray()]
     for p in paths:
         print(p)
     print(preview())

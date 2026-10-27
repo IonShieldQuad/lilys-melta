@@ -56,9 +56,10 @@ local turret =
   -- the part the player and the enemy can touch.
   collision_box = {{-1.2, -1.2}, {1.2, 1.2}},
   selection_box = {{-1.6, -1.6}, {1.6, 1.6}},
-  -- the cannon stands ~1.2 tiles tall and reaches 1.8 tiles out; this keeps it
-  -- from being clipped/sorted behind neighbours when it points at them
-  drawing_box_vertical_extension = 0.5,
+  -- the cannon stands ~1.2 tiles tall and reaches 1.8 tiles out, and the art is drawn
+  -- half a tile further south than the pivot (C.sprite_shift), so the box has to reach
+  -- 1.0 past the collision box at the bottom or the skirt gets clipped and sorted wrong
+  drawing_box_vertical_extension = 1.0,
   heating_energy = source.heating_energy,
   resistances = {{type = "fire", percent = 100}},
   turret_base_has_direction = true,
