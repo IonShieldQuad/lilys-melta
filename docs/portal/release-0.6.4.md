@@ -57,20 +57,26 @@ turrets only; with overhaul mods it will be whatever those mods' numbers make it
 
 ## Gallery
 
-Ready to upload from `docs/portal/screenshots/` (1920×1080 JPEG):
+Ready to upload from `docs/portal/screenshots/` (1920×1080 JPEG, real in-game captures — the
+scene is a four-emplacement line on generated Nauvis terrain, each turret fed from its own tank
+through a pipe, burning a different fuel so the beams differ in colour):
 
 | file | what it shows | suggested slot |
 |---|---|---|
-| `01-hero.jpg` | three emplacements firing into a wave, one burning down a cluster | first image |
-| `02-emplacement.jpg` | close-up: the model, the muzzle, the five deck lights | item/art shot |
-| `03-battle-line.jpg` | the emplacement line holding against a swarm | second image |
-| `04-night.jpg` | the lance at night, ground glow and fuel-tinted colour | mood shot |
-| `05-sweep.jpg` | mid-sweep: the beam crossing the gap between targets | the new behaviour |
-| `06-wide.jpg` | the line from further out, terrain context | optional |
+| `01-line.jpg` | the line firing into a swarm: orange (light oil), blue (petroleum gas), green (melta fuel) | first image |
+| `02-fuels.jpg` | close shot of two emplacements, orange vs blue beam | fuel colours |
+| `03-emplacement.jpg` | close-up of the model, muzzle, deck gauge lights | art / item shot |
+| `06-line-from-above.jpg` | the whole line with its tanks and pipes, terrain context | second image |
+| `05-sweep.jpg` | mid-sweep: the lance crossing the gap between targets | the new behaviour |
+| `04-night.jpg` | the same line at night, ground glow and fuel-tinted light | mood shot |
+| `07-technologies.jpg` | the technology screen with the Melta turret tech queued and selected, showing its cost, prerequisites and unlock | progression |
 
 Thumbnail already in the repo root: `thumbnail.png` (512×512) and `thumbnail-144.png`.
 
----
+The `.png` originals come from the harness (`melta-gallery-probe` + `run_gallery.py`); the tech
+screen is a real screenshot of the game window, taken after `add_research("melta-turret")` so the
+tree centres on this turret's technology. `run_gallery.py` also dismisses the freeplay welcome
+tip before grabbing it.
 
 ## Upload
 
