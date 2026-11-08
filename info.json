@@ -1,6 +1,6 @@
 {
 	"name": "lilys-melta",
-	"version": "0.6.4",
+	"version": "0.6.5",
 	"title": "Melta turret",
 	"author": "MsBinaryLily",
 	"description": "Adds a short-ranged turret that burns liquid fuel into a pressurized stream of heat. It needs no ammunition. Balance and progression are still being tuned (see the changelog).",

@@ -1,3 +1,17 @@
+Version: 0.6.5
+Date: 2026-11-09
+  Performance:
+    - The turret registry used to be rebuilt by scanning every surface of the map every ten
+      seconds. On a large save with no meltas built, that scan alone was 60 ms of a tick, which
+      reads as a hitch every ten seconds. The full scan now happens once, when the mod loads,
+      and afterwards the map is repaired one 512x512-tile block per second, so the same work
+      costs well under a millisecond on any single tick
+    - A chunk is checked the moment it is generated, so newly explored ground is covered
+      without waiting for its block to come round
+  Bugfixes:
+    - A melta placed by construction robots on a space platform, or duplicated by another mod,
+      was never registered and stayed silent until the next rescan. Both are picked up now
+
 Version: 0.6.4
 Date: 2026-10-27
   Major Features:

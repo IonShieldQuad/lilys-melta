@@ -1420,8 +1420,16 @@ local function unregister(entity)
 end
 
 -- Build/mine events cover everything a player or a robot places, but an entity
--- created by another mod's script raises nothing at all. The registry is only a
--- cache, so a periodic sweep repairs it instead of leaving silent dead turrets.
+-- created by another mod's script raises nothing at all, and neither does map
+-- generation. The registry is only a cache, so it is repaired from three sides:
+--
+--   * a full sweep, on load/update only. find_entities_filtered with no area walks
+--     every chunk of every surface (40 ms on a 25k-chunk map holding zero meltas),
+--     so it must never sit on a timer.
+--   * on_chunk_generated, for the one chunk that just appeared.
+--   * a sliced sweep, one block per second, marching over the blocks that hold
+--     generated chunks. Same total work, ~0.4 ms on any single tick instead of a
+--     60 ms hitch every ten seconds.
 local function reconcile()
   local seen = {}
   for _, surface in pairs(game.surfaces) do
@@ -1441,12 +1449,45 @@ local function reconcile()
   end
 end
 
+local SWEEP_BLOCK_CHUNKS = 16                   -- 16x16 chunks = 512x512 tiles a block
+local SWEEP_BLOCK_TILES = 32 * SWEEP_BLOCK_CHUNKS
+local SWEEP_PERIOD = 60                         -- one block per second
+
+local function sweep_block_of(x, y)
+  return math.floor(x / SWEEP_BLOCK_CHUNKS), math.floor(y / SWEEP_BLOCK_CHUNKS)
+end
+
+local function sweep_remember(sweep, surface_name, bx, by)
+  local key = surface_name .. ":" .. bx .. ":" .. by
+  if not sweep.seen[key] then
+    sweep.seen[key] = true
+    sweep.blocks[#sweep.blocks + 1] = {surface = surface_name, x = bx, y = by}
+  end
+end
+
+-- get_chunks() is the only call here whose cost is proportional to the whole map,
+-- so the block list is built on load/update and afterwards only appended to.
+local function sweep_rebuild()
+  local sweep = {blocks = {}, seen = {}, cursor = 0}
+  for _, surface in pairs(game.surfaces) do
+    for chunk in surface.get_chunks() do
+      local bx, by = sweep_block_of(chunk.x, chunk.y)
+      sweep_remember(sweep, surface.name, bx, by)
+    end
+  end
+  storage.sweep = sweep
+  if C.debug then
+    log(string.format("melta sweep: %d block(s) queued", #sweep.blocks))
+  end
+end
+
 script.on_init(function()
   storage.turrets = {}
   storage.fades = {}
   storage.bonus_cache = {}
   turrets = storage.turrets
   fades = storage.fades
+  sweep_rebuild()
 end)
 
 -- Research is the only thing that changes the bonus tables, so those two events
@@ -1467,11 +1508,9 @@ script.on_configuration_changed(function()
   flat_armor_cache = nil
   turrets = storage.turrets
   fades = storage.fades
+  -- this is the one place a whole-map walk is allowed: it runs once, on load
   reconcile()
-end)
-
-script.on_nth_tick(600, function()
-  reconcile()
+  sweep_rebuild()
 end)
 
 -- on_load only re-binds the local, the table itself is saved with the storage table
@@ -1480,16 +1519,59 @@ script.on_load(function()
   fades = storage.fades or {}
 end)
 
+-- one block a second: the repair is spread out, so no tick pays for the map
+script.on_nth_tick(SWEEP_PERIOD, function()
+  local sweep = storage.sweep
+  local count = sweep and #sweep.blocks or 0
+  if count == 0 then
+    return
+  end
+  sweep.cursor = sweep.cursor % count + 1
+  local block = sweep.blocks[sweep.cursor]
+  local surface = game.surfaces[block.surface]
+  if not surface then
+    return
+  end
+  local left, top = block.x * SWEEP_BLOCK_TILES, block.y * SWEEP_BLOCK_TILES
+  for _, entity in pairs(surface.find_entities_filtered
+  {
+    area = {{left, top}, {left + SWEEP_BLOCK_TILES, top + SWEEP_BLOCK_TILES}},
+    name = TURRET
+  }) do
+    if entity.unit_number then
+      state_for(entity)
+    end
+  end
+end)
+
+-- new ground cannot already hold a registered turret, so the chunk is swept the
+-- moment it exists instead of waiting for its block to come round again
+script.on_event(defines.events.on_chunk_generated, function(event)
+  local sweep = storage.sweep
+  if sweep then
+    local bx, by = sweep_block_of(event.position.x, event.position.y)
+    sweep_remember(sweep, event.surface.name, bx, by)
+  end
+  for _, entity in pairs(event.surface.find_entities_filtered{area = event.area, name = TURRET}) do
+    if entity.unit_number then
+      state_for(entity)
+    end
+  end
+end)
+
 local built_events =
 {
   defines.events.on_built_entity,
   defines.events.on_robot_built_entity,
+  defines.events.on_space_platform_built_entity,
   defines.events.script_raised_built,
-  defines.events.script_raised_revive
+  defines.events.script_raised_revive,
+  defines.events.on_entity_cloned
 }
 
 script.on_event(built_events, function(event)
-  local entity = event.entity or event.created_entity
+  -- on_entity_cloned reports the copy as `destination`
+  local entity = event.entity or event.created_entity or event.destination
   if entity and entity.valid and entity.name == TURRET and entity.unit_number then
     state_for(entity)
   end
@@ -1499,6 +1581,7 @@ local removed_events =
 {
   defines.events.on_player_mined_entity,
   defines.events.on_robot_mined_entity,
+  defines.events.on_space_platform_mined_entity,
   defines.events.on_entity_died,
   defines.events.script_raised_destroy
 }
